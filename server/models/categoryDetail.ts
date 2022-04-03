@@ -29,9 +29,17 @@ const CategoryDetail = sequelize.define(
       allowNull: false,
     },
   },
-  { tableName: "category_details" }
+  { tableName: "category_details", timestamps: true }
 );
 
+Product.belongsToMany(Category, {
+  through: CategoryDetail,
+  onDelete: "cascade"
+});
+Category.belongsToMany(Product, {
+  through: CategoryDetail,
+  onDelete: "cascade"
+});
 CategoryDetail.sync({ alter: true });
 
 export default CategoryDetail;

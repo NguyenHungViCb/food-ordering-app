@@ -18,7 +18,7 @@ const Category = sequelize.define(
       type: DataTypes.STRING,
     },
   },
-  { tableName: "categories" }
+  { tableName: "categories", timestamps: true }
 );
 
 Category.sync({ alter: true });

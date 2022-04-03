@@ -2,7 +2,7 @@ import { Sequelize } from "sequelize";
 import { DB_NAME, POST_URI } from "../utils/AppConfig";
 import { green, red, bold } from "colors";
 
-const sequelize = new Sequelize(POST_URI);
+const sequelize = new Sequelize(POST_URI, { define: { underscored: true } });
 const connectDb = async () => {
   try {
     await sequelize.authenticate();

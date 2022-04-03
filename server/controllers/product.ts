@@ -13,25 +13,30 @@ class ProductController {
   }
 
   @routeConfig({ method: "post", path: `${path}/create/single` })
-  async createProduct(req: Request, res: Response, __: NextFunction) {
+  async createOne(req: Request, res: Response, __: NextFunction) {
     let { categories, ...rest } = req.body;
     requireValues({ ...req.body });
 
-    const newCategories = validate<Array<any>>(
-      categories,
-      "categories"
-    ).isArray().value;
+    const categoryIds = validate<Array<any>>(categories, "categories").isArray()
+      .value;
 
     const product = await Product.create({
       ...rest,
     });
-    for (const category of newCategories) {
+    for (const categoryId of categoryIds) {
       await CategoryDetail.create({
         product_id: product.get("id"),
-        category_id: category,
+        category_id: categoryId,
       });
     }
     return res.json({ product });
+  }
+
+  @routeConfig({ method: "delete", path: `${path}/delete/single` })
+  async deleteOne(req: Request, res: Response, __: NextFunction) {
+    let { id } = req.body;
+    await Product.destroy({ where: { id: id } });
+    return res.status(200).json({ message: "deleted product", success: true });
   }
 }
 
