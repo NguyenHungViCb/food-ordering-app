@@ -21,13 +21,13 @@ app.set("view engine", "html");
 const routeEvent = new EventEmitter();
 let routes: RouteInfo[] = [];
 routeEvent.on("update_route", (route: RouteInfo) => {
-  routes.push(route)
-  app.get("/", (_, res) => {
-    res.render("index", { routes });
-  });
-  app.get("/api", (_, res) => {
-    res.json({ routes });
-  });
+  routes.push(route);
+});
+app.get("/", (_, res) => {
+  res.render("index", { routes });
+});
+app.get("/api", (_, res) => {
+  res.json({ routes });
 });
 
 export { routeEvent };

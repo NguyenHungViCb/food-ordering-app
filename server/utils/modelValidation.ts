@@ -12,17 +12,20 @@ function validate<T>(value: T, name?: string) {
       if (this.value === null || this.value === undefined) {
         throw new Error((this.name || "value") + " must not be empty");
       }
+      return this;
     },
     isNumber: function () {
       // @ts-ignore
       if (isNaN(this.value)) {
         throw new Error((this.name || "value") + " must be a number");
       }
+      return this;
     },
     isArray: function () {
       if (!Array.isArray(this.value)) {
         throw new Error((this.name || "value") + " must be an array");
       }
+      return this;
     },
   };
   return helper;

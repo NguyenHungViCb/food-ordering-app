@@ -317,4 +317,4 @@ lint/tmp/
 # Android Profiling
 *.hprof
 
-yarn.lock
+server/yarn.lock

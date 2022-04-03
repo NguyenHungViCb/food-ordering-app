@@ -14,21 +14,24 @@ class ProductController {
 
   @routeConfig({ method: "post", path: `${path}/create/single` })
   async createProduct(req: Request, res: Response, __: NextFunction) {
-    const { name, price, categories } = req.body;
-    try {
-      requireValues({ name, price, categories });
-      validate(categories, "categories").isArray();
-      const product = await Product.create({ name: name, price: price });
-      for (const category of categories) {
-        await CategoryDetail.create({
-          product_id: product.get("id"),
-          category_id: category,
-        });
-      }
-      res.json({ product });
-    } catch (error: any) {
-      res.json({ message: error.message, success: false });
+    let { categories, ...rest } = req.body;
+    requireValues({ ...req.body });
+
+    const newCategories = validate<Array<any>>(
+      categories,
+      "categories"
+    ).isArray().value;
+
+    const product = await Product.create({
+      ...rest,
+    });
+    for (const category of newCategories) {
+      await CategoryDetail.create({
+        product_id: product.get("id"),
+        category_id: category,
+      });
     }
+    return res.json({ product });
   }
 }
 

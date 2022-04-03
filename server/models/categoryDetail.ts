@@ -32,8 +32,6 @@ const CategoryDetail = sequelize.define(
   { tableName: "category_details" }
 );
 
-// Category.belongsToMany(Product, { through: CategoryDetail, otherKey: "category_id" });
-// Product.belongsToMany(Category, { through: CategoryDetail, otherKey: "product_id" });
 CategoryDetail.sync({ alter: true });
 
 export default CategoryDetail;

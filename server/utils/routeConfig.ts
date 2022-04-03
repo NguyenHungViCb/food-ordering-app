@@ -45,7 +45,11 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
               res: Response,
               next: NextFunction
             ) => {
-              await descriptor.value.apply(this, [req, res, next]);
+              try {
+                await descriptor.value.apply(this, [req, res, next]);
+              } catch (error: any) {
+                res.json({ message: error.message, success: false });
+              }
             };
             routeEvent.emit("update_route", { path, method });
             app[method]("/api" + path, handler);
