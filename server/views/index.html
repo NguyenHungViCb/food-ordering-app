@@ -41,8 +41,12 @@
           background-color: white;
         "
       >
-        <span style="text-transform: uppercase; padding-right: 0.3rem;"><strong><%= route.method %></strong></span>
-        <span style="font-weigth: 500;"><%= route.path %></span>
+        <div>
+          <span style="text-transform: uppercase; padding-right: 0.3rem"
+            ><strong><%= route.method %></strong></span
+          >
+          <span style="font-weigth: 500"><%= route.path %></span>
+        </div>
       </li>
       <% }); %>
     </ul>

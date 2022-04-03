@@ -19,9 +19,9 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "html");
 
 const routeEvent = new EventEmitter();
-const routes: RouteInfo[] = [];
+let routes: RouteInfo[] = [];
 routeEvent.on("update_route", (route: RouteInfo) => {
-  routes.push(route);
+  routes.push(route)
   app.get("/", (_, res) => {
     res.render("index", { routes });
   });

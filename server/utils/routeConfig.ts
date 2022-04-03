@@ -47,7 +47,8 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
             ) => {
               await descriptor.value.apply(this, [req, res, next]);
             };
-            app[method](path, handler);
+            routeEvent.emit("update_route", { path, method });
+            app[method]("/api" + path, handler);
           }
         );
       }
