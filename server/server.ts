@@ -3,6 +3,7 @@ import cors from "cors";
 import connectDb from "./db/config";
 import { EventEmitter } from "events";
 import path from "path";
+import { RouteInfo } from "./types/commonInterfaces";
 
 connectDb();
 
@@ -18,8 +19,8 @@ app.set("views", path.join(__dirname, "views"));
 app.set("view engine", "html");
 
 const routeEvent = new EventEmitter();
-const routes: any[] = [];
-routeEvent.on("update_route", (route: any) => {
+const routes: RouteInfo[] = [];
+routeEvent.on("update_route", (route: RouteInfo) => {
   routes.push(route);
   app.get("/", (_, res) => {
     res.render("index", { routes });
