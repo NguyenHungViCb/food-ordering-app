@@ -1,5 +1,5 @@
 import { NextFunction, RequestHandler, Request, Response } from "express";
-import app, { routeEvent } from "../server";
+import app, { routeEvent } from "../express";
 
 export type RouteConfig = {
   method: "post" | "get" | "delete" | "put";
@@ -9,22 +9,27 @@ export type RouteConfig = {
 
 const RouteSymbol = Symbol("RouteConfig");
 
-export const routeConfig = ({
-  method,
-  path,
-  middlewares,
-}: RouteConfig): MethodDecorator => {
+export const routeConfig = (config: RouteConfig): MethodDecorator => {
   return (
     target: any,
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
   ) => {
-    let handlers: Array<RequestHandler> = [];
-    if (middlewares && middlewares.length > 0) {
-      handlers = [...handlers, ...middlewares];
-    }
     target[RouteSymbol] = target[RouteSymbol] || new Map();
-    target[RouteSymbol].set(propertyKey, { descriptor, method, path });
+    if (target[RouteSymbol].get(propertyKey)) {
+      target[RouteSymbol].set(propertyKey, {
+        descriptor,
+        propertyKey,
+        ...config,
+        ...target[RouteSymbol].get(propertyKey),
+      });
+    } else {
+      target[RouteSymbol].set(propertyKey, {
+        descriptor,
+        propertyKey,
+        ...config,
+      });
+    }
   };
 };
 
@@ -39,8 +44,15 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
             descriptor,
             method,
             path,
-          }: RouteConfig & { descriptor: PropertyDescriptor }) => {
-            const handler = async (
+            middlewares,
+            ...rest
+          }: RouteConfig &
+            RouteDescription & {
+              descriptor: PropertyDescriptor;
+              propertyKey: string | Symbol;
+            }) => {
+            const handler: Array<RequestHandler> = [];
+            const main = async (
               req: Request,
               res: Response,
               next: NextFunction
@@ -51,7 +63,15 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
                 res.json({ message: error.message, success: false });
               }
             };
-            routeEvent.emit("update_route", { path, method });
+            handler.push(main);
+            if (middlewares && middlewares.length > 0) {
+              handler.push(...middlewares);
+            }
+            routeEvent.emit("update_route", {
+              path,
+              method,
+              ...rest,
+            });
             app[method]("/api" + path, handler);
           }
         );
@@ -59,3 +79,29 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
     }
   };
 }
+
+export type RouteDescription = {
+  request_payload?: object;
+  response_payload?: object;
+  usage?: string;
+  isAuth?: string;
+};
+export const routeDescription = (description: RouteDescription) => {
+  return (
+    target: any,
+    propertyKey: string | symbol,
+    __: PropertyDescriptor
+  ) => {
+    target[RouteSymbol] = target[RouteSymbol] || new Map();
+    if (target[RouteSymbol].get(propertyKey)) {
+      target[RouteSymbol].set(propertyKey, {
+        ...target[RouteSymbol].get(propertyKey),
+        ...description,
+      });
+    } else {
+      target[RouteSymbol].set(propertyKey, {
+        ...description,
+      });
+    }
+  };
+};

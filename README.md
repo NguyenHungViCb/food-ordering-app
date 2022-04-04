@@ -12,7 +12,8 @@
 ├── db                              # Things relate to configure database
 │   └── config.ts
 ├── index.ts                        # Root file
-├── server.ts                       # Express configuration
+├── express
+│   └── index.ts                    # Express configuration
 ├── utils
 │   ├── AppConfig.ts                # Global app variables
 │   └── routeConfig.ts              # route decorator

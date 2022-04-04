@@ -1,5 +1,5 @@
 import { yellow } from "colors";
-import app from "./server";
+import app from "./express";
 import { PORT } from "./utils/AppConfig";
 import ProductController from "./controllers/product";
 import CategoryController from "./controllers/category";

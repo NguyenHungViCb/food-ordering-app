@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from "express";
-import CategoryDetail from "../models/categoryDetail";
-import Product from "../models/product";
-import validate, { requireValues } from "../utils/modelValidation";
-import { controller, routeConfig } from "../utils/routeConfig";
+import CategoryDetail from "../../models/categoryDetail";
+import Product from "../../models/product";
+import validate, { requireValues } from "../../utils/modelValidation";
+import { controller, routeConfig } from "../../utils/routeConfig";
 
 const path = "/products";
 @controller
 class ProductController {
+  abc = "hello";
   @routeConfig({ method: "get", path: `${path}/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     res.json({ message: "success" });

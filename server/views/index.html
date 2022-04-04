@@ -43,10 +43,41 @@
       >
         <div>
           <span style="text-transform: uppercase; padding-right: 0.3rem"
-            ><strong><%= route.method %></strong></span
+          ><strong><%= route.method %></strong></span
           >
           <span style="font-weigth: 500"><%= route.path %></span>
+          <% if(route.usage){ %>
+          <span style="color: rgb(155, 155, 155)">(<%= route.usage %>)</span>
+          <% } %>
         </div>
+        <% if(route.request_payload){ %>
+        <div style="padding: 0.3rem 0.6rem; border: 1px solid #495057; border-radius: 0.3rem; margin: 0.3rem 0;">
+          <p
+            style="
+              margin: 0;
+              font-size: 0.875rem;
+              padding-bottom: 0.3rem;
+            "
+          >
+            Request payload
+          </p>
+          <pre style="margin: 0"><%= JSON.stringify(route.request_payload, undefined, 2).replaceAll(/"([^"]+)":/g, '$1:') %></pre>
+        </div>
+        <% } %>
+        <% if(route.response_payload){ %>
+        <div style="padding: 0.3rem 0.6rem; border: 1px solid #495057; border-radius: 0.3rem; margin: 0.3rem 0;">
+          <p
+            style="
+              margin: 0;
+              font-size: 0.875rem;
+              padding-bottom: 0.3rem;
+            "
+          >
+            Response payload
+          </p>
+          <pre style="margin: 0"><%= JSON.stringify(route.response_payload, undefined, 2) %></pre>
+        </div>
+        <% } %>
       </li>
       <% }); %>
     </ul>
