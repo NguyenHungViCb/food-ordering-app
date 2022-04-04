@@ -7,7 +7,6 @@ import { controller, routeConfig } from "../../utils/routeConfig";
 const path = "/products";
 @controller
 class ProductController {
-  abc = "hello";
   @routeConfig({ method: "get", path: `${path}/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     res.json({ message: "success" });

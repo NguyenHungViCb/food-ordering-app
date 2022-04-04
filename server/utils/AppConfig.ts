@@ -6,3 +6,4 @@ export const DB_USERNAME = process.env.DB_USERNAME || "";
 export const DB_HOST = process.env.DB_HOST || "";
 export const POST_URI = `postgres://${DB_USERNAME}@${DB_HOST}:5432/${DB_NAME}`;
 export const PORT = process.env.PORT;
+export const LOGGING = process.env.LOGGING === "true";
