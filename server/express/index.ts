@@ -1,9 +1,9 @@
 import express from "express";
 import cors from "cors";
-import connectDb from "./db/config";
+import connectDb from "../db/config";
 import { EventEmitter } from "events";
 import path from "path";
-import { RouteInfo } from "./types/commonInterfaces";
+import { RouteInfo } from "../types/commonInterfaces";
 
 connectDb();
 
@@ -15,7 +15,7 @@ app.use(
   })
 );
 app.engine(".html", require("ejs").__express);
-app.set("views", path.join(__dirname, "views"));
+app.set("views", path.join(__dirname, "../views"));
 app.set("view engine", "html");
 
 const routeEvent = new EventEmitter();

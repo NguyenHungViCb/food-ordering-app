@@ -1,5 +1,5 @@
 import { NextFunction, RequestHandler, Request, Response } from "express";
-import app, { routeEvent } from "../server";
+import app, { routeEvent } from "../express";
 
 export type RouteConfig = {
   method: "post" | "get" | "delete" | "put";
@@ -19,12 +19,13 @@ export const routeConfig = ({
     propertyKey: string | symbol,
     descriptor: PropertyDescriptor
   ) => {
-    let handlers: Array<RequestHandler> = [];
-    if (middlewares && middlewares.length > 0) {
-      handlers = [...handlers, ...middlewares];
-    }
     target[RouteSymbol] = target[RouteSymbol] || new Map();
-    target[RouteSymbol].set(propertyKey, { descriptor, method, path });
+    target[RouteSymbol].set(propertyKey, {
+      descriptor,
+      method,
+      path,
+      middlewares,
+    });
   };
 };
 
@@ -39,8 +40,10 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
             descriptor,
             method,
             path,
+            middlewares,
           }: RouteConfig & { descriptor: PropertyDescriptor }) => {
-            const handler = async (
+            const handler: Array<RequestHandler> = [];
+            const main = async (
               req: Request,
               res: Response,
               next: NextFunction
@@ -51,6 +54,10 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
                 res.json({ message: error.message, success: false });
               }
             };
+            handler.push(main);
+            if (middlewares && middlewares.length > 0) {
+              handler.push(...middlewares);
+            }
             routeEvent.emit("update_route", { path, method });
             app[method]("/api" + path, handler);
           }
