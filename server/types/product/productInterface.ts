@@ -1,3 +1,6 @@
+import Product from "../../models/product";
+import { getSchemaInPlainObj } from "../../utils/routeConfig";
+
 export class ProductModel {
   constructor(public name: string, public price: number) {}
 }
@@ -17,3 +20,5 @@ export class ProductCreation extends ProductModel {
     super(name, price);
   }
 }
+
+export const productCreationPlainObj = getSchemaInPlainObj(Product.rawAttributes)
