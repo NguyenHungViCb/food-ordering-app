@@ -4,21 +4,28 @@
     <title></title>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <link href="css/style.css" rel="stylesheet" />
   </head>
   <body
     style="
       font-family: sans-serif;
       width: 100%;
-      height: 35rem;
       display: flex;
       justify-content: center;
       align-items: center;
-      overflow: hidden;
+      overflow-y: auto;
+      overflow-x: hidden;
       flex-direction: column;
     "
   >
     <h1>I'm on! 🎉</h1>
+    <p style="width: 100%; text-align: center;">
+      All the data types you see here have been converted to javascript data
+      types, to see the actual data types, please checkout the
+      <a
+        href="https://github.com/NguyenHungViCb/food-ordering-app/tree/main/server/models"
+        >source code</a
+      >
+    </p>
     <ul
       style="
         list-style: none;
@@ -42,8 +49,10 @@
         "
       >
         <div>
-          <span style="text-transform: uppercase; padding-right: 0.3rem"
-          ><strong><%= route.method %></strong></span
+          <span
+            class="<%= route.method %>"
+            style="text-transform: uppercase; padding-right: 0.3rem; color: <%= route.method === 'post' ? '#40c057' : route.method === 'get' ? '#7950f2' : route.method === 'put' ? '#fab005' : '#fa5252' %>"
+            ><strong><%= route.method %></strong></span
           >
           <span style="font-weigth: 500"><%= route.path %></span>
           <% if(route.usage){ %>
@@ -51,31 +60,36 @@
           <% } %>
         </div>
         <% if(route.request_payload){ %>
-        <div style="padding: 0.3rem 0.6rem; border: 1px solid #495057; border-radius: 0.3rem; margin: 0.3rem 0;">
-          <p
-            style="
-              margin: 0;
-              font-size: 0.875rem;
-              padding-bottom: 0.3rem;
-            "
-          >
+        <div
+          style="
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #495057;
+            border-radius: 0.3rem;
+            margin: 0.3rem 0;
+          "
+        >
+          <p style="margin: 0; font-size: 0.875rem; padding-bottom: 0.3rem">
             Request payload
           </p>
-          <pre style="margin: 0"><%= JSON.stringify(route.request_payload, undefined, 2).replaceAll(/"([^"]+)":/g, '$1:') %></pre>
-        </div>
-        <% } %>
-        <% if(route.response_payload){ %>
-        <div style="padding: 0.3rem 0.6rem; border: 1px solid #495057; border-radius: 0.3rem; margin: 0.3rem 0;">
-          <p
-            style="
-              margin: 0;
-              font-size: 0.875rem;
-              padding-bottom: 0.3rem;
-            "
+          <pre style="margin: 0">
+<%= JSON.stringify(route.request_payload, undefined, 2).replaceAll(/"([^"]+)":/g, '$1:') %></pre
           >
+        </div>
+        <% } %> <% if(route.response_payload){ %>
+        <div
+          style="
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #495057;
+            border-radius: 0.3rem;
+            margin: 0.3rem 0;
+          "
+        >
+          <p style="margin: 0; font-size: 0.875rem; padding-bottom: 0.3rem">
             Response payload
           </p>
-          <pre style="margin: 0"><%= JSON.stringify(route.response_payload, undefined, 2) %></pre>
+          <pre style="margin: 0">
+<%= JSON.stringify(route.response_payload, undefined, 2) %></pre
+          >
         </div>
         <% } %>
       </li>

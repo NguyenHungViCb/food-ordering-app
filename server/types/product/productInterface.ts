@@ -1,5 +1,5 @@
 import Product from "../../models/product";
-import { getSchemaInPlainObj } from "../../utils/routeConfig";
+import {getSchemaInPlainObj} from "../../utils/modelUtils";
 
 export class ProductModel {
   constructor(public name: string, public price: number) {}
@@ -21,4 +21,10 @@ export class ProductCreation extends ProductModel {
   }
 }
 
-export const productCreationPlainObj = getSchemaInPlainObj(Product.rawAttributes)
+export const productSchemaPlainObj = getSchemaInPlainObj(Product.rawAttributes);
+const { id, createdAt, updatedAt, order_count, name, price, ...rest } =
+  Product.getAttributes();
+// @ts-ignore
+export const productModelPlainObj = getSchemaInPlainObj({ name, price });
+// @ts-ignore
+export const productCreationPlainObj = getSchemaInPlainObj(rest, true);

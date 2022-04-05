@@ -1,7 +1,6 @@
-import { NextFunction, RequestHandler, Request, Response } from "express";
-import app, { routeEvent } from "../express";
-import { BasicResponse } from "../types/commonInterfaces";
-import { Model, ModelAttributeColumnOptions } from "sequelize";
+import {NextFunction, Request, RequestHandler, Response} from "express";
+import app, {routeEvent} from "../express";
+import {BasicResponse} from "../types/commonInterfaces";
 
 export type RouteConfig = {
   method: "post" | "get" | "delete" | "put";
@@ -108,27 +107,3 @@ export const routeDescription = (description: RouteDescription) => {
   };
 };
 
-const dbTypeToString = (type: string) => {
-  const lowerCaseType = type.toLowerCase();
-  if (
-    lowerCaseType.includes("int") ||
-    lowerCaseType.toLowerCase().includes("decimal")
-  ) {
-    return "number";
-  } else if (lowerCaseType.includes("varchar")) {
-    return "string";
-  } else if (lowerCaseType.includes("time")) {
-    return "Date";
-  }
-  return "unknown";
-};
-
-export const getSchemaInPlainObj = (attributes: {
-  [attribute: string]: ModelAttributeColumnOptions<Model<any, any>>;
-}) => {
-  let obj: { [key: string]: string } = {};
-  Object.entries(attributes).map(([key, value]) => {
-    obj = { ...obj, [key]: dbTypeToString(value.type.toString({})) };
-  });
-  return obj;
-};
