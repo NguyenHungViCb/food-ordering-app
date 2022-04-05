@@ -6,18 +6,33 @@
 
 ```bash
 .
-├── controllers                     # Include all controllers/ routes
-│   ├── productController.ts
-│   └── userController.ts
-├── db                              # Things relate to configure database
+├── controllers                             # Controllers/ Routes for each entity
+│   ├── category
+│   │   └── index.ts
+│   └── product
+│       └── index.ts
+├── db                                      # Database configurations
 │   └── config.ts
-├── index.ts                        # Root file
-├── express
-│   └── index.ts                    # Express configuration
+├── env.sample                              # Sample environment variables
+├── express                                 # Express configurations
+│   └── index.ts
+├── index.ts                                # Root file
+├── models                                  # Models
+│   ├── categoryDetail.ts
+│   ├── category.ts
+│   └── product.ts
+├── types                                   # Typing for entities and other stuff
+│   ├── category
+│   │   └── categoryInterfaces.ts
+│   ├── commonInterfaces.ts
+│   └── product
+│       └── productInterface.ts
 ├── utils
-│   ├── AppConfig.ts                # Global app variables
-│   └── routeConfig.ts              # route decorator
-├── views                           # Simple api view
+│   ├── AppConfig.ts                        # App global variables and configurations
+│   ├── modelUtils.ts                       # Model helper functions
+│   ├── modelValidation.ts                  # Model validation functions
+│   └── routeConfig.ts                      # Route decorator
+└── views                                   # Api view
     └── index.html
 ```
 
