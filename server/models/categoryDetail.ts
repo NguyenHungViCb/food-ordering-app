@@ -34,11 +34,11 @@ const CategoryDetail = sequelize.define(
 
 Product.belongsToMany(Category, {
   through: CategoryDetail,
-  onDelete: "cascade"
+  onDelete: "cascade",
 });
 Category.belongsToMany(Product, {
   through: CategoryDetail,
-  onDelete: "cascade"
+  onDelete: "cascade",
 });
 CategoryDetail.sync({ alter: true });
 

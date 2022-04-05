@@ -1,6 +1,6 @@
-import {NextFunction, Request, RequestHandler, Response} from "express";
-import app, {routeEvent} from "../express";
-import {BasicResponse} from "../types/commonInterfaces";
+import { NextFunction, Request, RequestHandler, Response } from "express";
+import app, { routeEvent } from "../express";
+import { BasicResponse } from "../types/commonInterfaces";
 
 export type RouteConfig = {
   method: "post" | "get" | "delete" | "put";
@@ -106,4 +106,3 @@ export const routeDescription = (description: RouteDescription) => {
     }
   };
 };
-

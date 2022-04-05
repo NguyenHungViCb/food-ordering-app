@@ -23,4 +23,7 @@ const { name, description } = Category.getAttributes();
 // @ts-ignore
 export const categoryModelPlainObj = getSchemaInPlainObj({ name });
 // @ts-ignore
-export const categoryCreationPlainObj = getSchemaInPlainObj({ description }, true);
+export const categoryCreationPlainObj = getSchemaInPlainObj(
+  { description },
+  true
+);

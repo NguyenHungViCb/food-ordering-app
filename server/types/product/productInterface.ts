@@ -1,5 +1,5 @@
 import Product from "../../models/product";
-import {getSchemaInPlainObj} from "../../utils/modelUtils";
+import { getSchemaInPlainObj } from "../../utils/modelUtils";
 
 export class ProductModel {
   constructor(public name: string, public price: number) {}

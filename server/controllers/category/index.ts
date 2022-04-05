@@ -1,6 +1,10 @@
 import { NextFunction, Request, Response } from "express";
 import Category from "../../models/category";
-import { categoryCreationPlainObj, categoryModelPlainObj, categoryPlainObj } from "../../types/category/categoryInterfaces";
+import {
+  categoryCreationPlainObj,
+  categoryModelPlainObj,
+  categoryPlainObj,
+} from "../../types/category/categoryInterfaces";
 import {
   controller,
   routeConfig,
@@ -11,8 +15,8 @@ const path = "/categories";
 @controller
 class CategoryController {
   @routeDescription({
-    response_payload: {...categoryPlainObj},
-    request_payload: {...categoryModelPlainObj, ...categoryCreationPlainObj },
+    response_payload: { ...categoryPlainObj },
+    request_payload: { ...categoryModelPlainObj, ...categoryCreationPlainObj },
     usage: "create a single category",
   })
   @routeConfig({ method: "post", path: `${path}/create/single` })
