@@ -1,5 +1,5 @@
 {
-  "main":"dist/index.js",
+  "main": "dist/index.js",
   "dependencies": {
     "@types/cors": "^2.8.12",
     "@types/dotenv": "^8.2.0",
@@ -21,6 +21,13 @@
     "start": "nodemon dist/index.js",
     "copy-files": "cp -r ./views ./dist",
     "server": "tsc -w & yarn copy-files && nodemon dist/index.js",
-    "build": "tsc"
+    "build": "tsc",
+    "prepare": "cd .. && husky install server/.husky",
+    "format": "pretty-quick --staged"
+  },
+  "devDependencies": {
+    "husky": "^7.0.4",
+    "prettier": "^2.6.2",
+    "pretty-quick": "^3.1.3"
   }
 }
