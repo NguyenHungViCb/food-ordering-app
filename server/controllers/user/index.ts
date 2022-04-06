@@ -73,7 +73,8 @@ class UserController {
 
   @routeDescription({
     response_payload: userCreationResponsePayload,
-    usage: "get an user info(only that user can access his/ her info)",
+    usage: "get an user info (only that user can access his/ her info)",
+    isAuth: true,
   })
   @routeConfig({
     method: "get",
