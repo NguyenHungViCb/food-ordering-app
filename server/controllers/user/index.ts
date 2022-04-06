@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import { jwtValidate } from "../../middlewares/auths";
+import { jwtValidate, validateRefreshToken } from "../../middlewares/auths";
 import User from "../../models/user";
 import {
   userCreationResponsePayload,
@@ -30,7 +30,7 @@ class UserController {
     response_payload: userCreationResponsePayload,
     usage: "signup using email and password",
   })
-  @routeConfig({ method: "post", path: `${path}/auth/signup/local` })
+  @routeConfig({ method: "post", path: `${path}/signup/local` })
   async signUp(req: Request, res: Response, __: NextFunction) {
     const { password, ...rest } = req.body;
     requireValues([...req.body]);
@@ -47,7 +47,7 @@ class UserController {
     response_payload: { token: "string", refresh_token: "string" },
     usage: "login using email and password",
   })
-  @routeConfig({ method: "post", path: `${path}/auth/login/local` })
+  @routeConfig({ method: "post", path: `${path}/login/local` })
   async login(req: Request, res: Response, __: NextFunction) {
     requireValues([...req.body]);
     const user = await User.findOne({ where: { email: req.body.email } });
@@ -88,6 +88,28 @@ class UserController {
       last_name,
       email,
       email_verified,
+    });
+  }
+
+  @routeDescription({
+    response_payload: { token: "string", refresh_token: "string" },
+    isAuth: true,
+    usage: "refresh access and refresh token",
+  })
+  @routeConfig({
+    method: "get",
+    path: `${path}/auth/token/refresh`,
+    middlewares: [validateRefreshToken],
+  })
+  async refreshToken(req: Request, res: Response, __: NextFunction) {
+    const { id } = req.user.get();
+    const token = generateToken({ id });
+    const refreshToken = generateRefreshToken({ id });
+    req.user.set("refresh_token", refreshToken);
+    await req.user.save();
+    return res.status(200).json({
+      data: { token, refresh_token: refreshToken },
+      success: true,
     });
   }
 }

@@ -47,29 +47,24 @@ export async function validateRefreshToken(
   next: NextFunction
 ) {
   try {
-    if (
-      req.headers.authorization &&
-      req.headers.authorization.startsWith("Bearer")
-    ) {
-      let token = extractTokenFromHeader(req.headers);
+    let token = extractTokenFromHeader(req.headers);
 
-      req.user = await jwtTokenVerify<
-        Model<UserCreation, UserModel | UserCreation>
-      >(token, REFRESH_TOKEN_SECRET, async (decoded) => {
-        const user = await User.findOne({
-          where: { id: parseInt(decoded.id) },
-        });
-        if (!user) {
-          throw Error("UnAuthorized. User not found");
-        }
-        if (user.getDataValue("refresh_token") !== token) {
-          throw Error("UnAuthorized. Invalid token");
-        }
-
-        return user;
+    req.user = await jwtTokenVerify<
+      Model<UserCreation, UserModel | UserCreation>
+    >(token, REFRESH_TOKEN_SECRET, async (decoded) => {
+      const user = await User.findOne({
+        where: { id: parseInt(decoded.id) },
       });
-      return next();
-    }
+      if (!user) {
+        throw Error("UnAuthorized. User not found");
+      }
+      if (user.getDataValue("refresh_token") !== token) {
+        throw Error("UnAuthorized. Invalid token");
+      }
+
+      return user;
+    });
+    return next();
   } catch (error: any) {
     return res.status(400).json({ message: `UnAuthorized. ${error.message}` });
   }
