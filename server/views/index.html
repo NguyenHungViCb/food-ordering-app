@@ -18,7 +18,7 @@
     "
   >
     <h1>I'm on! 🎉</h1>
-    <p style="width: 100%; text-align: center;">
+    <p style="width: 100%; text-align: center">
       All the data types you see here have been converted to javascript data
       types, to see the actual data types, please checkout the
       <a
@@ -54,7 +54,7 @@
             style="text-transform: uppercase; padding-right: 0.3rem; color: <%= route.method === 'post' ? '#40c057' : route.method === 'get' ? '#7950f2' : route.method === 'put' ? '#fab005' : '#fa5252' %>"
             ><strong><%= route.method %></strong></span
           >
-          <span style="font-weigth: 500"><%= route.path %></span>
+          <span style="font-weight: 500">/api<%= route.path %></span>
           <% if(route.usage){ %>
           <span style="color: rgb(155, 155, 155)">(<%= route.usage %>)</span>
           <% } %>

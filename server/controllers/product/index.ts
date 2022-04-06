@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response } from "express";
-import CategoryDetail from "../../models/categoryDetail";
+import CategoryDetail from "../../models/category/categoryDetail";
 import Product from "../../models/product";
 import {
   productCreationPlainObj,
@@ -23,7 +23,7 @@ class ProductController {
     },
     usage: "get a list of every products",
   })
-  @routeConfig({ method: "get", path: `${path}/all` })
+  @routeConfig({ method: "get", path: `${path}/get/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     const products = await Product.findAndCountAll();
     return res
