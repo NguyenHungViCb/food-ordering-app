@@ -7,10 +7,15 @@ const dbTypeToString = (type: string) => {
     lowerCaseType.toLowerCase().includes("decimal")
   ) {
     return "number";
-  } else if (lowerCaseType.includes("varchar")) {
+  } else if (
+    lowerCaseType.includes("varchar") ||
+    lowerCaseType.includes("text")
+  ) {
     return "string";
   } else if (lowerCaseType.includes("time")) {
     return "Date";
+  } else if (lowerCaseType.includes("bool")) {
+    return "boolean";
   }
   return "unknown";
 };

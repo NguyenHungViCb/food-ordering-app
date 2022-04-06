@@ -7,26 +7,12 @@
 ```bash
 .
 ├── controllers                             # Controllers/ Routes for each entity
-│   ├── category
-│   │   └── index.ts
-│   └── product
-│       └── index.ts
 ├── db                                      # Database configurations
-│   └── config.ts
 ├── env.sample                              # Sample environment variables
 ├── express                                 # Express configurations
-│   └── index.ts
 ├── index.ts                                # Root file
 ├── models                                  # Models
-│   ├── categoryDetail.ts
-│   ├── category.ts
-│   └── product.ts
 ├── types                                   # Typing for entities and other stuff
-│   ├── category
-│   │   └── categoryInterfaces.ts
-│   ├── commonInterfaces.ts
-│   └── product
-│       └── productInterface.ts
 ├── utils
 │   ├── AppConfig.ts                        # App global variables and configurations
 │   ├── modelUtils.ts                       # Model helper functions
@@ -39,21 +25,27 @@
 ### Setup
 
 You will need the following programs installed
-- Postgresql (*should download version 13.6*)
-- Nodejs (*should download lts version*)
+
+- Postgresql (_should download version 13.6_)
+- Nodejs (_should download lts version_)
 - Typescript
 
 After installed all the above programs, following these step
-- Step 1: Create a database call `food_ordering_app` in postgresql(*recommend using datagrip to make thing easier*)
+
+- Step 1: Create a database call `food_ordering_app` in postgresql(_recommend using datagrip to make thing easier_)
+
 ```sql
 CREATE DATABASE foold_ordering_app
 ```
+
 - Step 2: Install dependencies
+
 ```bash
 cd food-ordering-app
 cd server
 npm install # Or yarn
 ```
+
 - Step 3: Complete .env file
   - Change file env.sample to .env
   - Fill in required information
@@ -81,7 +73,7 @@ npm install # Or yarn
     ```
 
 To get the list of every route available, go to [localhost:5002](http://localhost:5002/),
-you will see a screen with ui like this: 
+you will see a screen with ui like this:
 
 ![api home page](assets/api-home-page-ui.png)
 

@@ -61,13 +61,14 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
               try {
                 return await descriptor.value.apply(this, [req, res, next]);
               } catch (error: any) {
+                console.log(error);
                 return res.json({ message: error.message, success: false });
               }
             };
-            handler.push(main);
             if (middlewares && middlewares.length > 0) {
               handler.push(...middlewares);
             }
+            handler.push(main);
             routeEvent.emit("update_route", {
               path,
               method,
@@ -85,7 +86,7 @@ export type RouteDescription = {
   request_payload?: object;
   response_payload?: object;
   usage?: string;
-  isAuth?: string;
+  isAuth?: boolean;
 };
 export const routeDescription = (description: RouteDescription) => {
   return (

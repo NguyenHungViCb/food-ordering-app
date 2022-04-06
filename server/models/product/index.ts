@@ -1,10 +1,10 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../db/config";
+import { sequelize } from "../../db/config";
 import {
   ProductCreation,
   ProductModel,
-} from "../types/product/productInterface";
-import validate from "../utils/modelValidation";
+} from "../../types/product/productInterface";
+import validate from "../../utils/modelValidation";
 
 const Product = sequelize.define<
   Model<ProductCreation, ProductModel | ProductCreation>
