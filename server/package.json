@@ -23,7 +23,7 @@
     "start": "nodemon dist/index.js",
     "copy-files": "cp -r ./views ./dist",
     "server": "tsc -w & yarn copy-files && nodemon dist/index.js",
-    "build": "tsc",
+    "build": "tsc && yarn copy-files",
     "prepare": "cd .. && husky install server/.husky",
     "format": "pretty-quick --staged"
   },
