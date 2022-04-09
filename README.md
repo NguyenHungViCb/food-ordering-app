@@ -1,5 +1,11 @@
 # Food ordering app
 
+## App
+
+<div style="width: 100%; display: flex;">
+<img src="assets/app-welcome-screen.jpg" style="width: 300px; height: 600px; margin: 0 auto;"/>
+</div>
+
 ## Server
 
 ### Folder structure
