@@ -1,16 +1,29 @@
 import { Sequelize } from "sequelize";
-import { DB_NAME, LOGGING, POST_URI } from "../utils/AppConfig";
+import { DB_NAME, LOGGING, MODE, POST_URI } from "../utils/AppConfig";
 import { green, red, bold } from "colors";
+
+const modelConfig = (tableName: string) => {
+  return {
+    tableName: tableName,
+    underscored: true,
+    createdAt: "created_at",
+    updatedAt: "updated_at",
+  };
+};
 
 const sequelize = new Sequelize(POST_URI, {
   define: { underscored: true },
   logging: LOGGING,
-  dialectOptions: {
-    ssl: {
-      require: true,
-      rejectUnauthorized: false,
-    },
-  },
+  ...(MODE === "production"
+    ? {
+        dialectOptions: {
+          ssl: {
+            require: true,
+            rejectUnauthorized: false,
+          },
+        },
+      }
+    : {}),
 });
 const connectDb = async () => {
   try {
@@ -26,5 +39,5 @@ const connectDb = async () => {
   }
 };
 
-export { sequelize };
+export { sequelize, modelConfig };
 export default connectDb;

@@ -1,5 +1,5 @@
 import { DataTypes } from "sequelize";
-import { sequelize } from "../../db/config";
+import { modelConfig, sequelize } from "../../db/config";
 import Product from "../product";
 import Category from "./index";
 
@@ -29,7 +29,7 @@ const CategoryDetail = sequelize.define(
       allowNull: false,
     },
   },
-  { tableName: "category_details", timestamps: true }
+  modelConfig("category_details")
 );
 
 Product.belongsToMany(Category, {

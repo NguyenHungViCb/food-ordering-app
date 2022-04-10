@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../db/config";
+import { modelConfig, sequelize } from "../../db/config";
 import { UserCreation, UserModel } from "../../types/user/userInterfaces";
 
 const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
@@ -67,7 +67,7 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
       defaultValue: true,
     },
   },
-  { timestamps: true, tableName: "users" }
+  modelConfig("users")
 );
 
 User.sync({ alter: true });

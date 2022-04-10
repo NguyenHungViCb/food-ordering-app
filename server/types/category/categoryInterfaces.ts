@@ -10,8 +10,8 @@ export class CategoryCreation extends CategoryModel {
     public id: number,
     public name: string,
     public description: string,
-    public createdAt?: Date,
-    public updatedAt?: Date
+    public created_at?: Date,
+    public updated_at?: Date
   ) {
     super(name);
   }

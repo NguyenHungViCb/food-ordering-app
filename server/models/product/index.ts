@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../db/config";
+import { modelConfig, sequelize } from "../../db/config";
 import {
   ProductCreation,
   ProductModel,
@@ -61,7 +61,7 @@ const Product = sequelize.define<
       defaultValue: 0,
     },
   },
-  { timestamps: true, tableName: "products" }
+  modelConfig("products")
 );
 
 Product.sync({ alter: true });

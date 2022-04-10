@@ -1,5 +1,5 @@
 import { DataTypes, Model } from "sequelize";
-import { sequelize } from "../../db/config";
+import { modelConfig, sequelize } from "../../db/config";
 import {
   CategoryCreation,
   CategoryModel,
@@ -24,7 +24,7 @@ const Category = sequelize.define<
       type: DataTypes.STRING,
     },
   },
-  { tableName: "categories", timestamps: true }
+  modelConfig("categories")
 );
 
 Category.sync({ alter: true });

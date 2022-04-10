@@ -15,3 +15,4 @@ export const JWT_EXPIRY = eval(process.env.SESSION_EXPIRY!) || 60 * 15;
 export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
 export const JWT_REFRESH_EXPIRY =
   eval(process.env.REFRESH_TOKEN_EXPIRY!) || 60 * 60 * 24 * 30;
+export const MODE = process.env.MODE || "development";
