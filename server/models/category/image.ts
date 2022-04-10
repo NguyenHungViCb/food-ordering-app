@@ -1,9 +1,15 @@
 import { DataTypes, Model } from "sequelize";
 import Category from ".";
 import { modelConfig, sequelize } from "../../db/config";
+import {
+  CategoryImageCreation,
+  CategoryImageModel,
+} from "../../types/category/image";
 import Image from "../image";
 
-const CategoryImage = sequelize.define(
+const CategoryImage = sequelize.define<
+  Model<CategoryImageCreation, CategoryImageModel | CategoryImageCreation>
+>(
   "CategoryImage",
   {
     id: {

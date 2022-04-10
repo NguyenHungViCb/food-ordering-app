@@ -1,7 +1,10 @@
 import { DataTypes, Model } from "sequelize";
 import { modelConfig, sequelize } from "../../db/config";
+import { ImageCreation, ImageModel } from "../../types/image";
 
-const Image = sequelize.define(
+const Image = sequelize.define<
+  Model<ImageCreation, ImageModel | ImageCreation>
+>(
   "Image",
   {
     id: {

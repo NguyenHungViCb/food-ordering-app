@@ -1,5 +1,5 @@
 import { Model, Transaction } from "sequelize";
-import CategoryDetail from "../../models/category/categoryDetail";
+import CategoryDetail from "../../models/category/detail";
 import ProductImage from "../../models/product/image";
 import { ProductImageModel } from "../../types/product/image";
 import {
