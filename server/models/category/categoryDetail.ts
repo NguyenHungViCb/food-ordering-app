@@ -35,6 +35,7 @@ const CategoryDetail = sequelize.define(
 Product.belongsToMany(Category, {
   through: CategoryDetail,
   onDelete: "cascade",
+  as: "categories",
 });
 Category.belongsToMany(Product, {
   through: CategoryDetail,

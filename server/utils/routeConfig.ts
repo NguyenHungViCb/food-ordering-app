@@ -62,7 +62,14 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
                 return await descriptor.value.apply(this, [req, res, next]);
               } catch (error: any) {
                 console.log(error);
-                return res.json({ message: error.message, success: false });
+                if (error.code) {
+                  return res
+                    .status(error.code)
+                    .json({ message: error.message, success: false });
+                }
+                return res
+                  .status(500)
+                  .json({ message: error.message, success: false });
               }
             };
             if (middlewares && middlewares.length > 0) {
@@ -83,6 +90,7 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
 }
 
 export type RouteDescription = {
+  query?: object;
   request_payload?: object;
   response_payload?: object;
   usage?: string;

@@ -61,7 +61,7 @@ const Product = sequelize.define<
       defaultValue: 0,
     },
   },
-  modelConfig("products")
+  { ...modelConfig("products") }
 );
 
 Product.sync({ alter: true });

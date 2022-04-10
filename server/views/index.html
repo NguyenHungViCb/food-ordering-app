@@ -100,6 +100,22 @@
 <%= JSON.stringify(route.request_payload, undefined, 2).replaceAll(/"([^"]+)":/g, '$1:') %></pre
           >
         </div>
+        <% } %> <% if(route.query){ %>
+        <div
+          style="
+            padding: 0.3rem 0.6rem;
+            border: 1px solid #495057;
+            border-radius: 0.3rem;
+            margin: 0.3rem 0;
+          "
+        >
+          <p style="margin: 0; font-size: 0.875rem; padding-bottom: 0.3rem">
+            Query
+          </p>
+          <pre style="margin: 0">
+<%= JSON.stringify(route.query, undefined, 2) %></pre
+          >
+        </div>
         <% } %> <% if(route.response_payload){ %>
         <div
           style="
