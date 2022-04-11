@@ -38,7 +38,6 @@ const ProductImage = sequelize.define<
   { ...modelConfig("product_images") }
 );
 
-ProductImage.sync({ alter: true });
 Product.belongsToMany(Image, {
   through: ProductImage,
   onDelete: "cascade",
@@ -48,9 +47,5 @@ Image.belongsToMany(Product, {
   through: ProductImage,
   onDelete: "cascade",
 });
-// This should only be run when we change the table
-// And it should not be used at all
-// Need to find other way
-// ProductImage.sync({ force: true });
 
 export default ProductImage;

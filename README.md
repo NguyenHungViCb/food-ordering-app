@@ -13,17 +13,25 @@
 ```bash
 .
 ├── controllers                             # Controllers/ Routes for each entity
-├── db                                      # Database configurations
+├── db
+│   ├── config
+│   │   └── config.js                       # Migration config file
+│   ├── config.ts                           # Database configurations
+│   ├── migrations                          # Migration files
+│   └── seeders                             # Seeder files
 ├── env.sample                              # Sample environment variables
 ├── express                                 # Express configurations
 ├── index.ts                                # Root file
-├── models                                  # Models
+├── middlewares                             # Express Middlewares
+├── models                                  # Sequelize Models
+├── services                                # Model services
 ├── types                                   # Typing for entities and other stuff
 ├── utils
 │   ├── AppConfig.ts                        # App global variables and configurations
 │   ├── modelUtils.ts                       # Model helper functions
 │   ├── modelValidation.ts                  # Model validation functions
-│   └── routeConfig.ts                      # Route decorator
+│   ├── routeConfig.ts                      # Route decorator
+│   └── tokenUtils.ts
 └── views                                   # Api view
     └── index.html
 ```
@@ -63,6 +71,10 @@ npm install # Or yarn
   PORT=5002
   ```
 - Step 4: Run the api
+  - If this is the first time you run api (_this will compile ts to js and run database migrations_)
+  ```bash
+  npm run build # Or yarn build
+  ```
   - Mac OS/ Linux
   ```bash
   npm run server # Or yarn server
