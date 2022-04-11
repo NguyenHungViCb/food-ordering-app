@@ -27,6 +27,4 @@ const Category = sequelize.define<
   modelConfig("categories")
 );
 
-Category.sync({ alter: true });
-
 export default Category;

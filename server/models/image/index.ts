@@ -27,5 +27,4 @@ const Image = sequelize.define<
   modelConfig("images")
 );
 
-// Image.sync({ force: true });
 export default Image;

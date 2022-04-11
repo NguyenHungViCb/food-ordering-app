@@ -64,6 +64,4 @@ const Product = sequelize.define<
   { ...modelConfig("products") }
 );
 
-Product.sync({ alter: true });
-
 export default Product;
