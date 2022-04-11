@@ -11,7 +11,8 @@ const modelConfig = (tableName: string) => {
   };
 };
 
-const sequelize = new Sequelize(POST_URI, {
+console.log(POST_URI);
+const options = {
   define: { underscored: true },
   logging: LOGGING,
   ...(MODE === "production"
@@ -24,7 +25,9 @@ const sequelize = new Sequelize(POST_URI, {
         },
       }
     : {}),
-});
+};
+console.log(options);
+const sequelize = new Sequelize(POST_URI, options);
 const connectDb = async () => {
   try {
     await sequelize.authenticate();
