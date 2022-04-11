@@ -13,6 +13,9 @@ import {
 } from "../../utils/routeConfig";
 import Image from "../../models/image";
 import { imagePlainObj } from "../../types/image";
+import validate from "../../utils/modelValidation";
+import Product from "../../models/product";
+import { productSchemaPlainObj } from "../../types/product/productInterface";
 
 const path = "/categories";
 @controller
@@ -52,6 +55,52 @@ class CategoryController {
           ],
         }
       );
+      return res.json({ data: category, success: true });
+    }
+  }
+
+  @routeDescription({
+    query: {
+      ids: "[number]",
+      "c_page?": "number",
+      "c_lim?": "number",
+    },
+    response_payload: {
+      count: "number",
+      rows: [
+        {
+          ...categoryModelPlainObj,
+          ...categoryCreationPlainObj,
+          images: [imagePlainObj],
+          products: [productSchemaPlainObj],
+        },
+      ],
+    },
+    usage: "get products of categories (default limit up to 10 categories)",
+  })
+  @routeConfig({ method: "get", path: `${path}/get/products` })
+  async getProductsOfCategory(req: Request, res: Response, __: NextFunction) {
+    const { ids, c_lim, c_page } = req.query;
+    const cLim = c_lim && typeof c_lim === "string" ? parseInt(c_lim) : 10;
+    const cPage = c_page && typeof c_page === "string" ? parseInt(c_page) : 0;
+    if (ids && typeof ids === "string") {
+      validate(JSON.parse(ids)).isTruthy().isArray();
+      const category = await Category.findAndCountAll({
+        where: { id: JSON.parse(ids) },
+        offset: cPage * cLim,
+        limit: cLim,
+        include: [
+          {
+            model: Product,
+            as: "products",
+            through: { attributes: [] },
+            include: [
+              { model: Image, as: "images", through: { attributes: [] } },
+            ],
+          },
+          { model: Image, as: "images", through: { attributes: [] } },
+        ],
+      });
       return res.json({ data: category, success: true });
     }
   }

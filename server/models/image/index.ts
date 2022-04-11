@@ -28,5 +28,4 @@ const Image = sequelize.define<
 );
 
 // Image.sync({ force: true });
-
 export default Image;

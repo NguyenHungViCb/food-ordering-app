@@ -1,9 +1,15 @@
-import { DataTypes } from "sequelize";
+import { DataTypes, Model } from "sequelize";
 import { modelConfig, sequelize } from "../../db/config";
+import {
+  CategoryDetailCreation,
+  CategoryDetailModel,
+} from "../../types/category/categoryInterfaces";
 import Product from "../product";
 import Category from "./index";
 
-const CategoryDetail = sequelize.define(
+const CategoryDetail = sequelize.define<
+  Model<CategoryDetailCreation, CategoryDetailModel | CategoryDetailCreation>
+>(
   "CategoryDetail",
   {
     id: {
@@ -40,6 +46,7 @@ Product.belongsToMany(Category, {
 Category.belongsToMany(Product, {
   through: CategoryDetail,
   onDelete: "cascade",
+  as: "products",
 });
 CategoryDetail.sync({ alter: true });
 

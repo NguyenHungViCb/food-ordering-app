@@ -1,9 +1,6 @@
 import { NextFunction, Request, Response } from "express";
-import Category from "../../models/category";
 import Product from "../../models/product";
 import ProductImage from "../../models/product/image";
-import { createWithTransaction } from "../../services/";
-import { ProductImageModel } from "../../types/product/image";
 import {
   productCreationPlainObj,
   productModelPlainObj,
@@ -16,48 +13,69 @@ import {
   routeDescription,
 } from "../../utils/routeConfig";
 import ProductBase from "./product";
+import Image from "../../models/image";
+import { ImageModel } from "../../types/image";
 
 const path = "/products";
 @controller
 class ProductController extends ProductBase {
   @routeDescription({
-    query: { categories: "number[]" },
+    // query: { categories: "number[]" },
     response_payload: {
       count: "number",
       rows: [productSchemaPlainObj],
     },
     usage: "get a list of every products",
   })
-  @routeConfig({ method: "get", path: `${path}/get/all` })
-  async getProductList(req: Request, res: Response, __: NextFunction) {
-    if (req.query.categories && typeof req.query.categories === "string") {
-      const categories = JSON.parse(req.query.categories);
-      const products = await Product.findAndCountAll({
-        include: [
-          {
-            model: Category,
-            required: true,
-            as: "categories",
-            attributes: [],
-            through: { where: { category_id: categories } },
-          },
-          {
-            model: ProductImage,
-            as: "images",
-          },
-        ],
+  @routeConfig({ method: "get", path: `${path}` })
+  async getProductList(_: Request, res: Response, __: NextFunction) {
+    // if (req.query.categories && typeof req.query.categories === "string") {
+    //   const categories = JSON.parse(req.query.categories);
+    //   const products = await Product.findAndCountAll({
+    //     include: [
+    //       {
+    //         model: Category,
+    //         required: true,
+    //         as: "categories",
+    //         attributes: ["id", "name"],
+    //         through: { where: { category_id: categories }, attributes: [] },
+    //       },
+    //       {
+    //         model: Image,
+    //         as: "images",
+    //       },
+    //     ],
+    //   });
+    //   return res.json({ message: "success", data: products, success: true });
+    // } else if (!req.query.categories) {
+    const products = await Product.findAndCountAll({
+      include: [{ model: Image, as: "images" }],
+    });
+    return res
+      .status(200)
+      .json({ message: "success", data: products, success: true });
+    // } else {
+    //   throw new Error("categories must be string type");
+    // }
+  }
+
+  @routeDescription({
+    query: { id: "number" },
+    response_payload: {
+      ...productSchemaPlainObj,
+    },
+    usage: "get a single product by id",
+  })
+  @routeConfig({ method: "get", path: `${path}/:id` })
+  async getSingle(req: Request, res: Response, __: NextFunction) {
+    const { id } = req.query;
+    if (id && typeof id === "string") {
+      const product = await Product.findByPk(id, {
+        include: [{ model: Image, as: "images", through: { attributes: [] } }],
       });
-      return res.json({ message: "success", data: products, success: true });
-    } else if (!req.query.categories) {
-      const products = await Product.findAndCountAll({
-        include: [{ model: ProductImage, as: "images" }],
-      });
-      return res
-        .status(200)
-        .json({ message: "success", data: products, success: true });
-    } else {
-      throw new Error("categories must be string type");
+      return res.json(product);
     }
+    throw new Error("id must be a number");
   }
 
   @routeDescription({
@@ -76,41 +94,33 @@ class ProductController extends ProductBase {
   async createOne(req: Request, res: Response, __: NextFunction) {
     let { categories, images, ...rest } = req.body;
     requireValues({ ...req.body });
-    const imageArr = validate<Array<Pick<ProductImageModel, "src">>>(
-      images,
-      "images"
-    ).isArray().value;
+    const imageArr =
+      validate<Array<Pick<ImageModel, "src">>>(images).isArray().value;
+    const categoryIds = validate<Array<number>>(categories).isArray().value;
 
-    const categoryIds = validate<Array<number>>(
-      categories,
-      "categories"
-    ).isArray().value;
-
-    const {
-      createdEntity: product,
-      callbackValues,
-      error,
-    } = await createWithTransaction(
-      Product,
-      { values: rest },
-      async (product, transaction) => {
-        const createdImages = await this.createWithImage(
-          imageArr,
-          product,
-          transaction
-        );
-        await this.createWithCategoryId(categoryIds, product, transaction);
-        return createdImages;
+    const product = await Product.create(
+      { ...rest, images: imageArr },
+      {
+        include: [
+          {
+            model: Image,
+            required: true,
+            as: "images",
+            // @ts-ignore
+            through: ProductImage,
+          },
+        ],
       }
     );
-    if (error) {
-      throw new Error(error);
+    const { errors } = await this.createWithCategoryId(categoryIds, product);
+    if (errors.length > 0) {
+      return res.json({
+        data: product,
+        success: true,
+        message: "Product has been created with some error",
+      });
     }
-
-    return res.json({
-      data: { product, images: callbackValues },
-      success: true,
-    });
+    return res.json({ data: product, success: true });
   }
 
   @routeDescription({

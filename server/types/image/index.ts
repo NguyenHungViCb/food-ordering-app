@@ -10,7 +10,9 @@ class ImageCreation extends ImageModel {
     public id: number,
     public src: string,
     public type: string,
-    public ratio: string
+    public ratio: string,
+    public created_at?: Date,
+    public updated_at?: Date
   ) {
     super(src, type, ratio);
   }

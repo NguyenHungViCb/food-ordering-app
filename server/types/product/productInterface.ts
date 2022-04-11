@@ -22,21 +22,14 @@ export class ProductCreation extends ProductModel {
   }
 }
 
-const {
-  id: imageId,
-  product_id,
-  src,
-  ...imageRest
-} = ProductImage.getAttributes();
+const { id: imageId, product_id, ...imageRest } = ProductImage.getAttributes();
 
 export const productSchemaPlainObj = {
   ...getSchemaInPlainObj(Product.getAttributes()),
   images: [
     {
-      // @ts-ignore
-      ...getSchemaInPlainObj({ id: imageId, product_id, src }),
-      // @ts-ignore
-      ...getSchemaInPlainObj(imageRest, true),
+      ...getSchemaInPlainObj({ id: imageId, product_id }),
+      ...getSchemaInPlainObj({ ...imageRest }, true),
     },
   ],
 };
@@ -49,10 +42,8 @@ const {
   original_price,
   ...rest
 } = Product.getAttributes();
-// @ts-ignore
 export const productModelPlainObj = getSchemaInPlainObj({
   name,
   original_price,
 });
-// @ts-ignore
-export const productCreationPlainObj = getSchemaInPlainObj(rest, true);
+export const productCreationPlainObj = getSchemaInPlainObj({ ...rest }, true);
