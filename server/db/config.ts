@@ -11,7 +11,6 @@ const modelConfig = (tableName: string) => {
   };
 };
 
-console.log(POST_URI);
 const options = {
   define: { underscored: true },
   logging: LOGGING,
@@ -26,7 +25,6 @@ const options = {
       }
     : {}),
 };
-console.log(options);
 const sequelize = new Sequelize(POST_URI, options);
 const connectDb = async () => {
   try {
