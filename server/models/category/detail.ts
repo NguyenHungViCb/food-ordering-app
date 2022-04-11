@@ -48,6 +48,5 @@ Category.belongsToMany(Product, {
   onDelete: "cascade",
   as: "products",
 });
-CategoryDetail.sync({ alter: true });
 
 export default CategoryDetail;

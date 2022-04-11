@@ -70,6 +70,4 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
   modelConfig("users")
 );
 
-User.sync({ alter: true });
-
 export default User;

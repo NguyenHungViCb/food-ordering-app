@@ -38,7 +38,6 @@ const CategoryImage = sequelize.define<
   modelConfig("category_images")
 );
 
-CategoryImage.sync({ alter: true });
 Category.belongsToMany(Image, {
   through: CategoryImage,
   onDelete: "cascade",
