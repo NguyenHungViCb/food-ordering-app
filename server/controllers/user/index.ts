@@ -5,7 +5,7 @@ import {
   userCreationResponsePayload,
   UserModel,
 } from "../../types/user/userInterfaces";
-import { requireValues } from "../../utils/modelValidation";
+import { requireValues } from "../../utils/validations/modelValidation";
 import {
   controller,
   routeConfig,
