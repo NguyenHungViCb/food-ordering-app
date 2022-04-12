@@ -1,4 +1,4 @@
-import { getSchemaInPlainObj } from "../../utils/modelUtils";
+import { getAttributes } from "../../utils/modelUtils";
 import Image from "../../models/image";
 
 class ImageModel {
@@ -18,10 +18,9 @@ class ImageCreation extends ImageModel {
   }
 }
 
-const { src, type, ratio } = Image.getAttributes();
 export const imagePlainObj = {
-  ...getSchemaInPlainObj({ src }),
-  ...getSchemaInPlainObj({ type, ratio }, true),
+  ...getAttributes(Image, ["src"]),
+  ...getAttributes(Image, ["type", "ratio"]),
 };
 
 export { ImageModel, ImageCreation };
