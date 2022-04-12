@@ -4,7 +4,7 @@ import {
   ProductCreation,
   ProductModel,
 } from "../../types/product/productInterface";
-import validate from "../../utils/modelValidation";
+import validate from "../../utils/validations/modelValidation";
 
 const Product = sequelize.define<
   Model<ProductCreation, ProductModel | ProductCreation>

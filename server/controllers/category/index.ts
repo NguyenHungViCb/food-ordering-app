@@ -13,7 +13,7 @@ import {
 } from "../../utils/routeConfig";
 import Image from "../../models/image";
 import { imagePlainObj } from "../../types/image";
-import validate from "../../utils/modelValidation";
+import validate from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
 import { productSchemaPlainObj } from "../../types/product/productInterface";
 

@@ -6,7 +6,7 @@ import {
   productModelPlainObj,
   productSchemaPlainObj,
 } from "../../types/product/productInterface";
-import validate, { requireValues } from "../../utils/modelValidation";
+import { requireValues } from "../../utils/validations/modelValidation";
 import {
   controller,
   routeConfig,
@@ -15,6 +15,8 @@ import {
 import ProductBase from "./product";
 import Image from "../../models/image";
 import { ImageModel } from "../../types/image";
+import { getAttributes } from "../../utils/modelUtils";
+import { isArray } from "../../utils/validations/assertions";
 
 const path = "/products";
 @controller
@@ -58,9 +60,7 @@ class ProductController extends ProductBase {
   @routeDescription({
     request_payload: {
       ...productModelPlainObj,
-      images: [
-        { src: "string", "type?": "string", "ratio?": "portrait | landscape" },
-      ],
+      images: [getAttributes(Image, ["src", "type", "ratio"])],
       ...productCreationPlainObj,
       categories: "number[]",
     },
@@ -70,13 +70,12 @@ class ProductController extends ProductBase {
   @routeConfig({ method: "post", path: `${path}/create/single` })
   async createOne(req: Request, res: Response, __: NextFunction) {
     let { categories, images, ...rest } = req.body;
-    requireValues({ ...req.body });
-    const imageArr =
-      validate<Array<Pick<ImageModel, "src">>>(images).isArray().value;
-    const categoryIds = validate<Array<number>>(categories).isArray().value;
+    requireValues(req.body);
+    isArray<Array<Pick<ImageModel, "src">>>(images, "images");
+    isArray<Array<number>>(categories, categories);
 
     const product = await Product.create(
-      { ...rest, images: imageArr },
+      { ...rest, images: images },
       {
         include: [
           {
@@ -89,7 +88,7 @@ class ProductController extends ProductBase {
         ],
       }
     );
-    const { errors } = await this.createWithCategoryId(categoryIds, product);
+    const { errors } = await this.createWithCategoryId(categories, product);
     if (errors.length > 0) {
       return res.json({
         data: product,

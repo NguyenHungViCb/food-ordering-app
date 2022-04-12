@@ -1,5 +1,5 @@
 import { QueryInterface, Sequelize, DataTypes } from "sequelize";
-import validate from "../../utils/modelValidation";
+import validate from "../../utils/validations/modelValidation";
 
 module.exports = {
   async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
