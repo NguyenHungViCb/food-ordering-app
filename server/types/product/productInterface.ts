@@ -1,6 +1,7 @@
 import Product from "../../models/product";
 import ProductImage from "../../models/product/image";
 import { getAttributes } from "../../utils/modelUtils";
+import { imagePlainObj } from "../image";
 
 export class ProductModel {
   constructor(public name: string, public price: number) {}
@@ -35,3 +36,9 @@ export const productCreationPlainObj = getAttributes(Product, [
   { attribute: "price", optional: true },
   { attribute: "stock", optional: true },
 ]);
+export const createdProductResponsePayload = {
+  ...productModelPlainObj,
+  images: [imagePlainObj],
+  ...productCreationPlainObj,
+  categories: "number[]",
+};

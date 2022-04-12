@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Product from "../../models/product";
 import ProductImage from "../../models/product/image";
 import {
-  productCreationPlainObj,
-  productModelPlainObj,
+  createdProductResponsePayload,
   productSchemaPlainObj,
 } from "../../types/product/productInterface";
 import { requireValues } from "../../utils/validations/modelValidation";
@@ -14,7 +13,8 @@ import {
 } from "../../utils/routeConfig";
 import ProductBase from "./product";
 import Image from "../../models/image";
-import { ImageModel, imagePlainObj } from "../../types/image";
+import { ImageModel } from "../../types/image";
+import { isArray } from "../../utils/validations/assertions";
 
 const path = "/products";
 @controller
@@ -54,12 +54,7 @@ class ProductController extends ProductBase {
   }
 
   @routeDescription({
-    request_payload: {
-      ...productModelPlainObj,
-      images: [imagePlainObj],
-      ...productCreationPlainObj,
-      categories: "number[]",
-    },
+    request_payload: createdProductResponsePayload,
     response_payload: productSchemaPlainObj,
     usage: "create a single product",
   })
