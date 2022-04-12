@@ -1,4 +1,9 @@
-import { Model, ModelAttributeColumnOptions } from "sequelize";
+import {
+  Attributes,
+  Model,
+  ModelAttributeColumnOptions,
+  ModelCtor,
+} from "sequelize";
 
 const dbTypeToString = (type: string) => {
   const lowerCaseType = type.toLowerCase();
@@ -63,3 +68,48 @@ export const createPayload = (...args: object[]) => {
   });
   return obj;
 };
+
+type keyvalue<K> = {
+  attribute: K;
+  optional?: boolean;
+};
+
+export function getAttributes<
+  M extends Model,
+  K extends keyof TAttributes,
+  TAttributes = Attributes<M>
+>(model: ModelCtor<M>, keys?: (keyvalue<K> | K)[]): any {
+  const attributes = model.getAttributes();
+  if (keys && keys.length > 0) {
+    let obj: { [key: string]: string } = {};
+    for (const item of keys) {
+      for (const [key, value] of Object.entries(attributes)) {
+        // @ts-ignore
+        if (item.attribute && item.attribute === key) {
+          // @ts-ignore
+          if (item.optional) {
+            obj = {
+              ...obj,
+              [key + "?"]: dbTypeToString(value.type.toString({})),
+            };
+          } else {
+            obj = { ...obj, [key]: dbTypeToString(value.type.toString({})) };
+          }
+          break;
+        } else if (item === key) {
+          if (value.allowNull === false) {
+            obj = { ...obj, [key]: dbTypeToString(value.type.toString({})) };
+          } else {
+            obj = {
+              ...obj,
+              [key + "?"]: dbTypeToString(value.type.toString({})),
+            };
+          }
+          break;
+        }
+      }
+    }
+    return obj;
+  }
+  return getSchemaInPlainObj(attributes);
+}
