@@ -14,9 +14,7 @@ import {
 } from "../../utils/routeConfig";
 import ProductBase from "./product";
 import Image from "../../models/image";
-import { ImageModel } from "../../types/image";
-import { getAttributes } from "../../utils/modelUtils";
-import { isArray } from "../../utils/validations/assertions";
+import { ImageModel, imagePlainObj } from "../../types/image";
 
 const path = "/products";
 @controller
@@ -40,9 +38,7 @@ class ProductController extends ProductBase {
 
   @routeDescription({
     query: { id: "number" },
-    response_payload: {
-      ...productSchemaPlainObj,
-    },
+    response_payload: productSchemaPlainObj,
     usage: "get a single product by id",
   })
   @routeConfig({ method: "get", path: `${path}/:id` })
@@ -60,7 +56,7 @@ class ProductController extends ProductBase {
   @routeDescription({
     request_payload: {
       ...productModelPlainObj,
-      images: [getAttributes(Image, ["src", "type", "ratio"])],
+      images: [imagePlainObj],
       ...productCreationPlainObj,
       categories: "number[]",
     },
