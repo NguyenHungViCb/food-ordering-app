@@ -1,6 +1,6 @@
 import Product from "../../models/product";
 import ProductImage from "../../models/product/image";
-import { getSchemaInPlainObj } from "../../utils/modelUtils";
+import { getAttributes } from "../../utils/modelUtils";
 
 export class ProductModel {
   constructor(public name: string, public price: number) {}
@@ -22,28 +22,16 @@ export class ProductCreation extends ProductModel {
   }
 }
 
-const { id: imageId, product_id, ...imageRest } = ProductImage.getAttributes();
-
 export const productSchemaPlainObj = {
-  ...getSchemaInPlainObj(Product.getAttributes()),
-  images: [
-    {
-      ...getSchemaInPlainObj({ id: imageId, product_id }),
-      ...getSchemaInPlainObj({ ...imageRest }, true),
-    },
-  ],
+  ...getAttributes(Product),
+  images: [getAttributes(ProductImage)],
 };
-const {
-  id,
-  created_at,
-  updated_at,
-  order_count,
-  name,
-  original_price,
-  ...rest
-} = Product.getAttributes();
-export const productModelPlainObj = getSchemaInPlainObj({
-  name,
-  original_price,
-});
-export const productCreationPlainObj = getSchemaInPlainObj({ ...rest }, true);
+export const productModelPlainObj = getAttributes(Product, [
+  "name",
+  "original_price",
+]);
+export const productCreationPlainObj = getAttributes(Product, [
+  { attribute: "description", optional: true },
+  { attribute: "price", optional: true },
+  { attribute: "stock", optional: true },
+]);

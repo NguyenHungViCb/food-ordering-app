@@ -1,8 +1,5 @@
 import User from "../../models/user";
-import {
-  attributeToPlainObj,
-  getSchemaInPlainObj,
-} from "../../utils/modelUtils";
+import { getAttributes } from "../../utils/modelUtils";
 
 export class UserModel {
   constructor(
@@ -32,31 +29,17 @@ export class UserCreation extends UserModel {
   }
 }
 
-const {
-  first_name,
-  last_name,
-  email,
-  password,
-  email_verified,
-  phone_number,
-  avatar,
-  active,
-} = User.getAttributes();
 export const localRequestPayload = {
-  ...getSchemaInPlainObj({
-    first_name,
-    last_name,
-    email,
-  }),
-  ...attributeToPlainObj(password, true),
+  ...getAttributes(User, ["first_name", "last_name", "email"]),
+  ...getAttributes(User, [{ attribute: "password", optional: true }]),
 };
 
-export const userCreationResponsePayload = getSchemaInPlainObj({
-  first_name,
-  last_name,
-  email,
-  email_verified,
-  phone_number,
-  avatar,
-  active,
-});
+export const userCreationResponsePayload = getAttributes(User, [
+  "first_name",
+  "last_name",
+  "email",
+  "email_verified",
+  "phone_number",
+  "avatar",
+  "active",
+]);

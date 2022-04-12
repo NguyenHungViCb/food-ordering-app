@@ -1,5 +1,5 @@
 import Category from "../../models/category";
-import { getSchemaInPlainObj } from "../../utils/modelUtils";
+import { getAttributes, getSchemaInPlainObj } from "../../utils/modelUtils";
 
 export class CategoryModel {
   constructor(public name: string) {}
@@ -33,11 +33,8 @@ export class CategoryDetailCreation extends CategoryDetailModel {
   }
 }
 
-export const categoryPlainObj = getSchemaInPlainObj(Category.getAttributes());
-
-const { name, description } = Category.getAttributes();
-export const categoryModelPlainObj = getSchemaInPlainObj({ name });
-export const categoryCreationPlainObj = getSchemaInPlainObj(
-  { description },
-  true
-);
+export const categoryPlainObj = getAttributes(Category);
+export const categoryModelPlainObj = getAttributes(Category, ["name"]);
+export const categoryCreationPlainObj = getAttributes(Category, [
+  "description",
+]);

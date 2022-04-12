@@ -78,7 +78,7 @@ export function getAttributes<
   M extends Model,
   K extends keyof TAttributes,
   TAttributes = Attributes<M>
->(model: ModelCtor<M>, keys?: (keyvalue<K> | K)[]): any {
+>(model: ModelCtor<M>, keys?: (keyvalue<K> | K)[]) {
   const attributes = model.getAttributes();
   if (keys && keys.length > 0) {
     let obj: { [key: string]: string } = {};
