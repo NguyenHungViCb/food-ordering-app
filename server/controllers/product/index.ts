@@ -20,7 +20,6 @@ const path = "/products";
 @controller
 class ProductController extends ProductBase {
   @routeDescription({
-    // query: { categories: "number[]" },
     response_payload: {
       count: "number",
       rows: [productSchemaPlainObj],
@@ -29,34 +28,12 @@ class ProductController extends ProductBase {
   })
   @routeConfig({ method: "get", path: `${path}` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
-    // if (req.query.categories && typeof req.query.categories === "string") {
-    //   const categories = JSON.parse(req.query.categories);
-    //   const products = await Product.findAndCountAll({
-    //     include: [
-    //       {
-    //         model: Category,
-    //         required: true,
-    //         as: "categories",
-    //         attributes: ["id", "name"],
-    //         through: { where: { category_id: categories }, attributes: [] },
-    //       },
-    //       {
-    //         model: Image,
-    //         as: "images",
-    //       },
-    //     ],
-    //   });
-    //   return res.json({ message: "success", data: products, success: true });
-    // } else if (!req.query.categories) {
     const products = await Product.findAndCountAll({
       include: [{ model: Image, as: "images" }],
     });
     return res
       .status(200)
       .json({ message: "success", data: products, success: true });
-    // } else {
-    //   throw new Error("categories must be string type");
-    // }
   }
 
   @routeDescription({
