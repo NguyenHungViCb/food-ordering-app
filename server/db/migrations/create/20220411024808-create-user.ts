@@ -1,7 +1,7 @@
 import { QueryInterface, Sequelize, DataTypes } from "sequelize";
 
 module.exports = {
-  async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async up(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.createTable("users", {
       id: {
         allowNull: false,
@@ -75,7 +75,7 @@ module.exports = {
       },
     });
   },
-  async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async down(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.dropTable("users");
   },
 };

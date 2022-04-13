@@ -1,7 +1,7 @@
 import { QueryInterface, Sequelize, DataTypes } from "sequelize";
 
 module.exports = {
-  async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async up(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.createTable("product_images", {
       id: {
         type: DataTypes.BIGINT,
@@ -18,6 +18,7 @@ module.exports = {
           key: "id",
         },
         field: "product_id",
+        onDelete: "cascade",
       },
       image_id: {
         type: DataTypes.BIGINT,
@@ -28,6 +29,7 @@ module.exports = {
           key: "id",
         },
         field: "image_id",
+        onDelete: "cascade",
       },
       created_at: {
         allowNull: false,
@@ -39,7 +41,7 @@ module.exports = {
       },
     });
   },
-  async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async down(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.dropTable("product_images");
   },
 };

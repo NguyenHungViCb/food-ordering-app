@@ -1,35 +1,35 @@
 import { QueryInterface, Sequelize, DataTypes } from "sequelize";
 
 module.exports = {
-  async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
-    await queryInterface.createTable("category_details", {
+  async up(queryInterface: QueryInterface, _: Sequelize) {
+    await queryInterface.createTable("category_images", {
       id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      product_id: {
+      category_id: {
         type: DataTypes.BIGINT,
         references: {
           model: {
-            tableName: "products",
-            // schema: "schema"
+            tableName: "categories",
           },
           key: "id",
         },
-        allowNull: false,
+        field: "category_id",
+        onDelete: "cascade",
       },
-      category_id: {
-        type: DataTypes.INTEGER,
+      image_id: {
+        type: DataTypes.BIGINT,
         references: {
           model: {
-            tableName: "categories",
-            // schema: "schema"
+            tableName: "images",
           },
           key: "id",
         },
-        allowNull: false,
+        field: "image_id",
+        onDelete: "cascade",
       },
       created_at: {
         allowNull: false,
@@ -41,7 +41,7 @@ module.exports = {
       },
     });
   },
-  async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
-    await queryInterface.dropTable("category_details");
+  async down(queryInterface: QueryInterface, _: Sequelize) {
+    await queryInterface.dropTable("category_images");
   },
 };
