@@ -29,7 +29,15 @@ class ProductController extends ProductBase {
   @routeConfig({ method: "get", path: `${path}` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     const products = await Product.findAndCountAll({
-      include: [{ model: Image, as: "images" }],
+      include: [
+        {
+          model: Image,
+          as: "images",
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
     return res
       .status(200)
