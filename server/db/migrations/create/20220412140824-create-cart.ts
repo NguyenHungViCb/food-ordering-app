@@ -20,11 +20,11 @@ module.exports = {
         field: "user_id",
         onDelete: "cascade",
       },
-      createdAt: {
+      created_at: {
         allowNull: false,
         type: DataTypes.DATE,
       },
-      updatedAt: {
+      updated_at: {
         allowNull: false,
         type: DataTypes.DATE,
       },
