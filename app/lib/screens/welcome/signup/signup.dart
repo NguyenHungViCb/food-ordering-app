@@ -8,9 +8,9 @@ class SignUp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.of(context).size.height * 0.85,
       child: Column(
-        children: [SignupHeader(), const SignupForm()],
+        children: const [SignupHeader(), SignupForm()],
       ),
     );
   }
