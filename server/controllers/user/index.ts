@@ -12,6 +12,7 @@ import {
   routeDescription,
 } from "../../utils/routeConfig";
 import { generateRefreshToken, generateToken } from "../../utils/tokenUtils";
+import { getAttributesData } from "../../utils/modelUtils";
 
 const path = "/users";
 @controller
@@ -37,9 +38,24 @@ class UserController {
     const user = await this.createUser(rest);
     user.set("password", password);
     await user.save();
-    return res
-      .status(200)
-      .json({ message: "created user", data: user, success: true });
+    const values = getAttributesData(user, [
+      "id",
+      "first_name",
+      "last_name",
+      "email",
+      "email_verified",
+      "phone_number",
+      "birthday",
+      "avatar",
+      "active",
+      "created_at",
+      "updated_at",
+    ]);
+    return res.status(200).json({
+      message: "created user",
+      data: values,
+      success: true,
+    });
   }
 
   @routeDescription({
@@ -50,6 +66,7 @@ class UserController {
   @routeConfig({ method: "post", path: `${path}/login/local` })
   async login(req: Request, res: Response, __: NextFunction) {
     requireValues([...req.body]);
+    console.log(req.body);
     const user = await User.findOne({ where: { email: req.body.email } });
     if (user) {
       if (user.getDataValue("password") !== req.body.password) {

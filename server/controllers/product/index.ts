@@ -15,6 +15,7 @@ import {
 import ProductBase from "./product";
 import Image from "../../models/image";
 import { ImageModel, imagePlainObj } from "../../types/image";
+import { isArray } from "../../utils/validations/assertions";
 
 const path = "/products";
 @controller

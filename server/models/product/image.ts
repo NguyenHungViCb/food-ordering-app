@@ -42,10 +42,12 @@ Product.belongsToMany(Image, {
   through: ProductImage,
   onDelete: "cascade",
   as: "images",
+  foreignKey: "image_id",
 });
 Image.belongsToMany(Product, {
   through: ProductImage,
   onDelete: "cascade",
+  foreignKey: "image_id",
 });
 
 export default ProductImage;
