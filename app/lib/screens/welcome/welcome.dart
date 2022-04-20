@@ -1,15 +1,23 @@
+import 'package:app/models/users/users.dart';
 import 'package:app/screens/welcome/auth_bottom_sheet.dart';
-import 'package:app/screens/welcome/login/index.dart';
-import 'package:app/screens/welcome/signup/index.dart';
+import 'package:app/screens/welcome/login/login.dart';
+import 'package:app/screens/welcome/signup/signup.dart';
+import 'package:app/screens/welcome/widgets/logo.dart';
 import 'package:app/share/buttons/neutral_button.dart';
 import 'package:app/share/buttons/secondary_button.dart';
-import '../../share/buttons/neutral_button.dart';
 import 'package:flutter/material.dart';
 
-class WelcomeScreen extends StatelessWidget {
+class WelcomeScreen extends StatefulWidget {
   static String routeName = "/welcome";
 
   const WelcomeScreen({Key? key}) : super(key: key);
+
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+  UserResponse? user;
 
   @override
   Widget build(BuildContext context) {
@@ -22,28 +30,9 @@ class WelcomeScreen extends StatelessWidget {
             child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.only(top: 50),
-              child: Column(
-                children: [
-                  Image.asset("assets/images/logo.png"),
-                  const Text(
-                    "FoodApp",
-                    style: TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFFEE4D2A)),
-                  ),
-                  const SizedBox(height: 20),
-                  const Text(
-                    "Order everything with your phone",
-                    style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.white),
-                  )
-                ],
-              ),
+            const Padding(
+              padding: EdgeInsets.only(top: 50),
+              child: Logo(),
             ),
             Column(
               mainAxisAlignment: MainAxisAlignment.end,
@@ -53,33 +42,20 @@ class WelcomeScreen extends StatelessWidget {
                     margin: const EdgeInsets.only(bottom: 20),
                     child: SecondaryButton(
                         text: "Login",
-                        onPressed: (context) => {
-                              showModalBottomSheet(
-                                  isScrollControlled: true,
-                                  shape: const RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.vertical(
-                                          top: Radius.circular(20))),
-                                  context: context,
-                                  builder: (context) => const Padding(
-                                        padding: EdgeInsets.symmetric(
-                                            horizontal: 18),
-                                        child: AuthBottomSheet(child: Login()),
-                                      ))
-                            })),
+                        onPressed: (context) {
+                          displayBottomSheet(
+                              context,
+                              AuthBottomSheet(
+                                  child: Login(
+                                user: user,
+                              )));
+                        })),
                 Container(
                   margin: const EdgeInsets.only(bottom: 50),
                   child: NeutralButton(
                       onPressed: (context) {
-                        showModalBottomSheet(
-                            isScrollControlled: true,
-                            shape: const RoundedRectangleBorder(
-                                borderRadius: BorderRadius.vertical(
-                                    top: Radius.circular(20))),
-                            context: context,
-                            builder: (context) => const Padding(
-                                  padding: EdgeInsets.symmetric(horizontal: 18),
-                                  child: AuthBottomSheet(child: SignUp()),
-                                ));
+                        displayBottomSheet(
+                            context, const AuthBottomSheet(child: SignUp()));
                       },
                       text: "Sign Up"),
                 ),
@@ -89,5 +65,24 @@ class WelcomeScreen extends StatelessWidget {
         )),
       )),
     );
+  }
+
+  displayBottomSheet(context, Widget sheet) {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        context: context,
+        builder: (context) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: sheet,
+            )).then((value) => {
+          if (value is UserResponse)
+            {
+              setState(() {
+                user = value;
+              })
+            }
+        });
   }
 }

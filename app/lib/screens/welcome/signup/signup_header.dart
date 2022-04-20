@@ -1,14 +1,17 @@
 import 'package:flutter/cupertino.dart';
 
 class SignupHeader extends StatelessWidget {
+  const SignupHeader({Key? key}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
     return Row(
       children: [
         Padding(
           padding:
-              const EdgeInsets.only(bottom: 8.0, top: 24, left: 16, right: 16),
+              const EdgeInsets.only(bottom: 24.0, top: 24, left: 0, right: 16),
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: const [
               Text(
                 "Hello!",
