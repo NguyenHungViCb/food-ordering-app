@@ -1,8 +1,15 @@
+import 'dart:convert';
+import 'package:app/models/tokens/tokens.dart';
+import 'package:app/models/users/users.dart';
 import 'package:app/share/buttons/primary_button.dart';
+import 'package:app/share/constants/storage.dart';
+import 'package:app/share/text_fields/email.dart';
+import 'package:app/share/text_fields/password.dart';
 import 'package:flutter/material.dart';
 
 class LoginForm extends StatefulWidget {
-  const LoginForm({Key? key}) : super(key: key);
+  final UserResponse? user;
+  const LoginForm({Key? key, this.user}) : super(key: key);
 
   @override
   LoginFormState createState() => LoginFormState();
@@ -10,6 +17,16 @@ class LoginForm extends StatefulWidget {
 
 class LoginFormState extends State<LoginForm> {
   final _formKey = GlobalKey<FormState>();
+  final emailController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.user?.email != null) {
+      emailController.text = widget.user?.email as String;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -24,47 +41,9 @@ class LoginFormState extends State<LoginForm> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: <Widget>[
-                  TextFormField(
-                    key: const Key("emailField"),
-                    keyboardType: TextInputType.emailAddress,
-                    onSaved: (val) => {},
-                    decoration: InputDecoration(
-                      labelText: "Email *",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      isDense: true,
-                      filled: true,
-                      fillColor: const Color(0xfff0f2f6),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Email cannot be empty";
-                      }
-                      return null;
-                    },
-                  ),
+                  Email(controller: emailController),
                   const SizedBox(height: 30),
-                  TextFormField(
-                    key: const Key("passwordField"),
-                    obscureText: true,
-                    onSaved: (val) => {},
-                    decoration: InputDecoration(
-                      labelText: "Password *",
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      isDense: true,
-                      filled: true,
-                      fillColor: const Color(0xfff0f2f6),
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return "Email cannot be empty";
-                      }
-                      return null;
-                    },
-                  ),
+                  Password(controller: passwordController),
                   const SizedBox(height: 10),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -93,7 +72,8 @@ class LoginFormState extends State<LoginForm> {
                     ],
                   ),
                   const SizedBox(height: 30),
-                  PrimaryButton(onPressed: () {}, text: "Login")
+                  PrimaryButton(
+                      onPressed: loginHandler, text: "Login", loading: true)
                 ],
               ),
             ),
@@ -101,5 +81,17 @@ class LoginFormState extends State<LoginForm> {
         ),
       ),
     );
+  }
+
+  void loginHandler(context, toggleLoading) async {
+    toggleLoading();
+    var tokens =
+        await User().localLogin(emailController.text, passwordController.text);
+    if (tokens is Token) {
+      await GlobalStorage.write(
+          key: "tokens", value: json.encode(tokens.toJson()));
+      GlobalStorage.read(key: "tokens").then((value) => print(value));
+    }
+    toggleLoading();
   }
 }

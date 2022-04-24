@@ -76,7 +76,7 @@ type keyvalue<K> = {
 
 export function getAttributes<
   M extends Model,
-  K extends keyof TAttributes,
+  K extends keyof TAttributes | "created_at" | "updated_at",
   TAttributes = Attributes<M>
 >(model: ModelCtor<M>, keys?: (keyvalue<K> | K)[]) {
   const attributes = model.getAttributes();
@@ -112,4 +112,17 @@ export function getAttributes<
     return obj;
   }
   return getSchemaInPlainObj(attributes);
+}
+
+export function getAttributesData<
+  M extends Model,
+  K extends keyof TAttributes | "created_at" | "updated_at",
+  TAttributes = Attributes<M>
+>(model: M, keys: K[]) {
+  // @ts-ignore
+  let obj: { [key in K]: Model } = {};
+  for (const key of keys) {
+    Object.assign(obj, { [key]: model.get(key as string) });
+  }
+  return obj;
 }

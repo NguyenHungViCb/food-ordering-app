@@ -6,9 +6,7 @@ class AuthBottomSheet extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom * 0.5),
+    return SizedBox(
       child: child,
     );
   }
