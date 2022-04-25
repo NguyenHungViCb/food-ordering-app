@@ -18,15 +18,44 @@ class CartCreation extends CartModel {
   }
 }
 
+const details = getAttributes(CartDetail, [
+  "id",
+  "quantity",
+  "product_id",
+  "created_at",
+  "updated_at",
+]);
+
+const cartDetailItem = getAttributes(CartDetail, [
+  "product_id",
+  { attribute: "quantity", optional: false },
+]);
+
 const createdCartPayload = {
   ...getAttributes(Cart),
-  details: getAttributes(CartDetail, [
-    "id",
-    "quantity",
-    "product_id",
-    "created_at",
-    "updated_at",
-  ]),
+  details,
 };
 
-export { CartModel, CartCreation, createdCartPayload };
+const failedInsertType = {
+  item: cartDetailItem,
+  error: {
+    message: "string",
+    request: "number",
+    stock: "number",
+  },
+};
+
+const addItemsPayload = {
+  ...createdCartPayload,
+  succeeded_inserts: cartDetailItem,
+  failed_inserts: failedInsertType,
+};
+
+export {
+  CartModel,
+  CartCreation,
+  createdCartPayload,
+  cartDetailItem,
+  failedInsertType,
+  addItemsPayload,
+};

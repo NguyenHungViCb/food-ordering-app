@@ -4,7 +4,13 @@ import { jwtValidate } from "../../middlewares/auths";
 import { sequelize } from "../../db/config";
 import Cart from "../../models/cart";
 import CartDetail from "../../models/cart/detail";
-import { CartCreation, CartModel, createdCartPayload } from "../../types/cart";
+import {
+  addItemsPayload,
+  CartCreation,
+  cartDetailItem,
+  CartModel,
+  createdCartPayload,
+} from "../../types/cart";
 import { getAttributes } from "../../utils/modelUtils";
 import {
   controller,
@@ -63,7 +69,10 @@ class CartController {
   }
 
   @routeDescription({
-    request_payload: [getAttributes(CartDetail, ["product_id", "quantity"])],
+    request_payload: [cartDetailItem],
+    response_payload: [addItemsPayload],
+    usage: "Add items to cart",
+    isAuth: true,
   })
   @routeConfig({
     method: "post",
@@ -78,8 +87,8 @@ class CartController {
     isArray<Array<createPayloadType>>(items);
     isNotNull(user);
 
-    const failedInsert = [];
-    const succeededInsert = [];
+    const failedInserts = [];
+    const succeededInserts = [];
     for (const item of items) {
       const transaction = await sequelize.transaction();
       try {
@@ -99,26 +108,23 @@ class CartController {
           product?.getDataValue("stock") || 0,
           transaction
         );
-        succeededInsert.push(response);
-        transaction.commit();
+        succeededInserts.push(response);
+        await transaction.commit();
       } catch (error: any) {
         // rollback if new updated quantity > stock
-        failedInsert.push({ item, error: JSON.parse(error.message) });
-        transaction.rollback();
+        failedInserts.push({ item, error: JSON.parse(error.message) });
+        await transaction.rollback();
       }
     }
-    if (failedInsert.length > 0) {
-      return res.json({
-        message: "The operation succeed with error",
-        data: { ...cart.get(), succeededInsert, failedInsert },
-        success: true,
-      });
-    } else {
-      return res.json({
-        data: { ...cart.get(), succeededInsert },
-        success: true,
-      });
-    }
+    return res.json({
+      message: "The operation succeed with error",
+      data: {
+        ...cart.get(),
+        succeeded_inserts: succeededInserts,
+        failed_inserts: failedInserts,
+      },
+      success: true,
+    });
   }
 }
 
