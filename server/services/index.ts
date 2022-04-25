@@ -6,6 +6,7 @@ import {
   CreationAttributes,
   ModelCtor,
   Transaction,
+  WhereOptions,
 } from "sequelize";
 import { sequelize } from "../db/config";
 
@@ -50,4 +51,30 @@ export async function createWithTransaction<
     await newTransaction.rollback();
     throw new Error("Cannot create " + entity.name.toLowerCase());
   }
+}
+
+export async function upsert<M extends Model, TAttributes = Attributes<M>>(
+  model: ModelCtor<M>,
+  option: {
+    condition: WhereOptions<TAttributes>;
+    value?: CreationAttributes<M>;
+    transaction?: Transaction;
+  }
+): Promise<[result: M, created: boolean]> {
+  return await model
+    .findOne({ where: option.condition, transaction: option.transaction })
+    .then(async (response) => {
+      if (response) {
+        const result = await response.update(option.value || option.condition, {
+          transaction: option.transaction,
+        });
+        return [result, false];
+      } else {
+        const result = await model.create(
+          option.value || (option.condition as CreationAttributes<M>),
+          { transaction: option.transaction }
+        );
+        return [result, true];
+      }
+    });
 }
