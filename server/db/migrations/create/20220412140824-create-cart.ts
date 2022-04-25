@@ -20,6 +20,10 @@ module.exports = {
         field: "user_id",
         onDelete: "cascade",
       },
+      is_active: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: true,
+      },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,

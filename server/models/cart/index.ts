@@ -20,17 +20,23 @@ const Cart = sequelize.define<Model<CartCreation, CartModel | CartCreation>>(
       },
       field: "user_id",
     },
+    is_active: {
+      type: DataTypes.BOOLEAN,
+      defaultValue: true,
+    },
   },
   modelConfig("carts")
 );
 
 User.hasMany(Cart, {
-  as: "carts",
+  as: "user",
   onDelete: "cascade",
   onUpdate: "cascade",
+  foreignKey: "user_id",
 });
 Cart.belongsTo(User, {
-  as: "carts",
+  as: "user",
+  foreignKey: "user_id",
 });
 
 export default Cart;

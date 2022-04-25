@@ -26,7 +26,7 @@ class ProductController extends ProductBase {
     },
     usage: "get a list of every products",
   })
-  @routeConfig({ method: "get", path: `${path}` })
+  @routeConfig({ method: "get", path: `${path}/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     const products = await Product.findAndCountAll({
       include: [

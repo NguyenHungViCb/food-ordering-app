@@ -1,11 +1,11 @@
 import { DataTypes, Model } from "sequelize";
 import Cart from ".";
 import { modelConfig, sequelize } from "../../db/config";
-import { ClassDetailCreation, ClassDetailModel } from "../../types/cart/detail";
+import { CartDetailCreation, CartDetailModel } from "../../types/cart/detail";
 import Product from "../product";
 
 const CartDetail = sequelize.define<
-  Model<ClassDetailCreation, ClassDetailModel | ClassDetailCreation>
+  Model<CartDetailCreation, CartDetailModel | CartDetailCreation>
 >(
   "CartDetail",
   {
@@ -34,18 +34,19 @@ const CartDetail = sequelize.define<
     quantity: {
       type: DataTypes.INTEGER,
       defaultValue: 0,
-      allowNull: false,
     },
   },
-  modelConfig("cart_detail")
+  modelConfig("cart_details")
 );
 
 Cart.hasMany(CartDetail, {
-  as: "cart_details",
+  as: "cart",
   onDelete: "cascade",
+  foreignKey: "cart_id",
 });
 CartDetail.belongsTo(Cart, {
-  as: "cart_details",
+  as: "cart",
+  foreignKey: "cart_id",
 });
 
 export default CartDetail;
