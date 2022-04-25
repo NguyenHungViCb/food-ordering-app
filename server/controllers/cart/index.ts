@@ -14,6 +14,9 @@ import {
 import { isArray, isNotNull } from "../../utils/validations/assertions";
 import { requireValues } from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
+import { cartValidate } from "../../middlewares/carts";
+import { upsert } from "../../services";
+import { increaseQuantity } from "./cart";
 
 interface createPayloadType {
   product_id: number;
@@ -41,11 +44,10 @@ class CartController {
     requireValues(items);
     isArray<Array<createPayloadType>>(items);
     isNotNull(user);
-
     const cart = await Cart.create<
       Model<CartCreation, CartModel | CartCreation | { cart_details: any }>
     >(
-      { user_id: user.getDataValue("id"), cart_details: items },
+      { user_id: user.getDataValue("id") },
       {
         include: [
           {
@@ -66,9 +68,9 @@ class CartController {
   @routeConfig({
     method: "post",
     path: `${path}/items/add`,
-    middlewares: [jwtValidate],
+    middlewares: [jwtValidate, cartValidate],
   })
-  async addProductToCart(req: Request, res: Response, __: NextFunction) {
+  async addProductsToCart(req: Request, res: Response, __: NextFunction) {
     const { items } = req.body;
     const { user } = req;
     const { cart } = req;
@@ -76,21 +78,46 @@ class CartController {
     isArray<Array<createPayloadType>>(items);
     isNotNull(user);
 
+    const failedInsert = [];
+    const succeededInsert = [];
     for (const item of items) {
-      const product = await Product.findByPk(item.product_id);
-      const detail = await CartDetail.update(
-        { quantity: sequelize.literal(`quantity + ${item.quantity}`) },
-        {
-          where: {
+      const transaction = await sequelize.transaction();
+      try {
+        const product = await Product.findByPk(item.product_id, {
+          transaction,
+        });
+        const [detail] = await upsert(CartDetail, {
+          condition: {
             cart_id: cart.getDataValue("id"),
             product_id: item.product_id,
-            quantity: sequelize.literal(
-              `quantity + ${item.quantity} <= ${product?.getDataValue("id")}`
-            ),
           },
-        }
-      );
-      return res.json({ data: detail, success: true });
+          transaction,
+        });
+        const response = await increaseQuantity(
+          detail,
+          item.quantity,
+          product?.getDataValue("stock") || 0,
+          transaction
+        );
+        succeededInsert.push(response);
+        transaction.commit();
+      } catch (error: any) {
+        // rollback if new updated quantity > stock
+        failedInsert.push({ item, error: JSON.parse(error.message) });
+        transaction.rollback();
+      }
+    }
+    if (failedInsert.length > 0) {
+      return res.json({
+        message: "The operation succeed with error",
+        data: { ...cart.get(), succeededInsert, failedInsert },
+        success: true,
+      });
+    } else {
+      return res.json({
+        data: { ...cart.get(), succeededInsert },
+        success: true,
+      });
     }
   }
 }
