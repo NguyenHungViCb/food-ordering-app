@@ -2,8 +2,7 @@ import { NextFunction, Request, Response } from "express";
 import Product from "../../models/product";
 import ProductImage from "../../models/product/image";
 import {
-  productCreationPlainObj,
-  productModelPlainObj,
+  createdProductResponsePayload,
   productSchemaPlainObj,
 } from "../../types/product/productInterface";
 import { requireValues } from "../../utils/validations/modelValidation";
@@ -14,7 +13,7 @@ import {
 } from "../../utils/routeConfig";
 import ProductBase from "./product";
 import Image from "../../models/image";
-import { ImageModel, imagePlainObj } from "../../types/image";
+import { ImageModel } from "../../types/image";
 import { isArray } from "../../utils/validations/assertions";
 
 const path = "/products";
@@ -27,10 +26,18 @@ class ProductController extends ProductBase {
     },
     usage: "get a list of every products",
   })
-  @routeConfig({ method: "get", path: `${path}` })
+  @routeConfig({ method: "get", path: `${path}/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
     const products = await Product.findAndCountAll({
-      include: [{ model: Image, as: "images" }],
+      include: [
+        {
+          model: Image,
+          as: "images",
+          through: {
+            attributes: [],
+          },
+        },
+      ],
     });
     return res
       .status(200)
@@ -55,12 +62,7 @@ class ProductController extends ProductBase {
   }
 
   @routeDescription({
-    request_payload: {
-      ...productModelPlainObj,
-      images: [imagePlainObj],
-      ...productCreationPlainObj,
-      categories: "number[]",
-    },
+    request_payload: createdProductResponsePayload,
     response_payload: productSchemaPlainObj,
     usage: "create a single product",
   })

@@ -1,8 +1,8 @@
 import { QueryInterface, Sequelize, DataTypes } from "sequelize";
-import validate from "../../utils/validations/modelValidation";
+import validate from "../../../utils/validations/modelValidation";
 
 module.exports = {
-  async up(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async up(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.createTable("products", {
       id: {
         type: DataTypes.BIGINT,
@@ -63,7 +63,7 @@ module.exports = {
       },
     });
   },
-  async down(queryInterface: QueryInterface, Sequelize: Sequelize) {
+  async down(queryInterface: QueryInterface, _: Sequelize) {
     await queryInterface.dropTable("products");
   },
 };

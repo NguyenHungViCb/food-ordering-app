@@ -1,6 +1,7 @@
 import Product from "../../models/product";
-import ProductImage from "../../models/product/image";
+import Image from "../../models/image";
 import { getAttributes } from "../../utils/modelUtils";
+import { imagePlainObj } from "../image";
 
 export class ProductModel {
   constructor(public name: string, public price: number) {}
@@ -24,7 +25,7 @@ export class ProductCreation extends ProductModel {
 
 export const productSchemaPlainObj = {
   ...getAttributes(Product),
-  images: [getAttributes(ProductImage)],
+  images: [getAttributes(Image)],
 };
 export const productModelPlainObj = getAttributes(Product, [
   "name",
@@ -35,3 +36,9 @@ export const productCreationPlainObj = getAttributes(Product, [
   { attribute: "price", optional: true },
   { attribute: "stock", optional: true },
 ]);
+export const createdProductResponsePayload = {
+  ...productModelPlainObj,
+  images: [imagePlainObj],
+  ...productCreationPlainObj,
+  categories: "number[]",
+};

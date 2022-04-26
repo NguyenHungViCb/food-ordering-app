@@ -1,5 +1,5 @@
 import Category from "../../models/category";
-import { getAttributes, getSchemaInPlainObj } from "../../utils/modelUtils";
+import { getAttributes } from "../../utils/modelUtils";
 
 export class CategoryModel {
   constructor(public name: string) {}
