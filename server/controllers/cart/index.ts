@@ -10,8 +10,10 @@ import {
   cartDetailItem,
   CartModel,
   createdCartPayload,
+  failedInsertType,
+  removeItemsPayload,
 } from "../../types/cart";
-import { getAttributes } from "../../utils/modelUtils";
+import { createPayload, getAttributes } from "../../utils/modelUtils";
 import {
   controller,
   routeConfig,
@@ -20,11 +22,15 @@ import {
 import { isArray, isNotNull } from "../../utils/validations/assertions";
 import { requireValues } from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
-import { cartValidate } from "../../middlewares/carts";
+import {
+  activeCartValidate,
+  upsertActiveCartValidate,
+} from "../../middlewares/carts";
 import { upsert } from "../../services";
-import { increaseQuantity } from "./cart";
+import { decreaseQuantity, increaseQuantity } from "./cart";
+import { parseToJSON } from "../../utils/validations/json";
 
-interface createPayloadType {
+export interface createPayloadType {
   product_id: number;
   quantity: number;
 }
@@ -68,6 +74,40 @@ class CartController {
     res.json({ data: cart, success: true });
   }
 
+  async addSingleProductToCart(
+    item: createPayloadType,
+    cart: Model<CartCreation, CartCreation | CartModel>
+  ) {
+    let failedInserts;
+    let succeededInserts;
+    const transaction = await sequelize.transaction();
+    try {
+      const product = await Product.findByPk(item.product_id, {
+        transaction,
+      });
+      const [detail] = await upsert(CartDetail, {
+        condition: {
+          cart_id: cart.getDataValue("id"),
+          product_id: item.product_id,
+        },
+        transaction,
+      });
+      const response = await increaseQuantity(
+        detail,
+        item.quantity,
+        product?.getDataValue("stock") || 0,
+        transaction
+      );
+      succeededInserts = response;
+      await transaction.commit();
+    } catch (error: any) {
+      // rollback if new updated quantity > stock
+      failedInserts = { item, error: JSON.parse(error.message) };
+      await transaction.rollback();
+    }
+    return { succeededInserts, failedInserts };
+  }
+
   @routeDescription({
     request_payload: [cartDetailItem],
     response_payload: [addItemsPayload],
@@ -77,53 +117,113 @@ class CartController {
   @routeConfig({
     method: "post",
     path: `${path}/items/add`,
-    middlewares: [jwtValidate, cartValidate],
+    middlewares: [jwtValidate, upsertActiveCartValidate],
   })
   async addProductsToCart(req: Request, res: Response, __: NextFunction) {
     const { items } = req.body;
-    const { user } = req;
     const { cart } = req;
     requireValues(items);
     isArray<Array<createPayloadType>>(items);
-    isNotNull(user);
 
     const failedInserts = [];
     const succeededInserts = [];
     for (const item of items) {
-      const transaction = await sequelize.transaction();
-      try {
-        const product = await Product.findByPk(item.product_id, {
-          transaction,
-        });
-        const [detail] = await upsert(CartDetail, {
-          condition: {
-            cart_id: cart.getDataValue("id"),
-            product_id: item.product_id,
-          },
-          transaction,
-        });
-        const response = await increaseQuantity(
-          detail,
-          item.quantity,
-          product?.getDataValue("stock") || 0,
-          transaction
-        );
-        succeededInserts.push(response);
-        await transaction.commit();
-      } catch (error: any) {
-        // rollback if new updated quantity > stock
-        failedInserts.push({ item, error: JSON.parse(error.message) });
-        await transaction.rollback();
+      const result = await this.addSingleProductToCart(item, cart);
+      if (result.succeededInserts) {
+        succeededInserts.push(result.succeededInserts);
+      }
+      if (result.failedInserts) {
+        failedInserts.push(result.failedInserts);
       }
     }
     return res.json({
-      message: "The operation succeed with error",
+      ...(failedInserts.length > 0
+        ? { message: "The operation succeed with error" }
+        : {}),
       data: {
         ...cart.get(),
         succeeded_inserts: succeededInserts,
         failed_inserts: failedInserts,
       },
       success: true,
+    });
+  }
+
+  async removeSingleProductFromCart(
+    item: Pick<createPayloadType, "product_id">,
+    cart: Model<CartCreation, CartCreation | CartModel>
+  ) {
+    let succeededDeletes;
+    let failedDeletes;
+    try {
+      const response = await CartDetail.destroy({
+        where: {
+          cart_id: cart.getDataValue("id"),
+          product_id: item.product_id,
+        },
+      });
+      succeededDeletes = response;
+    } catch (error: any) {
+      failedDeletes = { item, error: error.message };
+    }
+    return { succeededDeletes, failedDeletes };
+  }
+
+  @routeDescription({
+    request_payload: [{ ...cartDetailItem, quantity: "number" }],
+    response_payload: [removeItemsPayload],
+    isAuth: true,
+    usage:
+      "Remove items from cart, include quantity to decrease quantity, exclude quantity to remove item",
+  })
+  @routeConfig({
+    method: "post",
+    path: `${path}/items/remove`,
+    middlewares: [jwtValidate, activeCartValidate],
+  })
+  async removeProductsFromCart(req: Request, res: Response, __: NextFunction) {
+    const { items } = req.body;
+    const { cart } = req;
+    requireValues(items);
+    const failedDeletes = [];
+    const succeededDeletes = [];
+    for (const item of items) {
+      const transaction = await sequelize.transaction();
+      try {
+        const detail = await CartDetail.findOne({
+          where: {
+            cart_id: cart.getDataValue("id"),
+            product_id: item.product_id,
+          },
+          transaction,
+        });
+        isNotNull(detail, "item", "not found");
+        const currentQty = detail?.getDataValue("quantity");
+        if (currentQty === 0 || !item.quantity) {
+          await detail.destroy();
+        } else if (item.quantity) {
+          if (isNaN(parseInt(item.quantity))) {
+            throw new Error("invalid quantity field");
+          }
+          await decreaseQuantity(detail, item.quantity, transaction);
+        }
+        await transaction.commit();
+        succeededDeletes.push(detail);
+      } catch (error: any) {
+        await transaction.rollback();
+        failedDeletes.push({ item, error: parseToJSON(error.message) });
+      }
+    }
+
+    return res.json({
+      ...(failedDeletes.length > 0
+        ? { message: "The operation succeed with error" }
+        : {}),
+      data: {
+        ...cart.get(),
+        succeeded_deletes: succeededDeletes,
+        failed_deletes: failedDeletes,
+      },
     });
   }
 }

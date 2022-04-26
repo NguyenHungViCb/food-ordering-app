@@ -1,6 +1,6 @@
 import Cart from "../../models/cart";
 import CartDetail from "../../models/cart/detail";
-import { getAttributes } from "../../utils/modelUtils";
+import { createPayload, getAttributes } from "../../utils/modelUtils";
 
 class CartModel {
   constructor(public user_id: number) {}
@@ -51,6 +51,12 @@ const addItemsPayload = {
   failed_inserts: failedInsertType,
 };
 
+const removeItemsPayload = {
+  ...createPayload,
+  succeeded_inserts: cartDetailItem,
+  failedInsertType: `${{ ...failedInsertType }} | 'string'`,
+};
+
 export {
   CartModel,
   CartCreation,
@@ -58,4 +64,5 @@ export {
   cartDetailItem,
   failedInsertType,
   addItemsPayload,
+  removeItemsPayload,
 };

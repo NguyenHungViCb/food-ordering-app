@@ -1,9 +1,10 @@
 export function isNotNull<T>(
   value: T,
-  name = "value"
+  name = "value",
+  message = "should not be null"
 ): asserts value is NonNullable<T> {
   if (value === null || value == undefined) {
-    throw new Error(name + " should not be null");
+    throw new Error(name + " " + message);
   }
 }
 
