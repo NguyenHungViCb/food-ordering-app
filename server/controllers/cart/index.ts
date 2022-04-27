@@ -10,10 +10,9 @@ import {
   cartDetailItem,
   CartModel,
   createdCartPayload,
-  failedInsertType,
   removeItemsPayload,
 } from "../../types/cart";
-import { createPayload, getAttributes } from "../../utils/modelUtils";
+import { getAttributes } from "../../utils/modelUtils";
 import {
   controller,
   routeConfig,
@@ -27,7 +26,7 @@ import {
   upsertActiveCartValidate,
 } from "../../middlewares/carts";
 import { upsert } from "../../services";
-import { decreaseQuantity, increaseQuantity } from "./cart";
+import { decreaseQuantity, increaseQuantity } from "../../services/cart/cart";
 import { parseToJSON } from "../../utils/validations/json";
 
 export interface createPayloadType {
@@ -92,13 +91,12 @@ class CartController {
         },
         transaction,
       });
-      const response = await increaseQuantity(
+      succeededInserts = await increaseQuantity(
         detail,
         item.quantity,
         product?.getDataValue("stock") || 0,
         transaction
       );
-      succeededInserts = response;
       await transaction.commit();
     } catch (error: any) {
       // rollback if new updated quantity > stock
@@ -156,13 +154,12 @@ class CartController {
     let succeededDeletes;
     let failedDeletes;
     try {
-      const response = await CartDetail.destroy({
+      succeededDeletes = await CartDetail.destroy({
         where: {
           cart_id: cart.getDataValue("id"),
           product_id: item.product_id,
         },
       });
-      succeededDeletes = response;
     } catch (error: any) {
       failedDeletes = { item, error: error.message };
     }
