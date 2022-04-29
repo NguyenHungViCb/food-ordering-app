@@ -223,6 +223,31 @@ class CartController {
       },
     });
   }
+
+  @routeDescription({
+    response_payload: {
+      ...createdCartPayload,
+      details: [createdCartPayload.details],
+    },
+  })
+  @routeConfig({
+    method: "get",
+    path: `${path}/active`,
+    middlewares: [jwtValidate],
+  })
+  async getActiveCart(req: Request, res: Response, __: NextFunction) {
+    const { user } = req;
+    const cart = await Cart.findOne({
+      where: { user_id: user.getDataValue("id"), is_active: true },
+      include: [{ model: CartDetail, as: "cart_details" }],
+    });
+    if (cart) {
+      return res.json({ data: cart, success: true });
+    }
+    return res
+      .status(404)
+      .json({ message: "No cart found", data: null, success: false });
+  }
 }
 
 export default CartController;

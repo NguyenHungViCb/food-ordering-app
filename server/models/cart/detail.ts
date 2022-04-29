@@ -40,7 +40,7 @@ const CartDetail = sequelize.define<
 );
 
 Cart.hasMany(CartDetail, {
-  as: "cart",
+  as: "cart_details",
   onDelete: "cascade",
   foreignKey: "cart_id",
 });
