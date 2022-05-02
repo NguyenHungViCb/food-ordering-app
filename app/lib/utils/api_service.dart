@@ -15,7 +15,7 @@ class ApiService {
   ApiService._internal();
 
   Future<http.Response> get(url) async {
-    return http.get(Uri.parse(baseURL + url), headers: {
+    return await http.get(Uri.parse(baseURL + url), headers: {
       'Content-Type': 'application/json; charset=UTF-8',
       'Authorization': 'Bearer' + tokens.token
     });

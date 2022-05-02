@@ -2,7 +2,7 @@ import 'dart:convert';
 
 // A generic class for response
 class BaseResponse<T> {
-  String message;
+  String? message;
   T data;
   bool success;
 
