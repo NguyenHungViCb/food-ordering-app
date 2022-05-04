@@ -1,8 +1,10 @@
 import 'package:app/models/restaurant.dart';
+import 'package:app/screens/detail/detail.dart';
 import 'package:app/screens/home/widget/food_list.dart';
 import 'package:app/screens/home/widget/food_list_view.dart';
 import 'package:app/screens/home/widget/restaurant_info.dart';
 import 'package:app/share/constants/colors.dart';
+import 'package:app/widgets/navigation_drawer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 
@@ -28,10 +30,13 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           CustomAppBar(
-            Icons.arrow_back_ios_outlined,
+            Icons.menu_sharp,
             Icons.search_outlined,
+            leftCallback: ()=> {
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const SecondRoute()),
+            )}
           ),
-          RestaurantInfo(),
+          // RestaurantInfo(),
           FoodList(selected,
               (int index) {
             setState(() {
@@ -51,34 +56,34 @@ class _HomePageState extends State<HomePage> {
                 restaurant
               ),
           ),
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 25),
-            height: 60,
-            child: SmoothPageIndicator(
-                controller: pageController,
-                count: restaurant.menu.length,
-            effect: CustomizableEffect(
-                dotDecoration: DotDecoration(
-                  width: 8,
-                  height: 8,
-                    color:Colors.grey.withOpacity(0.5),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                activeDotDecoration: DotDecoration(
-                  width: 10,
-                  height: 10,
-                  color: kBackground,
-                  borderRadius: BorderRadius.circular(10),
-                  dotBorder: DotBorder(
-                    color: kPrimaryColor,
-                    padding: 2,
-                    width: 2,
-                  )
-                ),
-            ),
-              onDotClicked: (index)=>pageController.jumpToPage(index),
-            ),
-          )
+          // Container(
+          //   padding: EdgeInsets.symmetric(horizontal: 25),
+          //   height: 60,
+          //   child: SmoothPageIndicator(
+          //       controller: pageController,
+          //       count: restaurant.menu.length,
+          //   effect: CustomizableEffect(
+          //       dotDecoration: DotDecoration(
+          //         width: 8,
+          //         height: 8,
+          //           color:Colors.grey.withOpacity(0.5),
+          //         borderRadius: BorderRadius.circular(8),
+          //       ),
+          //       activeDotDecoration: DotDecoration(
+          //         width: 10,
+          //         height: 10,
+          //         color: kBackground,
+          //         borderRadius: BorderRadius.circular(10),
+          //         dotBorder: DotBorder(
+          //           color: kPrimaryColor,
+          //           padding: 2,
+          //           width: 2,
+          //         )
+          //       ),
+          //   ),
+          //     onDotClicked: (index)=>pageController.jumpToPage(index),
+          //   ),
+          // )
         ],
       ),
       floatingActionButton: FloatingActionButton(
@@ -92,3 +97,26 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
+
+//test
+class SecondRoute extends StatelessWidget {
+  const SecondRoute({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Second Route'),
+      ),
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () {
+            Navigator.pop(context);
+          },
+          child: const Text('Go back!'),
+        ),
+      ),
+    );
+  }
+}
+

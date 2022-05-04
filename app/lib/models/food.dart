@@ -36,7 +36,7 @@ class Food {
       1,
       [
         {
-          'Noodle': 'assets/įmages/ingre1.png',
+          'Noodle': 'assets/images/ingre2.png',
         },
         {
           'Shrimp': 'assets/images/ingre2.png',

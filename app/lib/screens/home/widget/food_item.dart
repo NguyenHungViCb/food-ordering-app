@@ -51,12 +51,12 @@ class FoodItem extends StatelessWidget {
                     ],
                   ),
 
-                  Text(food.desc,
-                    style: TextStyle(
-                      color: food.hightLight ? kPrimaryColor :Colors.grey.withOpacity(0.8),
-                      height: 1.5,
-                    ),
-                  ),
+                  // Text(food.desc,
+                  //   style: TextStyle(
+                  //     color: food.hightLight ? kPrimaryColor :Colors.grey.withOpacity(0.8),
+                  //     height: 1.5,
+                  //   ),
+                  // ),
                   SizedBox(height: 5),
                   Row(
                     children:[
