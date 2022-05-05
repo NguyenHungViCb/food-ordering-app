@@ -1,3 +1,4 @@
+import 'package:app/constants.dart';
 import 'package:flutter/material.dart';
 
 class PrimaryButton extends StatefulWidget {
@@ -17,8 +18,8 @@ class PrimaryButton extends StatefulWidget {
 
 class _PrimaryButtonState extends State<PrimaryButton> {
   bool loading = false;
-  Color activeBg = const Color(0xFF10192D);
-  Color disableBg = const Color(0xFF222E49);
+  Color activeBg = const Color(0xFFEE4D2A);
+  Color disableBg = kPrimaryColor;
   Color activeFg = Colors.white;
   Color disableFg = Colors.white54;
 

@@ -5,6 +5,7 @@ import 'package:app/screens/welcome/signup/signup.dart';
 import 'package:app/screens/welcome/widgets/logo.dart';
 import 'package:app/share/buttons/neutral_button.dart';
 import 'package:app/share/buttons/secondary_button.dart';
+import 'package:app/share/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class WelcomeScreen extends StatefulWidget {
@@ -22,7 +23,7 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: kPrimaryColor,
       body: SafeArea(
           child: Padding(
         padding: const EdgeInsets.fromLTRB(30, 0, 30, 0),

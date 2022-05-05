@@ -1,4 +1,3 @@
-
 import 'package:app/routes.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
