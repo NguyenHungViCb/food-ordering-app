@@ -9,6 +9,7 @@ import {
   WhereOptions,
 } from "sequelize";
 import { sequelize } from "../db/config";
+import { Sequelize } from "../models";
 
 export async function createWithTransaction<
   M extends Model,
@@ -77,4 +78,15 @@ export async function upsert<M extends Model, TAttributes = Attributes<M>>(
         return [result, true];
       }
     });
+}
+
+export async function updateIfExist<
+  M extends Model,
+  K extends keyof TAttributes | "created_at" | "updated_at",
+  TAttributes = Attributes<M>
+>(model: M, updateValues: { [key in K]: Attributes<M>[key] }) {
+  const filtered = Object.entries(updateValues).filter(([_, value]) => {
+    return value !== undefined && value !== true;
+  });
+  return await model.update(Object.fromEntries(filtered));
 }
