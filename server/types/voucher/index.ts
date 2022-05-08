@@ -20,4 +20,23 @@ class VoucherCreation extends VoucherModel {
   }
 }
 
-export { VoucherModel, VoucherCreation };
+class VoucherDetailModel {
+  constructor(public voucher_id: number, public product_id: number) {}
+}
+
+class VoucherDetailCreation extends VoucherDetailModel {
+  constructor(
+    public id: number,
+    public voucher_id: number,
+    public product_id: number
+  ) {
+    super(voucher_id, product_id);
+  }
+}
+
+export {
+  VoucherModel,
+  VoucherCreation,
+  VoucherDetailModel,
+  VoucherDetailCreation,
+};

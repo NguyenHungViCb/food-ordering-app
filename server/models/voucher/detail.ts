@@ -1,9 +1,12 @@
 import { DataTypes, Model } from "sequelize";
 import Voucher from ".";
 import { modelConfig, sequelize } from "../../db/config";
+import { VoucherDetailCreation, VoucherDetailModel } from "../../types/voucher";
 import Product from "../product";
 
-const VoucherDetail = sequelize.define(
+const VoucherDetail = sequelize.define<
+  Model<VoucherDetailCreation, VoucherDetailCreation | VoucherDetailModel>
+>(
   "VoucherDetail",
   {
     id: {
@@ -32,10 +35,21 @@ const VoucherDetail = sequelize.define(
 
 Product.belongsToMany(Voucher, {
   through: VoucherDetail,
+  as: "vouchers",
+  foreignKey: "product_id",
 });
-
 Voucher.belongsToMany(Product, {
   through: VoucherDetail,
+  as: "products",
+  foreignKey: "voucher_id",
+});
+Voucher.hasMany(VoucherDetail, {
+  as: "details",
+  foreignKey: "voucher_id",
+});
+VoucherDetail.belongsTo(Voucher, {
+  as: "details",
+  foreignKey: "voucher_id",
 });
 
 export default VoucherDetail;
