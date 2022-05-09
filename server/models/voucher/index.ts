@@ -25,6 +25,10 @@ const Voucher = sequelize.define<
       type: DataTypes.STRING,
       allowNull: true,
     },
+    discount: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
     valid_from: {
       type: DataTypes.DATE,
       allowNull: false,
