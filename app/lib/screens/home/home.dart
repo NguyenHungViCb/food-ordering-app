@@ -2,7 +2,9 @@ import 'package:app/models/restaurant.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/home/widget/food_list.dart';
 import 'package:app/screens/home/widget/food_list_view.dart';
+import 'package:app/screens/home/widget/slider_List.dart';
 import 'package:app/share/constants/colors.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -105,6 +107,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* CustomAppBar(), */
+         DestinationCarousel(),
           // RestaurantInfo(),
           FoodList(selected, (int index) {
             setState(() {
