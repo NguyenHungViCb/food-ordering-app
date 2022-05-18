@@ -1,6 +1,8 @@
-//TODO: Intergrate with API
+//
 // import 'dart:convert';
 //
+// import 'package:app/models/product/product.dart';
+// import 'package:app/models/temp/Product.dart';
 // import 'package:app/share/text_fields/email.dart';
 // import 'package:app/share/text_fields/password.dart';
 // import 'package:app/share/text_fields/text.dart';
@@ -11,7 +13,6 @@
 //
 // import '../../size_config.dart';
 // class CartScreen extends StatefulWidget {
-//   static String routeName = "/cart";
 //   const CartScreen({Key? key}) : super(key: key);
 //
 //   @override
@@ -21,6 +22,7 @@
 // class CartItemsState extends State<CartScreen> {
 //   final _formKey = GlobalKey<FormState>();
 //   late Future<GetCartResponse> cart;
+//   late Future<GetProductResponse> product;
 //   @override
 //   void initState() {
 //     super.initState();
@@ -39,12 +41,13 @@
 //           title: const Text('Fetch Data Example'),
 //         ),
 //         body: Center(
-//           child: FutureBuilder<GetCartResponse>(
+//           child:
+//           FutureBuilder<GetCartResponse>(
 //             future: cart,
 //             builder: (context, snapshot) {
 //               if (snapshot.hasData) {
 //                 // "\$${snapshot.data!.userId}"
-//                 return Text.rich(TextSpan(text:"\$${snapshot.data!.userId.toString()}"));
+//                 return Text('success');
 //               } else if (snapshot.hasError) {
 //                 return Text('${snapshot.error}');
 //               }

@@ -1,4 +1,4 @@
-import 'package:app/models/temp/Cart.dart';
+
 import 'package:app/screens/cart/checkout/components/body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -76,7 +76,7 @@ class CheckoutCard extends StatelessWidget {
                     text: "Total:\n",
                     children: [
                       TextSpan(
-                        text: "\$"+"${Sum()}",
+                        text: "\$"+"${500}",
                         style: TextStyle(fontSize: 16, color: Colors.black),
                       ),
                     ],
@@ -108,3 +108,5 @@ displayBottomSheet(context, Widget sheet) {
         child: sheet,
       )).then((value) => {});
 }
+
+

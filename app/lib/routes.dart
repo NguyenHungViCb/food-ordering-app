@@ -1,4 +1,5 @@
 import 'package:app/screens/cart/cart/cart_screen.dart';
+import 'package:app/screens/cart/cart_page.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/widgets.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/widgets.dart';
 // All our routes will be available here
 final Map<String, WidgetBuilder> routes = {
   CartScreen.routeName: (context) => CartScreen(),
+  // CartPage.routeName: (context) => const CartPage(),
   WelcomeScreen.routeName: (context) => const WelcomeScreen(),
   HomePage.routeName: (context) => const HomePage(),
 };
