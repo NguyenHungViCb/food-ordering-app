@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/models/product/product.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,11 +11,9 @@ import 'cart_card.dart';
 class Body extends StatefulWidget {
   @override
   _BodyState createState() => _BodyState();
-  var total;
 }
 
 class _BodyState extends State<Body> {
-  var total;
   late Future<GetProductResponse> product;
   late Future<GetCartResponse> cart;
 
@@ -80,7 +77,7 @@ class _BodyState extends State<Body> {
                           //SizedBox(width: 100),
                           Center(
                               child: Container(
-                            height: 30,
+                            height: 22,
                             width: 70,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(4),

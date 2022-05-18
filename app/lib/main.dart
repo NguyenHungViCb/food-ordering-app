@@ -1,7 +1,4 @@
 import 'package:app/routes.dart';
-import 'package:app/screens/cart/cart/cart_screen.dart';
-import 'package:app/screens/cart/cart_page.dart';
-import 'package:app/screens/home/home.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/material.dart';

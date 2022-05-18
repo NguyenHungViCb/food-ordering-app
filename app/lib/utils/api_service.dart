@@ -21,7 +21,7 @@ class ApiService {
     if (savedToken != null) {
       var decoded = json.decode(savedToken);
       return Token(
-          token: decoded['token'], refreshToken: decoded["refresh_token"]);
+          token: decoded['token'], refreshToken: decoded["refreshToken"]);
     }
     return Token(token: "", refreshToken: "");
   }

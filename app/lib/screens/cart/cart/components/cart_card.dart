@@ -12,6 +12,8 @@ class CartCard extends StatelessWidget {
 
   final Future<GetProductResponse> productResponse;
   final int index;
+  final sum = 0;
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GetProductResponse>(
@@ -19,7 +21,7 @@ class CartCard extends StatelessWidget {
         builder: (context, snapshot) {
           return Container(
             decoration: BoxDecoration(
-              color: Color(0xFFFFFFFF),
+              color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(15),
             ),
             child:  Row(
@@ -31,29 +33,29 @@ class CartCard extends StatelessWidget {
                     child: Container(
                       padding: EdgeInsets.all(getProportionateScreenWidth(10)),
                       decoration: BoxDecoration(
-                        color: Color(0xFFFFFFFF),
+                        color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.asset("assets/images/dish1.png", fit: BoxFit.fitHeight),
+                      child: Image.asset(snapshot.data!.images[0].src.toString(), fit: BoxFit.fitHeight),
                     ),
                   ),
 
                 ),
-                SizedBox(width: 20),
+                const SizedBox(width: 20),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      snapshot.data!.name.toString(),
-                      style: TextStyle(color: Colors.black, fontSize: 16),
+                      "${snapshot.data!.name}",
+                      style: const TextStyle(color: Colors.black, fontSize: 16),
                       maxLines: 2,
                     ),
-                    SizedBox(height: 10),
+                    const SizedBox(height: 10),
 
                     Text.rich(
                       TextSpan(
                         text: "\$${snapshot.data!.price}",
-                        style: TextStyle(
+                        style: const TextStyle(
                             fontWeight: FontWeight.w600, color: kPrimaryColor),
                         // children: [
                         //   TextSpan(
@@ -68,7 +70,5 @@ class CartCard extends StatelessWidget {
             ),
           );
         });
-
-
   }
 }

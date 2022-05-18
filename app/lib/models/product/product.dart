@@ -1,5 +1,3 @@
-import 'dart:developer';
-import 'package:app/models/api/base_response.dart';
 import 'package:app/models/product/Images.dart';
 import 'dart:convert';
 import 'package:app/utils/api_service.dart';
@@ -55,4 +53,5 @@ class ProductItems {
       throw Exception('Failed to load product');
     }
   }
+
 }
