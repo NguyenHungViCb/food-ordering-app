@@ -28,6 +28,7 @@ import {
 import { upsert } from "../../services";
 import { decreaseQuantity, increaseQuantity } from "../../services/cart/cart";
 import { parseToJSON } from "../../utils/validations/json";
+import { errorsConverter } from "../../utils/commons";
 
 export interface createPayloadType {
   product_id: number;
@@ -100,7 +101,7 @@ class CartController {
       await transaction.commit();
     } catch (error: any) {
       // rollback if new updated quantity > stock
-      failedInserts = { item, error: JSON.parse(error.message) };
+      failedInserts = { item, error: errorsConverter.jsonOrString(error) };
       await transaction.rollback();
     }
     return { succeededInserts, failedInserts };

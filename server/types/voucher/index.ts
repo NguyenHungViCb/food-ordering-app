@@ -2,7 +2,8 @@ class VoucherModel {
   constructor(
     public code: string,
     public valid_from: Date,
-    public valid_until: Date
+    public valid_until: Date,
+    public discount: number
   ) {}
 }
 
@@ -12,11 +13,12 @@ class VoucherCreation extends VoucherModel {
     public code: string,
     public valid_from: Date,
     public valid_until: Date,
+    public discount: number,
     public description?: string,
     public created_at?: Date,
     public updated_at?: Date
   ) {
-    super(code, valid_from, valid_until);
+    super(code, valid_from, valid_until, discount);
   }
 }
 
