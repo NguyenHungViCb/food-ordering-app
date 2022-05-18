@@ -48,5 +48,9 @@ CartDetail.belongsTo(Cart, {
   as: "cart",
   foreignKey: "cart_id",
 });
+CartDetail.belongsTo(Product, {
+  as: "product",
+  foreignKey: "product_id",
+});
 
 export default CartDetail;

@@ -45,15 +45,15 @@ class ProductController extends ProductBase {
   }
 
   @routeDescription({
-    query: { id: "number" },
+    // query: { id: "number" },
     response_payload: productSchemaPlainObj,
     usage: "get a single product by id",
   })
   @routeConfig({ method: "get", path: `${path}/:id` })
   async getSingle(req: Request, res: Response, __: NextFunction) {
-    const { id } = req.query;
+    const { id } = req.params;
     if (id && typeof id === "string") {
-      const product = await Product.findByPk(id, {
+      const product = await Product.findByPk(parseInt(id), {
         include: [{ model: Image, as: "images", through: { attributes: [] } }],
       });
       return res.json(product);
@@ -74,7 +74,7 @@ class ProductController extends ProductBase {
     isArray<Array<number>>(categories, categories);
 
     const product = await Product.create(
-      { ...rest, images: images },
+      { ...rest, images: images, original_price: rest.original_price },
       {
         include: [
           {
