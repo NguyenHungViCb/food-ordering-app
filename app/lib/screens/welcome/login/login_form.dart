@@ -96,8 +96,8 @@ class LoginFormState extends State<LoginForm> {
        await GlobalStorage.write(
            key: "tokens", value: json.encode(tokens.toJson()));
        GlobalStorage.read(key: "tokens").then((value) => print(value));
+       Navigator.pushNamed(context, HomePage.routeName);
      }
     toggleLoading();
-    Navigator.pushNamed(context, HomePage.routeName);
   }
 }

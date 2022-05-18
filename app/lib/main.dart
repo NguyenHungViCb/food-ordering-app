@@ -12,7 +12,7 @@ void main() async {
   await dotenv.load();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: CartScreen.routeName,
+    initialRoute: WelcomeScreen.routeName,
     routes: routes,
     theme: ThemeData(primaryColor: const Color.fromARGB(1, 238, 77, 42)),
   ));
