@@ -96,8 +96,8 @@ class _PaymentState extends State<Payment> {
                           if (choosenMethod != -1 &&
                               Payment.paymentMethods[choosenMethod]['id'] ==
                                   PaymentMethods['stripe']) {
-                            /* final result = await Navigator.pushNamed( */
-                            /*     context, AddCard.routeName) as CustomCreditCard; */
+                            Navigator.pushNamed(context, AddCard.routeName)
+                                as CustomCreditCard;
                             /* setState(() { */
                             /*   _card = _card.copyWith(number: result.number); */
                             /*   _card = _card.copyWith( */

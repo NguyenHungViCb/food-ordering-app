@@ -1,10 +1,12 @@
 import 'package:app/screens/cart/checkout/components/body.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/cart/voucher/body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
+import '../../../welcome/auth_bottom_sheet.dart';
 
 class CheckoutCard extends StatefulWidget {
   const CheckoutCard({
@@ -48,8 +50,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: () async{
-                    final result = await Navigator.pushNamed(context, Payment.routeName);
+                  onTap: () async {
+                    final result =
+                        await Navigator.pushNamed(context, Payment.routeName);
                     print(result);
                   },
                   child: Row(
@@ -64,13 +67,19 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   ),
                 ),
                 const Spacer(),
-                const Text("Add voucher code"),
+                InkWell(
+                  child: const Text("Add voucher code"),
+                  onTap: () {
+                    displayBottomSheet(
+                        context, const AuthBottomSheet(child: Voucher()));
+                  },
+                ),
                 const SizedBox(width: 10),
                 const Icon(
                   Icons.arrow_forward_ios,
                   size: 12,
                   color: kTextColor,
-                ),
+                )
               ],
             ),
             SizedBox(height: getProportionateScreenHeight(20)),
@@ -104,6 +113,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
 displayBottomSheet(context, Widget sheet) {
   return showModalBottomSheet(
       isScrollControlled: true,
+      isDismissible: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       context: context,
