@@ -8,7 +8,7 @@ import 'package:app/utils/api_service.dart';
 
 // =================== User related models ===================
 
-GetFoodResponse userFromJson(String str) =>
+GetFoodResponse foodFromJson(String str) =>
     GetFoodResponse.fromJson(json.decode(str));
 
 String userToJson(GetFoodResponse data) => json.encode(data.toJson());
@@ -67,7 +67,7 @@ class GetFoodResponse {
 
 // =================== Class responsed for api called ===================
 
-class CartItems {
+class Foode {
   Future<GetFoodResponse> GetFood() async {
     var response = await ApiService().get("/api/products/all");
     if (response.statusCode == 200) {

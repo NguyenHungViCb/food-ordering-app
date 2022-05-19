@@ -1,4 +1,5 @@
 import 'package:app/models/food.dart';
+import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:flutter/material.dart';
 
@@ -52,11 +53,19 @@ class FoodQuantity extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text('-',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),),
+                GestureDetector(
+                    child:Text('-',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),),
+                  onTap: (){print('Terms');},
+                ),
+                // Text('-',
+                // style: TextStyle(
+                //   fontSize: 20,
+                //   fontWeight: FontWeight.bold,
+                // ),),
                 Container(
                   padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
@@ -68,11 +77,20 @@ class FoodQuantity extends StatelessWidget {
                     fontWeight: FontWeight.bold
                   ),),
                 ),
-                Text('+',
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                  ),),
+                GestureDetector(
+                  child:Text('+',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),) ,
+                  onTap: (){ Navigator.pushNamed(context, CartScreen.routeName);},
+                )
+                ,
+                // Text('+',
+                //   style: TextStyle(
+                //     fontSize: 20,
+                //     fontWeight: FontWeight.bold,
+                //   ),),
               ],
             ),
           ),

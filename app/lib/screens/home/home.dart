@@ -8,6 +8,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../models/foods/getfood/foode.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -16,9 +17,11 @@ class HomePage extends StatefulWidget {
 
   @override
   State<HomePage> createState() => _HomePageState();
+
 }
 
 class _HomePageState extends State<HomePage> {
+
   var selected = 0;
   final pageController = PageController();
   final restaurant = Restaurant.generateRestaurant();
@@ -101,7 +104,9 @@ class _HomePageState extends State<HomePage> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: CustomAppBar(Icons.menu_sharp, Icons.search_outlined,
-            leftCallback: (context) => {Scaffold.of(context).openDrawer()}),
+            leftCallback: (context) => {Scaffold.of(context).openDrawer()},
+
+        ),
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

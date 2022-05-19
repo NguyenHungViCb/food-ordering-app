@@ -17,12 +17,15 @@ class CustomAppBar extends StatelessWidget {
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
+        children: <Widget>[
           GestureDetector(
             onTap: leftCallback !=null ? () => leftCallback!(context) : null,
             child: _buildIcon(leftIcon),
           ),
-          _buildIcon(rightIcon),
+          GestureDetector(
+            onTap: (){ print('Terms');},
+            child: _buildIcon(rightIcon),
+          ),
         ],
       ),
     );

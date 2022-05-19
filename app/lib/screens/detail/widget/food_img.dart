@@ -17,17 +17,17 @@ FoodImg(this.food);
                 flex: 1,
                 child: Container(),
               ),
-              Expanded(
-                  flex:1,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(50),
-                        topRight: Radius.circular(50),
-                      ),
-                      color: kBackground,
-                    ),
-                  ))
+              // Expanded(
+              //     flex:1,
+              //     child: Container(
+              //       decoration: BoxDecoration(
+              //         borderRadius: BorderRadius.only(
+              //           topLeft: Radius.circular(50),
+              //           topRight: Radius.circular(50),
+              //         ),
+              //         color: kBackground,
+              //       ),
+              //     ))
             ],
           ),
           Align(

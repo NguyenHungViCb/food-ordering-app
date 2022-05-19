@@ -20,11 +20,11 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
 
   final List<String> images = [
     'assets/images/voucher3.png',
-    'assets/images/voucher2.png',
     'assets/images/voucher3.png',
-    'assets/images/voucher2.png',
     'assets/images/voucher3.png',
-    'assets/images/voucher2.png',
+    'assets/images/voucher3.png',
+    'assets/images/voucher3.png',
+    'assets/images/voucher3.png',
   ];
 
  // final List<String> places = [
