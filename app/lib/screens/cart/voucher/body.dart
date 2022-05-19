@@ -11,7 +11,7 @@ class Voucher extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: MediaQuery.of(context).size.height * 0.4,
+      height: MediaQuery.of(context).size.height * 0.3,
       child: Column(
         children: const [VoucherPage()],
       ),

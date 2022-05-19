@@ -24,14 +24,13 @@ class VoucherPageState extends State<VoucherPage> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   const SizedBox(height: 30),
-                  Text("Note"),
+                  Text("Voucher Code"),
                   TextFormField(
-                    controller: noteController,
-                    minLines: 6, // any number you need (It works as the rows for the textarea)
+                    controller: noteController, // any number you need (It works as the rows for the textarea)
                     keyboardType: TextInputType.multiline,
                     maxLines: null,
                   ),
-                  const SizedBox(height: 15),
+                  const SizedBox(height: 5),
                   DefaultButton(
                     press:() {},
                     text: "Save",
