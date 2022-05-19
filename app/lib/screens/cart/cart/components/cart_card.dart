@@ -4,11 +4,8 @@ import 'package:app/size_config.dart';
 import 'package:flutter/material.dart';
 
 class CartCard extends StatelessWidget {
-  const CartCard({
-    Key? key,
-    required this.productResponse,
-    required this.index
-  }) : super(key: key);
+  const CartCard({Key? key, required this.productResponse, required this.index})
+      : super(key: key);
 
   final Future<GetProductResponse> productResponse;
   final int index;
@@ -24,7 +21,7 @@ class CartCard extends StatelessWidget {
               color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(15),
             ),
-            child:  Row(
+            child: Row(
               children: [
                 SizedBox(
                   width: 88,
@@ -36,10 +33,11 @@ class CartCard extends StatelessWidget {
                         color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.asset(snapshot.data!.images[0].src.toString(), fit: BoxFit.fitHeight),
+                      child: Image.network(
+                          snapshot.data!.images[0].src.toString(),
+                          fit: BoxFit.fitHeight),
                     ),
                   ),
-
                 ),
                 const SizedBox(width: 20),
                 Column(
@@ -51,7 +49,6 @@ class CartCard extends StatelessWidget {
                       maxLines: 2,
                     ),
                     const SizedBox(height: 10),
-
                     Text.rich(
                       TextSpan(
                         text: "\$${snapshot.data!.price}",
