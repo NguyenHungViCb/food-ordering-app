@@ -14,7 +14,7 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  late Future<GetProductResponse> product;
+  late Future<GetSingleProductResponse> product;
   late Future<GetCartResponse> cart;
 
   @override
@@ -92,8 +92,8 @@ class _BodyState extends State<Body> {
                                   InkWell(
                                       onTap: () {
                                         setState(() {
-                                          snapshot
-                                              .data!.details[index].quantity--;
+                                          snapshot.data!.details[index].quantity--;
+                                          DeleteCart(snapshot.data!.details[index].productId, 1);
                                         });
                                       },
                                       child: const Icon(
@@ -108,8 +108,8 @@ class _BodyState extends State<Body> {
                                   InkWell(
                                       onTap: () {
                                         setState(() {
-                                          snapshot
-                                              .data!.details[index].quantity++;
+                                          snapshot.data!.details[index].quantity++;
+                                          AddCart(snapshot.data!.details[index].productId, 1);
                                         });
                                       },
                                       child: const Icon(
@@ -138,14 +138,19 @@ class _BodyState extends State<Body> {
 
   void DeleteCart(String Id, int? quantity) async {
     try {
-      await Future.delayed(const Duration(seconds: 1));
-
       await CartItems().DeleteCart(Id, quantity);
     } catch (e) {
       log(e.toString());
     }
   }
 
+  void AddCart(String Id, int? quantity) async {
+    try {
+      await CartItems().AddCart(Id, quantity);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
   void sum() {}
 }
 

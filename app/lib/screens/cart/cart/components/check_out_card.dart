@@ -1,5 +1,6 @@
 
 import 'package:app/screens/cart/checkout/components/body.dart';
+import 'package:app/screens/cart/voucher/body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
@@ -58,7 +59,10 @@ class CheckoutCard extends StatelessWidget {
                   )
                 ),
                 const Spacer(),
-                const Text("Add voucher code"),
+                InkWell(
+                  child: const Text("Add voucher code"),
+                  onTap: () {displayBottomSheet(context, const AuthBottomSheet(child: Voucher()));},
+                ),
                 const SizedBox(width: 10),
                 const Icon(
                   Icons.arrow_forward_ios,
@@ -100,6 +104,7 @@ class CheckoutCard extends StatelessWidget {
 displayBottomSheet(context, Widget sheet) {
   return showModalBottomSheet(
       isScrollControlled: true,
+      isDismissible: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       context: context,

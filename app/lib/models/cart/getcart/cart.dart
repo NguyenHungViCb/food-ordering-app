@@ -118,4 +118,13 @@ class CartItems {
     }
     return null;
   }
+
+  Future<dynamic> AddCart(String productId, int? quantity) async {
+    try {
+      await ApiService().post("/api/carts/items/add", json.encode({"items":[{"product_id": productId,"quantity": quantity}]}));
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
 }

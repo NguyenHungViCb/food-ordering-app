@@ -10,13 +10,13 @@ class CartCard extends StatelessWidget {
     required this.index
   }) : super(key: key);
 
-  final Future<GetProductResponse> productResponse;
+  final Future<GetSingleProductResponse> productResponse;
   final int index;
   final sum = 0;
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<GetProductResponse>(
+    return FutureBuilder<GetSingleProductResponse>(
         future: productResponse,
         builder: (context, snapshot) {
           return Container(
@@ -36,7 +36,7 @@ class CartCard extends StatelessWidget {
                         color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.asset(snapshot.data!.images[0].src.toString(), fit: BoxFit.fitHeight),
+                      child: Image.asset(snapshot.data?.images[0].src.toString() ?? "", fit: BoxFit.fitHeight),
                     ),
                   ),
 
@@ -46,7 +46,7 @@ class CartCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${snapshot.data!.name}",
+                      "${snapshot.data?.name ?? ""}",
                       style: const TextStyle(color: Colors.black, fontSize: 16),
                       maxLines: 2,
                     ),
