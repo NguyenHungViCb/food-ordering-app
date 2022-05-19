@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:app/models/tokens/tokens.dart';
 import 'package:app/models/users/users.dart';
-import 'package:app/screens/cart/cart_items.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/share/buttons/primary_button.dart';
 import 'package:app/share/constants/storage.dart';
@@ -88,14 +87,14 @@ class LoginFormState extends State<LoginForm> {
   void loginHandler(context, toggleLoading) async {
     toggleLoading();
     await Future.delayed(const Duration(seconds: 1));
-    /* var tokens = */
-    /*     await User().localLogin(emailController.text, passwordController.text); */
-    /* if (tokens is Token) { */
-    /*   await GlobalStorage.write( */
-    /*       key: "tokens", value: json.encode(tokens.toJson())); */
-    /*   GlobalStorage.read(key: "tokens").then((value) => print(value)); */
-    /* } */
+     var tokens =
+        await User().localLogin(emailController.text, passwordController.text);
+     if (tokens is Token) {
+       await GlobalStorage.write(
+           key: "tokens", value: json.encode(tokens.toJson()));
+       GlobalStorage.read(key: "tokens").then((value) => print(value));
+       Navigator.pushNamed(context, HomePage.routeName);
+     }
     toggleLoading();
-    Navigator.pushNamed(context, HomePage.routeName);
   }
 }

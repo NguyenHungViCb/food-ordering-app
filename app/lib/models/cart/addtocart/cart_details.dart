@@ -14,7 +14,7 @@ class CartDetails
 
   Map<String, dynamic> toJson() => {
     "id": id,
-    "quantity?": quantity,
+    "quantity": quantity,
     "product_id":productId,
     "updated_at": updatedAt.toIso8601String(),
     "created_at": createdAt.toIso8601String(),

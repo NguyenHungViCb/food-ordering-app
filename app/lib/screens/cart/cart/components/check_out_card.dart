@@ -1,17 +1,24 @@
-import 'package:app/models/temp/Cart.dart';
 import 'package:app/screens/cart/checkout/components/body.dart';
+import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/cart/voucher/body.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
-
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 import '../../../welcome/auth_bottom_sheet.dart';
 
-class CheckoutCard extends StatelessWidget {
+class CheckoutCard extends StatefulWidget {
   const CheckoutCard({
     Key? key,
   }) : super(key: key);
+
+  @override
+  State<CheckoutCard> createState() => _CheckoutCardState();
+}
+
+class _CheckoutCardState extends State<CheckoutCard> {
+  var paymentMethod = Payment.paymentMethods[0];
 
   @override
   Widget build(BuildContext context) {
@@ -23,15 +30,15 @@ class CheckoutCard extends StatelessWidget {
       // height: 174,
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           topLeft: Radius.circular(30),
           topRight: Radius.circular(30),
         ),
         boxShadow: [
           BoxShadow(
-            offset: Offset(0, -15),
+            offset: const Offset(0, -15),
             blurRadius: 20,
-            color: Color(0xFFDADADA).withOpacity(0.15),
+            color: const Color(0xFFDADADA).withOpacity(0.15),
           )
         ],
       ),
@@ -42,25 +49,33 @@ class CheckoutCard extends StatelessWidget {
           children: [
             Row(
               children: [
-                Container(
-                  padding: EdgeInsets.all(10),
-                  height: getProportionateScreenWidth(40),
-                  width: getProportionateScreenWidth(40),
-                  decoration: BoxDecoration(
-                    color: Color(0xFFF5F6F9),
-                    borderRadius: BorderRadius.circular(10),
+                GestureDetector(
+                  onTap: () async {
+                    final result =
+                        await Navigator.pushNamed(context, Payment.routeName);
+                    print(result);
+                  },
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        paymentMethod['src']!,
+                        width: 30,
+                      ),
+                      const SizedBox(width: 20),
+                      Text(paymentMethod['name']!)
+                    ],
                   ),
-                  child: GestureDetector(
-                    onTap: (){
-                      displayBottomSheet(context, const AuthBottomSheet(child: Checkout()));
-                    },
-                    child: SvgPicture.asset("assets/temp/icons/receipt.svg"),
-                  )
                 ),
-                Spacer(),
-                Text("Add voucher code"),
+                const Spacer(),
+                InkWell(
+                  child: const Text("Add voucher code"),
+                  onTap: () {
+                    displayBottomSheet(
+                        context, const AuthBottomSheet(child: Voucher()));
+                  },
+                ),
                 const SizedBox(width: 10),
-                Icon(
+                const Icon(
                   Icons.arrow_forward_ios,
                   size: 12,
                   color: kTextColor,
@@ -71,12 +86,12 @@ class CheckoutCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text.rich(
+                const Text.rich(
                   TextSpan(
                     text: "Total:\n",
                     children: [
                       TextSpan(
-                        text: "\$"+"${Sum()}",
+                        text: "\$ " "${500}",
                         style: TextStyle(fontSize: 16, color: Colors.black),
                       ),
                     ],
@@ -84,10 +99,7 @@ class CheckoutCard extends StatelessWidget {
                 ),
                 SizedBox(
                   width: getProportionateScreenWidth(190),
-                  child: DefaultButton(
-                    text: "Check Out",
-                    press: (){}
-                  ),
+                  child: DefaultButton(text: "Check Out", press: () {}),
                 ),
               ],
             ),
@@ -97,14 +109,16 @@ class CheckoutCard extends StatelessWidget {
     );
   }
 }
+
 displayBottomSheet(context, Widget sheet) {
   return showModalBottomSheet(
       isScrollControlled: true,
+      isDismissible: true,
       shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       context: context,
       builder: (context) => Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18),
-        child: sheet,
-      )).then((value) => {});
+            padding: const EdgeInsets.symmetric(horizontal: 18),
+            child: sheet,
+          )).then((value) => {});
 }
