@@ -13,6 +13,7 @@ import {
 } from "../../utils/routeConfig";
 import { generateRefreshToken, generateToken } from "../../utils/tokenUtils";
 import { getAttributesData } from "../../utils/modelUtils";
+import { updateIfExist } from "../../services";
 
 const path = "/users";
 @controller
@@ -99,12 +100,53 @@ class UserController {
     middlewares: [jwtValidate],
   })
   async getInfo(req: Request, res: Response, __: NextFunction) {
-    const { first_name, last_name, email, email_verified } = req.user.get();
-    return res.status(200).json({
+    const values = getAttributesData(req.user, [
+      "id",
+      "first_name",
+      "last_name",
+      "email",
+      "email_verified",
+      "phone_number",
+      "birthday",
+      "avatar",
+      "active",
+      "created_at",
+      "updated_at",
+    ]);
+    return res.status(200).json({ data: values, success: true });
+  }
+
+  @routeConfig({
+    method: "put",
+    path: `${path}/auth/info/update/single`,
+    middlewares: [jwtValidate],
+  })
+  async updateInfo(req: Request, res: Response, __: NextFunction) {
+    const { user } = req;
+    const { first_name, last_name, birthday, avatar } = req.body;
+    const updated = await updateIfExist(user, {
       first_name,
       last_name,
-      email,
-      email_verified,
+      birthday,
+      avatar,
+    });
+    const values = getAttributesData(updated, [
+      "id",
+      "first_name",
+      "last_name",
+      "email",
+      "email_verified",
+      "phone_number",
+      "birthday",
+      "avatar",
+      "active",
+      "created_at",
+      "updated_at",
+    ]);
+    return res.json({
+      message: "update succeeded",
+      data: values,
+      success: true,
     });
   }
 
@@ -129,6 +171,112 @@ class UserController {
       success: true,
     });
   }
+
+  // @routeConfig({
+  //   method: "post",
+  //   path: `${path}/auth/addresses/create/single`,
+  //   middlewares: [jwtValidate],
+  // })
+  // async addAddress(req: Request, res: Response, __: NextFunction) {
+  //   const { user } = req;
+  //   const { address, ward, district, city, is_primary } = req.body;
+  //   const created = await Address.create({
+  //     user_id: user.getDataValue("id"),
+  //     address,
+  //     ward,
+  //     district,
+  //     city,
+  //     is_primary: is_primary || false,
+  //   });
+  //   return res.json({ data: created, success: true });
+  // }
+
+  // @routeConfig({
+  //   method: "get",
+  //   path: `${path}/auth/addresses/all`,
+  //   middlewares: [jwtValidate],
+  // })
+  // async getAllAddress(req: Request, res: Response, __: NextFunction) {
+  //   const { a_lim, a_page } = req.query;
+  //   const aLim = a_lim && typeof a_lim === "string" ? parseInt(a_lim) : 10;
+  //   const aPage = a_page && typeof a_page === "string" ? parseInt(a_page) : 0;
+  //   const { user } = req;
+  //   const all = await Address.findAndCountAll({
+  //     where: { user_id: user.getDataValue("id") },
+  //     offset: aPage * aLim,
+  //     limit: aLim,
+  //   });
+  //   return res.json({ data: all, success: true });
+  // }
+
+  // @routeConfig({
+  //   method: "put",
+  //   path: `${path}/auth/addresses/update/single`,
+  //   middlewares: [jwtValidate],
+  // })
+  // async updateSingleAddress(req: Request, res: Response, __: NextFunction) {
+  //   const { id, address, ward, district, city, is_primary } = req.body;
+  //   const { user } = req;
+
+  //   const exist = await Address.findByPk(id);
+  //   if (!exist) {
+  //     throw new Error("Address not found");
+  //   }
+  //   const user_id = exist.getDataValue("user_id");
+  //   if (typeof user_id === "string") {
+  //     if (parseInt(user_id) !== user.getDataValue("id")) {
+  //       throw new Error("UnAuthorized");
+  //     }
+  //   } else {
+  //     if (user_id !== user.getDataValue("id")) {
+  //       throw new Error("UnAuthorized");
+  //     }
+  //   }
+  //   const updated = await exist.update({
+  //     address,
+  //     ward,
+  //     district,
+  //     city,
+  //     is_primary,
+  //   });
+  //   return res.json({
+  //     message: "update succeeded",
+  //     data: updated,
+  //     success: true,
+  //   });
+  // }
+
+  // @routeConfig({
+  //   method: "delete",
+  //   path: `${path}/auth/addresses/delete/single`,
+  //   middlewares: [jwtValidate],
+  // })
+  // async deleteSingleAdderss(req: Request, res: Response, __: NextFunction) {
+  //   const { id } = req.body;
+  //   const { user } = req;
+
+  //   const exist = await Address.findByPk(id);
+  //   if (!exist) {
+  //     throw new Error("Address not found");
+  //   }
+  //   const user_id = exist.getDataValue("user_id");
+  //   if (typeof user_id === "string") {
+  //     if (parseInt(user_id) !== user.getDataValue("id")) {
+  //       throw new Error("UnAuthorized");
+  //     }
+  //   } else {
+  //     if (user_id !== user.getDataValue("id")) {
+  //       throw new Error("UnAuthorized");
+  //     }
+  //   }
+
+  //   await exist.destroy();
+  //   return res.json({
+  //     message: "delete succeeded",
+  //     data: exist,
+  //     success: true,
+  //   });
+  // }
 }
 
 export default UserController;

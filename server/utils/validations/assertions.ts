@@ -17,3 +17,15 @@ export function isArray<T>(
     throw new Error(name + " should be any array");
   }
 }
+
+export function queryToNum(value: any) {
+  console.log({ value }, typeof value);
+  if (typeof value !== "string" && typeof value !== "number") {
+    throw new Error("Invalid data format");
+  }
+  if (typeof value === "string") {
+    const num = parseInt(value);
+    return num;
+  }
+  return value;
+}

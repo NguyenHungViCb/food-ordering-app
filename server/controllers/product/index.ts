@@ -35,19 +35,19 @@ class ProductController {
   }
 
   @routeDescription({
-    query: { id: "number" },
+    // query: { id: "number" },
     response_payload: productSchemaPlainObj,
     usage: "get a single product by id",
   })
   @routeConfig({ method: "get", path: `${path}/:id` })
   async getSingle(req: Request, res: Response, __: NextFunction) {
-    const { id } = req.query;
+    const { id } = req.params;
     if (id && typeof id === "string") {
-      const product = await Product.findByPk(id).then((data) => {
+      const product = await Product.findByPk(parseInt(id)).then((data) => {
         if (!data) {
           return data;
         }
-        imageToArray(data);
+        return imageToArray(data);
       });
       return res.json(product);
     }
@@ -67,7 +67,11 @@ class ProductController {
     const reducedImages = images.reduce((prev, curr) => {
       return prev + ";" + curr.src;
     }, "");
-    const product = await Product.create({ ...rest, images: reducedImages });
+    const product = await Product.create({
+      ...rest,
+      images: reducedImages,
+      original_price: rest.original_price,
+    });
     return res.json({ data: product, success: true });
   }
 

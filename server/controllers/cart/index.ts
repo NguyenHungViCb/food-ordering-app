@@ -28,6 +28,7 @@ import {
 import { upsert } from "../../services";
 import { decreaseQuantity, increaseQuantity } from "../../services/cart/cart";
 import { parseToJSON } from "../../utils/validations/json";
+import { errorsConverter } from "../../utils/commons";
 
 export interface createPayloadType {
   product_id: number;
@@ -100,7 +101,10 @@ class CartController {
       await transaction.commit();
     } catch (error: any) {
       // rollback if new updated quantity > stock
-      failedInsert = { item, error: parseToJSON(error.message) };
+      failedInsert = {
+        item,
+        error: errorsConverter.jsonOrString(error.message),
+      };
       await transaction.rollback();
     }
     return {
@@ -213,7 +217,14 @@ class CartController {
           if (isNaN(parseInt(item.quantity))) {
             throw new Error("invalid quantity field");
           }
-          await decreaseQuantity(detail, item.quantity, transaction);
+          const increased = await decreaseQuantity(
+            detail,
+            item.quantity,
+            transaction
+          );
+          if (increased.getDataValue("quantity") === 0) {
+            await increased.destroy({ transaction });
+          }
           const product = await Product.findByPk(
             detail.getDataValue("product_id")
           );

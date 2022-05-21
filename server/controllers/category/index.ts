@@ -11,8 +11,6 @@ import {
   routeConfig,
   routeDescription,
 } from "../../utils/routeConfig";
-import Image from "../../models/image";
-import { imagePlainObj } from "../../types/image";
 import validate from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
 import { productSchemaPlainObj } from "../../types/product/productInterface";
@@ -23,11 +21,11 @@ const path = "/categories";
 @controller
 class CategoryController {
   @routeDescription({
-    response_payload: { ...categoryPlainObj, images: [imagePlainObj] },
+    response_payload: { ...categoryPlainObj, images: [{ src: "string" }] },
     request_payload: {
       ...categoryModelPlainObj,
       ...categoryCreationPlainObj,
-      images: [imagePlainObj],
+      images: [{ src: "string" }],
     },
     usage: "create a single category",
   })
@@ -65,7 +63,7 @@ class CategoryController {
         {
           ...categoryModelPlainObj,
           ...categoryCreationPlainObj,
-          images: [imagePlainObj],
+          images: [{ src: "string" }],
           products: [productSchemaPlainObj],
         },
       ],
