@@ -8,7 +8,7 @@ const activeCartValidate = async (
 ) => {
   const { user } = req;
   const existCart = await Cart.findOne({
-    where: { user_id: user.getDataValue("id"), is_active: true },
+    where: { user_id: user.getDataValue("id") },
   });
   if (!existCart) {
     return res.status(404).json({
@@ -28,7 +28,7 @@ const upsertActiveCartValidate = async (
 ) => {
   const { user } = req;
   const existCart = await Cart.findOrCreate({
-    where: { user_id: user.getDataValue("id"), is_active: true },
+    where: { user_id: user.getDataValue("id") },
     limit: 1,
   });
   req.cart = existCart[0];

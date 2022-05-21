@@ -13,3 +13,4 @@ app.listen(PORT, () => {
   new UserController();
   new CartController();
 });
+export { imageToArray } from "./utils/modelUtils";

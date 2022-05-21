@@ -2,34 +2,40 @@ import { QueryInterface, Sequelize, DataTypes } from "sequelize";
 
 module.exports = {
   async up(queryInterface: QueryInterface, _: Sequelize) {
-    await queryInterface.createTable("category_details", {
+    await queryInterface.createTable("vouchers", {
       id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
       },
-      product_id: {
-        type: DataTypes.BIGINT,
-        references: {
-          model: {
-            tableName: "products",
-          },
-          key: "id",
+      code: {
+        type: DataTypes.STRING,
+        validate: {
+          max: 12,
         },
         allowNull: false,
-        onDelete: "cascade",
+        unique: true,
       },
-      category_id: {
+      description: {
+        type: DataTypes.STRING,
+        allowNull: true,
+      },
+      discount: {
         type: DataTypes.INTEGER,
-        references: {
-          model: {
-            tableName: "categories",
-          },
-          key: "id",
-        },
         allowNull: false,
-        onDelete: "cascade",
+      },
+      valid_from: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      valid_until: {
+        type: DataTypes.DATE,
+        allowNull: false,
+      },
+      min_value: {
+        type: DataTypes.DECIMAL,
+        defaultValue: 0,
       },
       created_at: {
         allowNull: false,
@@ -41,7 +47,8 @@ module.exports = {
       },
     });
   },
+
   async down(queryInterface: QueryInterface, _: Sequelize) {
-    await queryInterface.dropTable("category_details");
+    await queryInterface.dropTable("vouchers");
   },
 };

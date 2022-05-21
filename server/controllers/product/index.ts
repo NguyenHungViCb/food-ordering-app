@@ -1,8 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import Product from "../../models/product";
-import ProductImage from "../../models/product/image";
 import {
-  createdProductResponsePayload,
+  productCreationPlainObj,
   productSchemaPlainObj,
 } from "../../types/product/productInterface";
 import { requireValues } from "../../utils/validations/modelValidation";
@@ -11,14 +10,12 @@ import {
   routeConfig,
   routeDescription,
 } from "../../utils/routeConfig";
-import ProductBase from "./product";
-import Image from "../../models/image";
-import { ImageModel } from "../../types/image";
 import { isArray } from "../../utils/validations/assertions";
+import { imageToArray } from "../../utils/modelUtils";
 
 const path = "/products";
 @controller
-class ProductController extends ProductBase {
+class ProductController {
   @routeDescription({
     response_payload: {
       count: "number",
@@ -28,17 +25,10 @@ class ProductController extends ProductBase {
   })
   @routeConfig({ method: "get", path: `${path}/all` })
   async getProductList(_: Request, res: Response, __: NextFunction) {
-    const products = await Product.findAndCountAll({
-      include: [
-        {
-          model: Image,
-          as: "images",
-          through: {
-            attributes: [],
-          },
-        },
-      ],
-    });
+    const products = await Product.findAndCountAll().then((data) => ({
+      rows: data.rows.map((item) => imageToArray(item)),
+      count: data.count,
+    }));
     return res
       .status(200)
       .json({ message: "success", data: products, success: true });
@@ -53,8 +43,11 @@ class ProductController extends ProductBase {
   async getSingle(req: Request, res: Response, __: NextFunction) {
     const { id } = req.query;
     if (id && typeof id === "string") {
-      const product = await Product.findByPk(id, {
-        include: [{ model: Image, as: "images", through: { attributes: [] } }],
+      const product = await Product.findByPk(id).then((data) => {
+        if (!data) {
+          return data;
+        }
+        imageToArray(data);
       });
       return res.json(product);
     }
@@ -62,39 +55,19 @@ class ProductController extends ProductBase {
   }
 
   @routeDescription({
-    request_payload: createdProductResponsePayload,
+    request_payload: { ...productCreationPlainObj, images: "string[]" },
     response_payload: productSchemaPlainObj,
     usage: "create a single product",
   })
   @routeConfig({ method: "post", path: `${path}/create/single` })
   async createOne(req: Request, res: Response, __: NextFunction) {
-    let { categories, images, ...rest } = req.body;
+    let { images, ...rest } = req.body;
+    isArray<{ src: string }>(images);
     requireValues(req.body);
-    isArray<Array<Pick<ImageModel, "src">>>(images, "images");
-    isArray<Array<number>>(categories, categories);
-
-    const product = await Product.create(
-      { ...rest, images: images },
-      {
-        include: [
-          {
-            model: Image,
-            required: true,
-            as: "images",
-            // @ts-ignore
-            through: ProductImage,
-          },
-        ],
-      }
-    );
-    const { errors } = await this.createWithCategoryId(categories, product);
-    if (errors.length > 0) {
-      return res.json({
-        data: product,
-        success: true,
-        message: "Product has been created with some error",
-      });
-    }
+    const reducedImages = images.reduce((prev, curr) => {
+      return prev + ";" + curr.src;
+    }, "");
+    const product = await Product.create({ ...rest, images: reducedImages });
     return res.json({ data: product, success: true });
   }
 

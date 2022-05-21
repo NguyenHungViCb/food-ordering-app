@@ -5,9 +5,10 @@ import {
   ProductModel,
 } from "../../types/product/productInterface";
 import validate from "../../utils/validations/modelValidation";
+import Category from "../category";
 
 const Product = sequelize.define<
-  Model<ProductCreation, ProductModel | ProductCreation>
+  Model<ProductCreation, ProductCreation | ProductModel>
 >(
   "Product",
   {
@@ -55,13 +56,27 @@ const Product = sequelize.define<
         },
       },
     },
-    order_count: {
-      type: DataTypes.INTEGER(),
+    category_id: {
+      type: DataTypes.BIGINT,
+      references: {
+        model: Category,
+      },
+      key: "id",
+    },
+    images: {
+      type: DataTypes.STRING,
       allowNull: false,
-      defaultValue: 0,
     },
   },
   { ...modelConfig("products") }
 );
 
+Product.belongsTo(Category, {
+  as: "category",
+  foreignKey: "id",
+});
+Category.hasMany(Product, {
+  as: "products",
+  foreignKey: "id",
+});
 export default Product;

@@ -20,9 +20,10 @@ const Cart = sequelize.define<Model<CartCreation, CartModel | CartCreation>>(
       },
       field: "user_id",
     },
-    is_active: {
-      type: DataTypes.BOOLEAN,
-      defaultValue: true,
+    total: {
+      type: DataTypes.DECIMAL,
+      allowNull: false,
+      defaultValue: 0,
     },
   },
   modelConfig("carts")

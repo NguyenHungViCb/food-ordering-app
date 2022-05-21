@@ -2,12 +2,21 @@ import { QueryInterface, Sequelize, DataTypes } from "sequelize";
 
 module.exports = {
   async up(queryInterface: QueryInterface, _: Sequelize) {
-    await queryInterface.createTable("product_images", {
+    await queryInterface.createTable("order_details", {
       id: {
         type: DataTypes.BIGINT,
         autoIncrement: true,
         allowNull: false,
         primaryKey: true,
+      },
+      order_id: {
+        type: DataTypes.BIGINT,
+        references: {
+          model: {
+            tableName: "orders",
+          },
+          key: "id",
+        },
       },
       product_id: {
         type: DataTypes.BIGINT,
@@ -17,19 +26,14 @@ module.exports = {
           },
           key: "id",
         },
-        field: "product_id",
-        onDelete: "cascade",
       },
-      image_id: {
-        type: DataTypes.BIGINT,
-        references: {
-          model: {
-            tableName: "images",
-          },
-          key: "id",
-        },
-        field: "image_id",
-        onDelete: "cascade",
+      quantity: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+      },
+      price: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
       },
       created_at: {
         allowNull: false,
@@ -41,7 +45,8 @@ module.exports = {
       },
     });
   },
+
   async down(queryInterface: QueryInterface, _: Sequelize) {
-    await queryInterface.dropTable("product_images");
+    await queryInterface.dropTable("orders_details");
   },
 };

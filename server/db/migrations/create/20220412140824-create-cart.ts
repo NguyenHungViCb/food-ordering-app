@@ -20,9 +20,9 @@ module.exports = {
         field: "user_id",
         onDelete: "cascade",
       },
-      is_active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
+      total: {
+        type: DataTypes.DECIMAL,
+        allowNull: false,
       },
       created_at: {
         allowNull: false,

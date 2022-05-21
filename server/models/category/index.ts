@@ -20,6 +20,9 @@ const Category = sequelize.define<
       type: DataTypes.STRING,
       allowNull: false,
     },
+    images: {
+      type: DataTypes.STRING,
+    },
     description: {
       type: DataTypes.STRING,
     },

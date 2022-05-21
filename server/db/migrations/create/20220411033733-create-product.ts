@@ -48,10 +48,19 @@ module.exports = {
           },
         },
       },
-      order_count: {
-        type: DataTypes.INTEGER(),
+      category_id: {
+        type: DataTypes.BIGINT,
+        references: {
+          model: {
+            tableName: "categories",
+          },
+          key: "id",
+        },
         allowNull: false,
-        defaultValue: 0,
+      },
+      images: {
+        type: DataTypes.STRING,
+        allowNull: false,
       },
       created_at: {
         allowNull: false,

@@ -4,7 +4,12 @@ import { getAttributes } from "../../utils/modelUtils";
 import { imagePlainObj } from "../image";
 
 export class ProductModel {
-  constructor(public name: string, public price: number) {}
+  constructor(
+    public name: string,
+    public price: number,
+    public category_id: number,
+    public images: string
+  ) {}
 }
 
 export class ProductCreation extends ProductModel {
@@ -15,11 +20,12 @@ export class ProductCreation extends ProductModel {
     public description: string,
     public original_price: number,
     public stock: number,
-    public order_count: number,
+    public category_id: number,
+    public images: string,
     public created_at?: Date,
     public updated_at?: Date
   ) {
-    super(name, price);
+    super(name, price, category_id, images);
   }
 }
 
@@ -32,9 +38,11 @@ export const productModelPlainObj = getAttributes(Product, [
   "original_price",
 ]);
 export const productCreationPlainObj = getAttributes(Product, [
-  { attribute: "description", optional: true },
-  { attribute: "price", optional: true },
+  "name",
+  "description",
+  "original_price",
   { attribute: "stock", optional: true },
+  "category_id",
 ]);
 export const createdProductResponsePayload = {
   ...productModelPlainObj,

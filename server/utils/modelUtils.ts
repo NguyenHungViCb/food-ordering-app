@@ -126,3 +126,15 @@ export function getAttributesData<
   }
   return obj;
 }
+
+export function imageToArray<M extends Model>(data: M) {
+  return {
+    ...data?.get(),
+    images: (data?.getDataValue("images") as string)
+      .split(";")
+      .map((url) => ({
+        src: url,
+      }))
+      .filter((item) => item.src.trim() !== ""),
+  };
+}

@@ -25,6 +25,7 @@
     "copy-files": "cp -r ./views ./dist",
     "migration": "npx sequelize-cli db:migrate --migrations-path dist/db/migrations/create",
     "server": "tsc -w & yarn copy-files && nodemon dist/index.js",
+    "clean": "rm -r ./dist",
     "build": "tsc && yarn copy-files && yarn migration",
     "prepare": "cd .. && husky install server/.husky",
     "format": "pretty-quick --staged"

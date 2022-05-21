@@ -10,7 +10,7 @@ class CartCreation extends CartModel {
   constructor(
     public id: number,
     public user_id: number,
-    public is_active: boolean,
+    public total: number,
     public created_at?: Date,
     public updated_at?: Date
   ) {

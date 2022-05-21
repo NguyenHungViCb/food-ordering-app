@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Category from "../../models/category";
-import CategoryImage from "../../models/category/image";
+// import CategoryImage from "../../models/category/image";
 import {
   categoryCreationPlainObj,
   categoryModelPlainObj,
@@ -16,6 +16,8 @@ import { imagePlainObj } from "../../types/image";
 import validate from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
 import { productSchemaPlainObj } from "../../types/product/productInterface";
+import { isArray } from "../../utils/validations/assertions";
+import { imageToArray } from "../../utils/modelUtils";
 
 const path = "/categories";
 @controller
@@ -41,20 +43,12 @@ class CategoryController {
         });
       }
     } else {
-      const category = await Category.create(
-        // @ts-ignore
-        { name, description, images: images },
-        {
-          include: [
-            {
-              model: Image,
-              required: true,
-              as: "images",
-              through: CategoryImage,
-            },
-          ],
-        }
-      );
+      isArray<{ src: string }>(images);
+      const category = await Category.create({
+        name,
+        description,
+        images: images.reduce((prev, curr) => prev + curr.src + ";", ""),
+      });
       return res.json({ data: category, success: true });
     }
   }
@@ -93,14 +87,12 @@ class CategoryController {
           {
             model: Product,
             as: "products",
-            through: { attributes: [] },
-            include: [
-              { model: Image, as: "images", through: { attributes: [] } },
-            ],
           },
-          { model: Image, as: "images", through: { attributes: [] } },
         ],
-      });
+      }).then((data) => ({
+        rows: data.rows.map((row) => imageToArray(row)),
+        count: data.count,
+      }));
       return res.json({ data: category, success: true });
     }
   }

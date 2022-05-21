@@ -8,7 +8,10 @@ export function isNotNull<T>(
   }
 }
 
-export function isArray<T>(value: any, name = "value"): asserts value is T {
+export function isArray<T>(
+  value: any,
+  name = "value"
+): asserts value is Array<T> {
   isNotNull(value);
   if (!Array.isArray(value)) {
     throw new Error(name + " should be any array");

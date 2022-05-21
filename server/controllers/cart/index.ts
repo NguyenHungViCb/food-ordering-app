@@ -77,13 +77,13 @@ class CartController {
     item: createPayloadType,
     cart: Model<CartCreation, CartCreation | CartModel>
   ) {
-    let failedInserts;
-    let succeededInserts;
+    let failedInsert;
+    let succeededInsert;
     const transaction = await sequelize.transaction();
+    const product = await Product.findByPk(item.product_id, {
+      transaction,
+    });
     try {
-      const product = await Product.findByPk(item.product_id, {
-        transaction,
-      });
       const [detail] = await upsert(CartDetail, {
         condition: {
           cart_id: cart.getDataValue("id"),
@@ -91,7 +91,7 @@ class CartController {
         },
         transaction,
       });
-      succeededInserts = await increaseQuantity(
+      succeededInsert = await increaseQuantity(
         detail,
         item.quantity,
         product?.getDataValue("stock") || 0,
@@ -100,10 +100,18 @@ class CartController {
       await transaction.commit();
     } catch (error: any) {
       // rollback if new updated quantity > stock
-      failedInserts = { item, error: JSON.parse(error.message) };
+      failedInsert = { item, error: parseToJSON(error.message) };
       await transaction.rollback();
     }
-    return { succeededInserts, failedInserts };
+    return {
+      succeededInsert: {
+        value: succeededInsert,
+        total:
+          (succeededInsert?.getDataValue("quantity") || 0) *
+          (product?.getDataValue("price") || 0),
+      },
+      failedInsert,
+    };
   }
 
   @routeDescription({
@@ -121,19 +129,22 @@ class CartController {
     const { items } = req.body;
     const { cart } = req;
     requireValues(items);
-    isArray<Array<createPayloadType>>(items);
+    isArray<createPayloadType>(items);
 
     const failedInserts = [];
     const succeededInserts = [];
+    let total = 0;
     for (const item of items) {
       const result = await this.addSingleProductToCart(item, cart);
-      if (result.succeededInserts) {
-        succeededInserts.push(result.succeededInserts);
+      if (result.succeededInsert) {
+        succeededInserts.push(result.succeededInsert.value);
+        total += result.succeededInsert.total;
       }
-      if (result.failedInserts) {
-        failedInserts.push(result.failedInserts);
+      if (result.failedInsert) {
+        failedInserts.push(result.failedInsert);
       }
     }
+    await cart.update({ total });
     return res.json({
       ...(failedInserts.length > 0
         ? { message: "The operation succeed with error" }
@@ -203,6 +214,16 @@ class CartController {
             throw new Error("invalid quantity field");
           }
           await decreaseQuantity(detail, item.quantity, transaction);
+          const product = await Product.findByPk(
+            detail.getDataValue("product_id")
+          );
+          if (product) {
+            await cart.update({
+              total:
+                detail.getDataValue("quantity") *
+                product?.getDataValue("price"),
+            });
+          }
         }
         await transaction.commit();
         succeededDeletes.push(detail);
@@ -238,7 +259,7 @@ class CartController {
   async getActiveCart(req: Request, res: Response, __: NextFunction) {
     const { user } = req;
     const cart = await Cart.findOne({
-      where: { user_id: user.getDataValue("id"), is_active: true },
+      where: { user_id: user.getDataValue("id") },
       include: [{ model: CartDetail, as: "cart_details" }],
     });
     if (cart) {
