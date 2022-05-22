@@ -41,7 +41,7 @@ class GetCartResponse {
   GetCartResponse(
     this.id,
     this.userId,
-    this.isActive,
+    /* this.isActive, */
     this.createdAt,
     this.updatedAt,
     this.details,
@@ -49,7 +49,7 @@ class GetCartResponse {
 
   String id;
   String userId;
-  bool isActive;
+  /* bool isActive; */
   DateTime createdAt;
   DateTime updatedAt;
   List<CartDetails> details;
@@ -58,7 +58,7 @@ class GetCartResponse {
       GetCartResponse(
         json["id"],
         json["user_id"],
-        json["is_active"],
+        /* json["is_active"], */
         DateTime.parse(json["updated_at"]),
         DateTime.parse(json["created_at"]),
         List<CartDetails>.from(
@@ -97,6 +97,7 @@ int Sum = 0;
 class CartItems {
   Future<GetCartResponse> GetCart() async {
     var response = await ApiService().get("/api/carts/active");
+    print(responseFromJson(response.body).data);
     if (response.statusCode == 200) {
       //var cartDetails = GetCartItems();
       var cartResponse =
@@ -127,7 +128,13 @@ class CartItems {
 
   Future<dynamic> AddCart(String productId, int? quantity) async {
     try {
-      await ApiService().post("/api/carts/items/add", json.encode({"items":[{"product_id": productId,"quantity": quantity}]}));
+      await ApiService().post(
+          "/api/carts/items/add",
+          json.encode({
+            "items": [
+              {"product_id": productId, "quantity": quantity}
+            ]
+          }));
     } catch (e) {
       log(e.toString());
     }
