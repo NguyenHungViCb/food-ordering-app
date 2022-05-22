@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { sequelize } from "../../db/config";
+import { getOrderTotal } from "../../middlewares/payment";
 import Voucher from "../../models/voucher";
 import { getAttributesData } from "../../utils/modelUtils";
 import { controller, routeConfig } from "../../utils/routeConfig";
@@ -9,6 +10,9 @@ import {
   queryToNum,
 } from "../../utils/validations/assertions";
 import { requireValues } from "../../utils/validations/modelValidation";
+import { activeCartValidate } from "../../middlewares/carts";
+import { Op } from "sequelize";
+import { jwtValidate } from "../../middlewares/auths";
 
 const path = "/vouchers";
 @controller
@@ -31,6 +35,7 @@ class VoucherController {
       valid_until,
       products,
       discount,
+      min_value,
     });
     isArray<Array<number>>(products);
     const transaction = await sequelize.transaction();
@@ -70,6 +75,20 @@ class VoucherController {
       },
     });
     return res.json({ data: all, success: true });
+  }
+
+  @routeConfig({
+    method: "get",
+    path: `${path}/applicabled/cart`,
+    middlewares: [jwtValidate, activeCartValidate, getOrderTotal],
+  })
+  async getApplicabledVoucher(req: Request, res: Response, __: NextFunction) {
+    const { total } = req.body;
+    console.log({total})
+    const applicabledVouchers = await Voucher.findAll({
+      where: { min_value: { [Op.lt]: total } },
+    });
+    return res.json({ data: applicabledVouchers, success: true });
   }
 }
 

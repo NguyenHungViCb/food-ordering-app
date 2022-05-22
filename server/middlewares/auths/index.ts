@@ -1,3 +1,4 @@
+import { green } from "colors";
 import { NextFunction, Request, Response } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { Model } from "sequelize/types";
@@ -23,6 +24,7 @@ export async function jwtValidate(
   res: Response,
   next: NextFunction
 ) {
+  console.log(green("validate user"));
   try {
     let token = extractTokenFromHeader(req.headers);
 

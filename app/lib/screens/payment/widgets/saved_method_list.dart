@@ -1,12 +1,12 @@
-import 'package:app/screens/payment/widgets/method_item.dart';
+import 'package:app/screens/payment/widgets/saved_method_item.dart';
 import 'package:flutter/material.dart';
 
-class MethodList extends StatefulWidget {
-  final List<Map<String, String>> paymentMethods;
+class SavedMethodList extends StatefulWidget {
+  final List<dynamic> paymentMethods;
   final String? name;
   final Function? changePaymentMethod;
   final String? selectedMethod;
-  const MethodList(
+  const SavedMethodList(
       {Key? key,
       required this.paymentMethods,
       this.name,
@@ -15,10 +15,15 @@ class MethodList extends StatefulWidget {
       : super(key: key);
 
   @override
-  State<MethodList> createState() => _MethodListState();
+  State<SavedMethodList> createState() => _SavedMethodListState();
 }
 
-class _MethodListState extends State<MethodList> {
+class _SavedMethodListState extends State<SavedMethodList> {
+  @override
+  void initState() {
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return ListView.separated(
@@ -26,7 +31,7 @@ class _MethodListState extends State<MethodList> {
       itemCount: widget.paymentMethods.length + (widget.name != null ? 1 : 0),
       itemBuilder: (context, index) => index == 0 && widget.name != null
           ? Text(widget.name as String)
-          : MethodItem(
+          : SavedMethodItem(
               paymentMethod:
                   widget.paymentMethods[index - (widget.name != null ? 1 : 0)],
               isCheck: widget.selectedMethod ==

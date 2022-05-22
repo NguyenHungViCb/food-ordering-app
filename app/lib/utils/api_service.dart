@@ -43,4 +43,14 @@ class ApiService {
         },
         body: body);
   }
+
+  Future<http.Response> put(url, Object? body) async {
+    Token tokens = await getToken();
+    return await http.put(Uri.parse(baseURL + url),
+        headers: {
+          'Content-Type': 'application/json; charset=UTF-8',
+          'Authorization': 'Bearer ' + tokens.token
+        },
+        body: json.encode(body));
+  }
 }
