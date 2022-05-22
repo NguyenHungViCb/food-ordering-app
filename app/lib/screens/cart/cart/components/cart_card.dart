@@ -21,7 +21,7 @@ class CartCard extends StatelessWidget {
               color: const Color(0xFFFFFFFF),
               borderRadius: BorderRadius.circular(15),
             ),
-            child:  Row(
+            child: Row(
               children: [
                 SizedBox(
                   width: 88,
@@ -33,7 +33,9 @@ class CartCard extends StatelessWidget {
                         color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.asset(snapshot.data?.images[0].src.toString() ?? "", fit: BoxFit.fitHeight),
+                      child: Image.network(
+                          snapshot.data?.images[0].src.toString() ?? "",
+                          fit: BoxFit.fitHeight),
                     ),
                   ),
                 ),

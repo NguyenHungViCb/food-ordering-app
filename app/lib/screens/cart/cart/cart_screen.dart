@@ -1,4 +1,3 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 import 'components/body.dart';
@@ -9,24 +8,24 @@ class CartScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color(0xFFF5F5F5),
+      backgroundColor: const Color(0xFFF5F5F5),
       appBar: buildAppBar(context),
       body: Body(),
-      bottomNavigationBar: CheckoutCard(),
+      bottomNavigationBar: const CheckoutCard(),
     );
   }
 
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
-      backgroundColor: Color(0xFFFDBF30),
+      backgroundColor: const Color(0xFFFDBF30),
       leading: GestureDetector(
         onTap: (){
           Navigator.pop(context);
         },
-        child: Icon(Icons.arrow_back_ios),
+        child: const Icon(Icons.arrow_back_ios),
       ),
       title: Row(
-        children: [
+        children: const [
           SizedBox(width: 100,),
           Text(
             "Your Cart",
