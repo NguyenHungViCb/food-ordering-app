@@ -1,4 +1,3 @@
-import { green } from "colors";
 import { NextFunction, Request, Response } from "express";
 import { Model } from "sequelize";
 import Cart from "../../models/cart";
@@ -18,7 +17,6 @@ type CartWithDetailWithProduct = Model<
 >;
 
 const getOrderTotal = async (req: Request, _: Response, next: NextFunction) => {
-  console.log(green("Get order total"));
   let cart_id;
   if (req.method.toLowerCase() === "get") {
     cart_id = req.query.cart_id;
@@ -57,12 +55,12 @@ const getOrderTotal = async (req: Request, _: Response, next: NextFunction) => {
   next();
 };
 
-const voucherApply = async (req: Request, _: Response, next: NextFunction) => {
-  const { voucher } = req.body;
-  if (!voucher) {
-    next();
+const applyVoucher = async (req: Request, _: Response, next: NextFunction) => {
+  const { voucher_id } = req.body;
+  if (!voucher_id) {
+    return next();
   }
-  const existVoucher = await Voucher.findByPk(voucher);
+  const existVoucher = await Voucher.findByPk(voucher_id);
   if (!existVoucher) {
     throw new Error("Voucher not founded");
   }
@@ -71,4 +69,4 @@ const voucherApply = async (req: Request, _: Response, next: NextFunction) => {
   next();
 };
 
-export { getOrderTotal, voucherApply };
+export { getOrderTotal, applyVoucher };

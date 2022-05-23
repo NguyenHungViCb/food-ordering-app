@@ -64,14 +64,15 @@ class PaymentService {
     return _nullSafety;
   }
 
-  static checkout(dynamic paymentMethod, String address) async {
+  static checkout(dynamic paymentMethod, String address, int? voucherId) async {
     var cartId = await GlobalStorage.read(key: "cart_id");
     var response = await ApiService().post(
         "/api/payments/stripe/confirm",
         json.encode({
           "payment_method": paymentMethod['id'],
           "address": address,
-          "cart_id": cartId
+          "cart_id": cartId,
+          "voucher_id": voucherId
         }));
     if (response.statusCode == 200) {
       print(responseFromJson(response.body).data);

@@ -24,7 +24,6 @@ export async function jwtValidate(
   res: Response,
   next: NextFunction
 ) {
-  console.log(green("validate user"));
   try {
     let token = extractTokenFromHeader(req.headers);
 

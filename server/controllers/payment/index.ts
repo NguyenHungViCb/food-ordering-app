@@ -3,7 +3,7 @@ import { Model } from "sequelize/types";
 import { Stripe } from "stripe";
 import { sequelize } from "../../db/config";
 import { jwtValidate } from "../../middlewares/auths";
-import { getOrderTotal, voucherApply } from "../../middlewares/payment";
+import { getOrderTotal, applyVoucher } from "../../middlewares/payment";
 import CartDetail from "../../models/cart/detail";
 import Order from "../../models/order";
 import OrderDetail from "../../models/order/details";
@@ -21,6 +21,7 @@ interface IOrderCreation {
   status: "succeeded" | "canceled" | "pending" | "confirmed" | "processing";
   address: string;
   cart: Model<CartCreation, CartCreation | CartModel>;
+  voucherId: number;
 }
 
 @controller
@@ -35,6 +36,7 @@ class PaymentController {
     status,
     cart,
     address,
+    voucherId,
   }: IOrderCreation) {
     const transaction = await sequelize.transaction();
     try {
@@ -46,6 +48,7 @@ class PaymentController {
           paid_at: paidAt,
           status,
           address,
+          voucher_id: voucherId,
         },
         { transaction }
       );
@@ -157,11 +160,11 @@ class PaymentController {
   @routeConfig({
     method: "post",
     path: `${PaymentController.path}/stripe/confirm`,
-    middlewares: [jwtValidate, getOrderTotal],
+    middlewares: [jwtValidate, getOrderTotal, applyVoucher],
   })
   async stripeConfirmPayment(req: Request, res: Response, __: NextFunction) {
     const { user, cart } = req;
-    const { total, payment_method, address } = req.body;
+    const { total, payment_method, address, voucher_id } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total * 100,
       currency: "usd",
@@ -179,6 +182,7 @@ class PaymentController {
       status: paymentIntent.status,
       cart: cart,
       address: address,
+      voucherId: voucher_id,
     });
     return res.json({ data: paymentIntent, success: true });
   }
@@ -297,7 +301,7 @@ class PaymentController {
   @routeConfig({
     method: "post",
     path: `${PaymentController.path}/paypal`,
-    middlewares: [jwtValidate, getOrderTotal, voucherApply],
+    middlewares: [jwtValidate, getOrderTotal, applyVoucher],
   })
   async paypalCheckout(req: Request, res: Response, __: NextFunction) {
     const { total } = req.body;

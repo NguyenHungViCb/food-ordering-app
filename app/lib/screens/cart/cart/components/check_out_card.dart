@@ -115,7 +115,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   child: DefaultButton(
                       text: "Check Out",
                       press: () async {
-                        PaymentService.checkout(paymentMethod, "");
+                        // Replace this hard code id by allow user to select voucher
+                        // You can pass null to skip apply voucher
+                        PaymentService.checkout(paymentMethod, "", 1);
                       }),
                 ),
               ],
