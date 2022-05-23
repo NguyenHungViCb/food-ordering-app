@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:app/models/api/base_response.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
 
 class PaymentService {
@@ -61,5 +62,21 @@ class PaymentService {
       return responseFromJson(response.body).data;
     }
     return _nullSafety;
+  }
+
+  static checkout(dynamic paymentMethod, String address) async {
+    var cartId = await GlobalStorage.read(key: "cart_id");
+    var response = await ApiService().post(
+        "/api/payments/stripe/confirm",
+        json.encode({
+          "payment_method": paymentMethod['id'],
+          "address": address,
+          "cart_id": cartId
+        }));
+    if (response.statusCode == 200) {
+      print(responseFromJson(response.body).data);
+    } else {
+      print(responseFromJson(response.body).message);
+    }
   }
 }

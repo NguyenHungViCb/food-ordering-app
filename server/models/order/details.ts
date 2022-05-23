@@ -18,6 +18,7 @@ const OrderDetail = sequelize.define(
         model: Order,
         key: "id",
       },
+      onDelete: 'cascade'
     },
     product_id: {
       type: DataTypes.BIGINT,
@@ -30,7 +31,7 @@ const OrderDetail = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
     },
-    price: {
+    total: {
       type: DataTypes.DECIMAL,
       allowNull: false,
     },

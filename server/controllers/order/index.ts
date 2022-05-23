@@ -2,7 +2,6 @@ import { NextFunction, Request, Response } from "express";
 import Stripe from "stripe";
 import { jwtValidate } from "../../middlewares/auths";
 import { controller, routeConfig } from "../../utils/routeConfig";
-import { queryToNum } from "../../utils/validations/assertions";
 
 @controller
 class OrderController {
@@ -24,27 +23,7 @@ class OrderController {
     middlewares: [jwtValidate],
   })
   async placeOrder(req: Request, res: Response, __: NextFunction) {
-    /* We will add create order later */
-    const queries = req.query;
-    console.log(queries);
-    // if (method === "stripe") {
-    //   console.log(this.extractIntent(req).client_secret)
-
-    //   return res.json({
-    //     data: {
-    //       payment_intent: this.extractIntent(req).client_secret,
-    //       total: queryToNum(total),
-    //     },
-    //     success: true,
-    //   });
-    // } else if (method === "paypal") {
-    //   return res.json({
-    //     data: {
-    //       client_secret: req.query.client_secret,
-    //       total: queryToNum(total),
-    //     },
-    //   });
-    // }
+    const {} = req.query;
     return res.json({ success: true });
   }
 }

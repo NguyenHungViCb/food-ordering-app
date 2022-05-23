@@ -1,14 +1,107 @@
 import { NextFunction, Request, Response } from "express";
+import { Model } from "sequelize/types";
 import { Stripe } from "stripe";
+import { sequelize } from "../../db/config";
 import { jwtValidate } from "../../middlewares/auths";
 import { getOrderTotal, voucherApply } from "../../middlewares/payment";
+import CartDetail from "../../models/cart/detail";
+import Order from "../../models/order";
+import OrderDetail from "../../models/order/details";
+import Product from "../../models/product";
+import { CartCreation, CartModel } from "../../types/cart";
 import { PAYPAL_SECRET, stripe, STRIPE_SECRET } from "../../utils/AppConfig";
 import { controller, routeConfig } from "../../utils/routeConfig";
 import OrderController from "../order";
 
+interface IOrderCreation {
+  userId: string;
+  paymentMethod: string;
+  paymentDetail: string;
+  paidAt: Date;
+  status: "succeeded" | "canceled" | "pending" | "confirmed" | "processing";
+  address: string;
+  cart: Model<CartCreation, CartCreation | CartModel>;
+}
+
 @controller
 class PaymentController {
   static path = "/payments";
+
+  async placeOrder({
+    userId,
+    paymentMethod,
+    paymentDetail,
+    paidAt,
+    status,
+    cart,
+    address,
+  }: IOrderCreation) {
+    const transaction = await sequelize.transaction();
+    try {
+      const createdOrder = await Order.create(
+        {
+          user_id: userId,
+          payment_method: paymentMethod,
+          payment_detail: paymentDetail,
+          paid_at: paidAt,
+          status,
+          address,
+        },
+        { transaction }
+      );
+      // Find all items in cart
+      const cartLineItems = await CartDetail.findAll({
+        where: { cart_id: cart.getDataValue("id") },
+        transaction,
+      });
+      let orderLineItems: any[] = [];
+      // Move to order and delete all cart's items
+      for (const item of cartLineItems) {
+        // Find product to calculate total and copy to order
+        const product = await Product.findByPk(
+          item.getDataValue("product_id"),
+          {
+            transaction,
+          }
+        );
+        if (product) {
+          if (status === "succeeded") {
+            await product.update({
+              stock:
+                product.getDataValue("stock") - item.getDataValue("quantity"),
+            });
+          }
+          orderLineItems.push({
+            order_id: createdOrder.getDataValue("id"),
+            product_id: item.getDataValue("product_id"),
+            quantity: item.getDataValue("quantity"),
+            total:
+              product.getDataValue("price") * item.getDataValue("quantity"),
+          });
+        }
+      }
+      const createdOrderLineItems = await OrderDetail.bulkCreate(
+        orderLineItems,
+        {
+          transaction,
+        }
+      );
+      if (status === "succeeded") {
+        await CartDetail.destroy({
+          where: { id: cartLineItems.map((item) => item.getDataValue("id")) },
+          transaction,
+        });
+      }
+      await transaction.commit();
+      return {
+        ...createdOrder.get(),
+        details: createdOrderLineItems.map((item) => item.get()),
+      };
+    } catch (error: any) {
+      await transaction.rollback();
+      throw new Error(error.message);
+    }
+  }
 
   @routeConfig({
     method: "post",
@@ -67,8 +160,8 @@ class PaymentController {
     middlewares: [jwtValidate, getOrderTotal],
   })
   async stripeConfirmPayment(req: Request, res: Response, __: NextFunction) {
-    const { user } = req;
-    const { total, payment_method } = req.body;
+    const { user, cart } = req;
+    const { total, payment_method, address } = req.body;
     const paymentIntent = await stripe.paymentIntents.create({
       amount: total * 100,
       currency: "usd",
@@ -77,8 +170,19 @@ class PaymentController {
       confirm: true,
       payment_method: payment_method,
     });
+    const paymentMethod = await stripe.paymentMethods.retrieve(payment_method);
+    await this.placeOrder({
+      paymentMethod: paymentMethod.card?.brand || "stripe",
+      paymentDetail: paymentMethod.card?.last4 || "",
+      paidAt: new Date(paymentIntent.created),
+      // @ts-ignore
+      status: paymentIntent.status,
+      cart: cart,
+      address: address,
+    });
     return res.json({ data: paymentIntent, success: true });
   }
+
   @routeConfig({
     method: "get",
     path: `${PaymentController.path}/cards/saved`,
@@ -125,7 +229,7 @@ class PaymentController {
     const { user } = req;
     if (
       user.getDataValue("selected_card") !== "paypal" &&
-      user.getDataValue("selected_card").trim() !== ""
+      user.getDataValue("selected_card")?.trim() !== ""
     ) {
       const paymentMethods = await stripe.customers.listPaymentMethods(
         user.getDataValue("stripe_id"),
@@ -154,7 +258,6 @@ class PaymentController {
         },
         success: true,
       });
-
     }
   }
 
