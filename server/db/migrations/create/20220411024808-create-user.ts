@@ -72,6 +72,12 @@ module.exports = {
         allowNull: false,
         type: DataTypes.DATE,
       },
+      stripe_id: {
+        type: DataTypes.STRING,
+      },
+      selected_card: {
+        type: DataTypes.STRING,
+      },
     });
   },
   async down(queryInterface: QueryInterface, _: Sequelize) {

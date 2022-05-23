@@ -25,16 +25,21 @@ class VoucherCreation extends VoucherModel {
 }
 
 class VoucherDetailModel {
-  constructor(public voucher_id: number, public product_id: number) {}
+  constructor(
+    public voucher_id: number,
+    public product_id: number,
+    public min_value: number
+  ) {}
 }
 
 class VoucherDetailCreation extends VoucherDetailModel {
   constructor(
     public id: number,
     public voucher_id: number,
-    public product_id: number
+    public product_id: number,
+    public min_value: number
   ) {
-    super(voucher_id, product_id);
+    super(voucher_id, product_id, min_value);
   }
 }
 

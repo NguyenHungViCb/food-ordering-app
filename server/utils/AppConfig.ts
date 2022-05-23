@@ -1,4 +1,5 @@
 import dotenv from "dotenv";
+import Stripe from "stripe";
 dotenv.config();
 
 export const DB_NAME = process.env.DB_NAME || "";
@@ -16,3 +17,8 @@ export const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET || "";
 export const JWT_REFRESH_EXPIRY =
   eval(process.env.REFRESH_TOKEN_EXPIRY!) || 60 * 60 * 24 * 30;
 export const MODE = process.env.MODE || "development";
+export const STRIPE_SECRET = process.env.STRIPE_CLIENT_SECRET || "";
+export const PAYPAL_SECRET = process.env.PAYPAL_CLIENT_SECRET || "";
+export const stripe = new Stripe(STRIPE_SECRET, {
+  apiVersion: "2020-08-27",
+});

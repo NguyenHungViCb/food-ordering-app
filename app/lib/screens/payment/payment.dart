@@ -1,14 +1,14 @@
 import 'dart:convert';
-import 'dart:developer';
-
-import 'package:app/models/credit_card.dart';
+import 'package:app/models/api/base_response.dart';
 import 'package:app/screens/add_card/add_card.dart';
 import 'package:app/screens/payment/widgets/method_list.dart';
+import 'package:app/screens/payment/widgets/saved_method_list.dart';
 import 'package:app/share/buttons/yellow_button.dart';
 import 'package:app/share/constants/app_config.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
+import 'package:app/utils/payment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
@@ -25,7 +25,6 @@ class Payment extends StatefulWidget {
       'name': "Paypal"
     },
   ];
-  static List<Map<String, String>>? savedPaymentMethod;
   static String routeName = "/payment";
   const Payment({Key? key}) : super(key: key);
 
@@ -34,8 +33,30 @@ class Payment extends StatefulWidget {
 }
 
 class _PaymentState extends State<Payment> {
-  CardDetails _card = CardDetails();
+  List<dynamic>? savedPaymentMethods;
+  final CardDetails _card = CardDetails();
   int choosenMethod = -1;
+  String? choosenMethodId;
+
+  @override
+  void initState() {
+    super.initState();
+    getSavedPaymentMethod();
+  }
+
+  getSavedPaymentMethod() async {
+    var response = await ApiService().get("/api/payments/cards/saved");
+    if (response.statusCode == 200) {
+      var defaultMethod = await PaymentService.fetchDefaultMethod();
+      setState(() {
+        savedPaymentMethods = responseFromJson(response.body).data;
+        var selected = savedPaymentMethods!
+            .firstWhere((element) => element['id'] == defaultMethod['id']);
+        choosenMethodId = selected['id'] ?? PaymentMethods['stripe'];
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,14 +75,13 @@ class _PaymentState extends State<Payment> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Payment.savedPaymentMethod != null &&
-                      Payment.savedPaymentMethod!.isNotEmpty
+              savedPaymentMethods != null && savedPaymentMethods!.isNotEmpty
                   ? Flexible(
-                      child: MethodList(
-                        paymentMethods: Payment.savedPaymentMethod!,
-                        name: "Saved Payment Methods",
-                      ),
-                    )
+                      child: SavedMethodList(
+                          paymentMethods: savedPaymentMethods!,
+                          name: "Saved Methods",
+                          selectedMethod: choosenMethodId,
+                          changePaymentMethod: changePaymentMethod))
                   : Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -83,9 +103,11 @@ class _PaymentState extends State<Payment> {
               ),
               Flexible(
                 child: MethodList(
-                    paymentMethods: Payment.paymentMethods,
-                    name: "Payment Methods",
-                    changePaymentMethod: changePaymentMethod),
+                  paymentMethods: Payment.paymentMethods,
+                  name: "Payment Methods",
+                  changePaymentMethod: changePaymentMethod,
+                  selectedMethod: choosenMethodId,
+                ),
               ),
               SizedBox(
                 width: MediaQuery.of(context).size.width * 100,
@@ -93,20 +115,13 @@ class _PaymentState extends State<Payment> {
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 30),
                     child: YellowButton(
                         onPressed: (context) async {
-                          if (choosenMethod != -1 &&
-                              Payment.paymentMethods[choosenMethod]['id'] ==
-                                  PaymentMethods['stripe']) {
-                            Navigator.pushNamed(context, AddCard.routeName)
-                                as CustomCreditCard;
-                            /* setState(() { */
-                            /*   _card = _card.copyWith(number: result.number); */
-                            /*   _card = _card.copyWith( */
-                            /*       expirationYear: result.expirationYear); */
-                            /*   _card = _card.copyWith( */
-                            /*       expirationMonth: result.expirationMonth); */
-                            /*   _card = _card.copyWith(cvc: result.cvc); */
-                            /* }); */
-                            /* _handlePayPress(); */
+                          if (choosenMethodId != null &&
+                              choosenMethodId == PaymentMethods['stripe']) {
+                            Navigator.pushNamed(context, AddCard.routeName);
+                          } else {
+                            await PaymentService.updateDefaultMethod(
+                                choosenMethodId as String);
+                            Navigator.pop(context);
                           }
                         },
                         text: "Confirm")),
@@ -123,8 +138,8 @@ class _PaymentState extends State<Payment> {
       // 1. Gather customer billing information (ex. email)
 
       // 2. Create payment method
-      final paymentMethod =
-          await Stripe.instance.createPaymentMethod(PaymentMethodParams.card(
+      final paymentMethod = await Stripe.instance
+          .createPaymentMethod(const PaymentMethodParams.card(
         paymentMethodData: PaymentMethodData(),
       ));
 
@@ -179,9 +194,9 @@ class _PaymentState extends State<Payment> {
     }
   }
 
-  changePaymentMethod(context, index) {
+  changePaymentMethod(context, id) {
     setState(() {
-      choosenMethod = index;
+      choosenMethodId = id;
     });
   }
 }

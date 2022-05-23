@@ -1,6 +1,6 @@
-import 'package:app/screens/cart/checkout/components/body.dart';
 import 'package:app/screens/payment/payment.dart';
 import 'package:app/screens/cart/voucher/body.dart';
+import 'package:app/utils/payment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
@@ -18,10 +18,20 @@ class CheckoutCard extends StatefulWidget {
 }
 
 class _CheckoutCardState extends State<CheckoutCard> {
-  var paymentMethod = Payment.paymentMethods[0];
+  dynamic paymentMethod;
+
+  getDefaultMethod() async {
+    var defaultMethod = await PaymentService.fetchDefaultMethod();
+    if (paymentMethod == null || paymentMethod['id'] != defaultMethod['id']) {
+      setState(() {
+        paymentMethod = defaultMethod;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    getDefaultMethod();
     return Container(
       padding: EdgeInsets.symmetric(
         vertical: getProportionateScreenWidth(15),
@@ -50,21 +60,24 @@ class _CheckoutCardState extends State<CheckoutCard> {
             Row(
               children: [
                 GestureDetector(
-                  onTap: () async {
-                    final result =
-                        await Navigator.pushNamed(context, Payment.routeName);
-                    print(result);
+                  onTap: () {
+                    Navigator.pushNamed(context, Payment.routeName)
+                        .then((value) => setState(() {}));
                   },
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        paymentMethod['src']!,
-                        width: 30,
-                      ),
-                      const SizedBox(width: 20),
-                      Text(paymentMethod['name']!)
-                    ],
-                  ),
+                  child: paymentMethod == null
+                      ? const Text("Add Payment Method")
+                      : Row(
+                          children: [
+                            SvgPicture.asset(
+                              paymentMethod['card']["brand"] == 'visa'
+                                  ? "assets/images/visa.svg"
+                                  : "assets/images/mastercard.svg",
+                              width: 30,
+                            ),
+                            const SizedBox(width: 20),
+                            Text(paymentMethod['card']['last4'])
+                          ],
+                        ),
                 ),
                 const Spacer(),
                 InkWell(
@@ -99,7 +112,13 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 ),
                 SizedBox(
                   width: getProportionateScreenWidth(190),
-                  child: DefaultButton(text: "Check Out", press: () {}),
+                  child: DefaultButton(
+                      text: "Check Out",
+                      press: () async {
+                        // Replace this hard code id by allow user to select voucher
+                        // You can pass null to skip apply voucher
+                        PaymentService.checkout(paymentMethod, "", 1);
+                      }),
                 ),
               ],
             ),

@@ -1,4 +1,9 @@
-import { NextFunction, Request, RequestHandler, Response } from "express";
+import {
+  NextFunction,
+  Request,
+  RequestHandler,
+  Response,
+} from "express";
 import app, { routeEvent } from "../express";
 import { BasicResponse } from "../types/commonInterfaces";
 
@@ -73,7 +78,20 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
               }
             };
             if (middlewares && middlewares.length > 0) {
-              handler.push(...middlewares);
+              handler.push(
+                ...middlewares.map(
+                  (middleware) =>
+                    async (req: Request, res: Response, next: NextFunction) => {
+                      try {
+                        return await middleware.apply(this, [req, res, next]);
+                      } catch (error: any) {
+                        return res
+                          .status(500)
+                          .json({ message: error.message, success: false });
+                      }
+                    }
+                )
+              );
             }
             handler.push(main);
             routeEvent.emit("update_route", {

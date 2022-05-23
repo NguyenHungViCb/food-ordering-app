@@ -23,7 +23,11 @@ export class UserCreation extends UserModel {
     public google_id: string,
     public avatar: string,
     public active: boolean,
-    public birthday: Date
+    public birthday: Date,
+    public stripe_id: string,
+    public selected_card: string,
+    public created_at?: Date,
+    public updated_at?: Date
   ) {
     super(first_name, last_name, email);
   }
