@@ -9,16 +9,17 @@ import Order from "../../models/order";
 import OrderDetail from "../../models/order/details";
 import Product from "../../models/product";
 import { CartCreation, CartModel } from "../../types/cart";
+import { ORDER_STATUS } from "../../types/order";
 import { PAYPAL_SECRET, stripe, STRIPE_SECRET } from "../../utils/AppConfig";
 import { controller, routeConfig } from "../../utils/routeConfig";
 import OrderController from "../order";
 
 interface IOrderCreation {
-  userId: string;
+  userId: number;
   paymentMethod: string;
   paymentDetail: string;
   paidAt: Date;
-  status: "succeeded" | "canceled" | "pending" | "confirmed" | "processing";
+  status: ORDER_STATUS;
   address: string;
   cart: Model<CartCreation, CartCreation | CartModel>;
   voucherId: number;
@@ -40,13 +41,19 @@ class PaymentController {
   }: IOrderCreation) {
     const transaction = await sequelize.transaction();
     try {
+      let paymentStatus: ORDER_STATUS;
+      if (status === ORDER_STATUS.succeeded) {
+        paymentStatus = ORDER_STATUS.pending;
+      } else {
+        paymentStatus = ORDER_STATUS.canceled;
+      }
       const createdOrder = await Order.create(
         {
           user_id: userId,
           payment_method: paymentMethod,
           payment_detail: paymentDetail,
           paid_at: paidAt,
-          status,
+          status: paymentStatus,
           address,
           voucher_id: voucherId,
         },
@@ -68,7 +75,7 @@ class PaymentController {
           }
         );
         if (product) {
-          if (status === "succeeded") {
+          if (status === ORDER_STATUS.succeeded) {
             await product.update({
               stock:
                 product.getDataValue("stock") - item.getDataValue("quantity"),
@@ -89,12 +96,10 @@ class PaymentController {
           transaction,
         }
       );
-      if (status === "succeeded") {
-        await CartDetail.destroy({
-          where: { id: cartLineItems.map((item) => item.getDataValue("id")) },
-          transaction,
-        });
-      }
+      await CartDetail.destroy({
+        where: { id: cartLineItems.map((item) => item.getDataValue("id")) },
+        transaction,
+      });
       await transaction.commit();
       return {
         ...createdOrder.get(),
@@ -175,6 +180,7 @@ class PaymentController {
     });
     const paymentMethod = await stripe.paymentMethods.retrieve(payment_method);
     await this.placeOrder({
+      userId: user.getDataValue("id"),
       paymentMethod: paymentMethod.card?.brand || "stripe",
       paymentDetail: paymentMethod.card?.last4 || "",
       paidAt: new Date(paymentIntent.created),

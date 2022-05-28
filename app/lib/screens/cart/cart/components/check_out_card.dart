@@ -1,5 +1,7 @@
+import 'package:app/screens/home/home.dart';
 import 'package:app/screens/payment/payment.dart';
 import 'package:app/screens/cart/voucher/body.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/payment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -117,7 +119,16 @@ class _CheckoutCardState extends State<CheckoutCard> {
                       press: () async {
                         // Replace this hard code id by allow user to select voucher
                         // You can pass null to skip apply voucher
-                        PaymentService.checkout(paymentMethod, "", 1);
+                        var response = await PaymentService.checkout(
+                            context, paymentMethod, "", 1);
+                        if (response["error"] != true) {
+                          await GlobalStorage.write(
+                              key: "isCheckouted", value: "true");
+                          Navigator.popUntil(
+                              context,
+                              (route) =>
+                                  route.settings.name == HomePage.routeName);
+                        }
                       }),
                 ),
               ],
