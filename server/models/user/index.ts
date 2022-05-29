@@ -66,6 +66,15 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
       type: DataTypes.BOOLEAN,
       defaultValue: true,
     },
+    stripe_id: {
+      type: DataTypes.STRING,
+    },
+    selected_card: {
+      type: DataTypes.STRING,
+    },
+    address: {
+      type: DataTypes.STRING
+    }
   },
   modelConfig("users")
 );

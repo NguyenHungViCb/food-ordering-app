@@ -21,10 +21,14 @@ const Order = sequelize.define(
       allowNull: false,
     },
     status: {
-      type: DataTypes.ENUM("pending", "failed", "succeed"),
+      type: DataTypes.ENUM("pending", "canceled", "succeeded", "confirmed", "processing"),
       allowNull: false,
     },
     payment_method: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    payment_detail: {
       type: DataTypes.STRING,
       allowNull: false,
     },
@@ -34,7 +38,7 @@ const Order = sequelize.define(
     cancelled_at: {
       type: DataTypes.DATE,
     },
-    voucher: {
+    voucher_id: {
       type: DataTypes.BIGINT,
       references: {
         model: Voucher,

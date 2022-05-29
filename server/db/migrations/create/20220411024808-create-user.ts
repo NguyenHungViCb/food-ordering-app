@@ -64,6 +64,15 @@ module.exports = {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
+      stripe_id: {
+        type: DataTypes.STRING,
+      },
+      selected_card: {
+        type: DataTypes.STRING,
+      },
+      address: {
+        type: DataTypes.STRING,
+      },
       created_at: {
         allowNull: false,
         type: DataTypes.DATE,

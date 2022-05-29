@@ -18,8 +18,8 @@ class YellowButton extends StatefulWidget {
 
 class _YellowButtonState extends State<YellowButton> {
   bool loading = false;
-  Color activeBg = kPrimaryColor;
-  Color disableBg = kPrimaryColor;
+  Color activeBg = const Color(0xFFFDBF30);
+  Color disableBg = const Color(0xFFFDBF30);
   Color activeFg = Colors.white;
   Color disableFg = Colors.white54;
 

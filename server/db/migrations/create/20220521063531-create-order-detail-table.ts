@@ -17,6 +17,7 @@ module.exports = {
           },
           key: "id",
         },
+        onDelete: "cascade",
       },
       product_id: {
         type: DataTypes.BIGINT,
@@ -31,7 +32,7 @@ module.exports = {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      price: {
+      total: {
         type: DataTypes.DECIMAL,
         allowNull: false,
       },

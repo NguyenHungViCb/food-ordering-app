@@ -18,10 +18,13 @@ export function isArray<T>(
   }
 }
 
-export function queryToNum(value: any) {
-  console.log({ value }, typeof value);
+export function queryToNum(value: any, callback?: (value: any) => void) {
   if (typeof value !== "string" && typeof value !== "number") {
-    throw new Error("Invalid data format");
+    if (callback) {
+      callback(value);
+    } else {
+      throw new Error("Invalid data format");
+    }
   }
   if (typeof value === "string") {
     const num = parseInt(value);
