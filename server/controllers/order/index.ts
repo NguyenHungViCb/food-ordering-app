@@ -3,6 +3,7 @@ import { Op } from "sequelize";
 import { jwtValidate } from "../../middlewares/auths";
 import Order from "../../models/order";
 import OrderDetail from "../../models/order/details";
+import { isAllowTransitionState } from "../../services/order/state";
 import { ORDER_STATUS } from "../../types/order";
 import { controller, routeConfig } from "../../utils/routeConfig";
 import RootSocket from "../socket";
@@ -42,8 +43,18 @@ class OrderController {
         status: { [Op.notIn]: [ORDER_STATUS.canceled, ORDER_STATUS.succeeded] },
       },
     });
-    if (!Object.values(ORDER_STATUS).includes(status)) {
-      throw new Error("Not a valid status");
+    if (!order) {
+      throw new Error("Order not founded");
+    }
+    if (!isAllowTransitionState(order.getDataValue("status"), status)) {
+      throw new Error(
+        JSON.stringify({
+          code: 422,
+          message: `Invalid target state, order with state of ${order.getDataValue(
+            "status"
+          )} can't be transition to ${status}`,
+        })
+      );
     }
     const updatedOrder = await order?.update({ status: status });
     RootSocket.socket?.emit(
