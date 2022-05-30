@@ -1,4 +1,3 @@
-import 'package:app/models/food.dart';
 import 'package:app/models/product/product.dart';
 
 class Restaurant {
@@ -14,7 +13,7 @@ class Restaurant {
   Restaurant(this.name, this.waitTime, this.distance, this.label, this.logoUrl,
       this.desc, this.score, this.menu);
 
-  static Restaurant generateRestaurant(List<Product> list) {
+  static Restaurant generateRestaurant({required List<Product>? list}) {
     return Restaurant(
       'Restaurant',
       '20-30 min',
@@ -24,8 +23,8 @@ class Restaurant {
       'Orange sandwiches is delicious',
       4.7,
       {
-        'Recommend': list,
-        'Popular': list,
+        'Recommend': list ?? [],
+        'Popular': list ?? [],
         'Noodles': [],
         'Pizza': [],
       },

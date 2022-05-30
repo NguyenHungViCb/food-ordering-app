@@ -1,10 +1,10 @@
+import 'package:app/models/product/product.dart';
 import 'package:app/models/restaurant.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/home/widget/food_list.dart';
 import 'package:app/screens/home/widget/food_list_view.dart';
 import 'package:app/screens/home/widget/slider_List.dart';
 import 'package:app/share/constants/colors.dart';
-import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -12,6 +12,7 @@ import '../../widgets/custom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
   static String routeName = "/home";
+
   const HomePage({Key? key}) : super(key: key);
 
   @override
@@ -21,7 +22,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   var selected = 0;
   final pageController = PageController();
-  final restaurant = Restaurant.generateRestaurant();
+  Restaurant? restaurant;
   final controls = [
     {"icon": 'assets/images/account.svg', "text": "Account"},
     {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
@@ -29,9 +30,22 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
+      final products = await Product().loadList();
+      print(products);
+      setState(() {
+        restaurant = Restaurant.generateRestaurant(list: products);
+      });
+    });
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: kBackground, // background color main
+      backgroundColor: kBackground,
+      // background color main
       drawer: ClipRRect(
         child: Drawer(
           child: Column(children: [
@@ -107,21 +121,23 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* CustomAppBar(), */
-         DestinationCarousel(),
+          DestinationCarousel(),
           // RestaurantInfo(),
-          FoodList(selected, (int index) {
-            setState(() {
-              selected = index;
-            });
-            pageController.jumpToPage(index);
-          }, restaurant),
-          Expanded(
-            child: FoodListView(selected, (int index) {
+          if (restaurant != null)
+            FoodList(selected, (int index) {
               setState(() {
                 selected = index;
               });
-            }, pageController, restaurant),
-          ),
+              pageController.jumpToPage(index);
+            }, restaurant!),
+          if (restaurant != null)
+            Expanded(
+              child: FoodListView(selected, (int index) {
+                setState(() {
+                  selected = index;
+                });
+              }, pageController, restaurant!),
+            ),
           // Container(
           //   padding: EdgeInsets.symmetric(horizontal: 25),
           //   height: 60,

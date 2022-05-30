@@ -1,3 +1,6 @@
+import 'dart:convert';
+import 'dart:developer';
+
 import 'package:http/http.dart' as http;
 
 class Product {
@@ -35,7 +38,7 @@ class Product {
     if (json['images'] != null) {
       images = <Images>[];
       json['images'].forEach((v) {
-        images!.add( Images.fromJson(v));
+        images!.add(Images.fromJson(v));
       });
     }
     createdAt = json['created_at'];
@@ -59,15 +62,16 @@ class Product {
     return data;
   }
 
-  Future<List<Product>> loadList() async {
-    Uri link = Uri(scheme: 'https', host: 'food-ordering-app-149311cb.herokuapp.com');
+  Future<List<Product>?> loadList() async {
+    Uri link = Uri(
+        scheme: 'https',
+        host: 'food-ordering-app-149311cb.herokuapp.com',
+        path: '/api/products/all');
     try {
-      var response = await http.get(link,
-          json.encode({"email": email, "password": password}));
-      if (response.statusCode.toString().startsWith("2")) {
-        var tokens = Token.fromJson(responseFromJson(response.body).data);
-        return tokens;
-      }
+      final data = await http.get(link);
+      final response = json.decode(data.body);
+
+      return ProductsResponse.fromJson(response).product;
     } catch (e) {
       log(e.toString());
     }
@@ -89,4 +93,15 @@ class Images {
     data['src'] = src;
     return data;
   }
+}
+
+class ProductsResponse {
+  final List<Product>? product;
+
+  ProductsResponse(this.product);
+
+  ProductsResponse.fromJson(Map<String, dynamic>? json)
+      : product = (json?['data']?["rows"] as List?)
+            ?.map((i) => Product.fromJson(i))
+            .toList();
 }
