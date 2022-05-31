@@ -1,3 +1,5 @@
+import 'package:app/models/cart/addtocart/cart.dart';
+import 'package:app/models/cart/addtocart/cart_request.dart';
 import 'package:app/models/product/product.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/detail/widget/food_detail.dart';
@@ -20,11 +22,21 @@ class _DetailPageState extends State<DetailPage> {
 
   void _counter({bool tick = false}) {
     setState(() {
-      if (tick)
+      if (tick) {
         counter -= 1;
-      else
+      } else {
         counter += 1;
+      }
+      if (counter < 0) counter = 0;
     });
+  }
+
+  void _onTapAddCart() {
+    if (widget.food.id != null) {
+      final item =
+          CartRequest(productId: int.parse(widget.food.id!), quantity: counter);
+      Cart().AddtoCart(item);
+    }
   }
 
   @override
@@ -42,6 +54,7 @@ class _DetailPageState extends State<DetailPage> {
               counter: counter,
               onTapAdd: _counter,
               onTapMinus: () => _counter(tick: true),
+              onTapAddCart: _onTapAddCart,
             )
           ],
         ),

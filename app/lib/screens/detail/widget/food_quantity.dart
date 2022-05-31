@@ -7,8 +7,10 @@ class FoodQuantity extends StatelessWidget {
   final int? counter;
   final Function()? onTapAdd;
   final Function()? onTapMinus;
+  final Function()? onTapAddCart;
 
-  const FoodQuantity(this.food, {this.counter, this.onTapAdd, this.onTapMinus});
+  const FoodQuantity(this.food,
+      {this.counter, this.onTapAdd, this.onTapMinus, this.onTapAddCart});
 
   Widget build(BuildContext context) {
     return Container(
@@ -91,7 +93,18 @@ class FoodQuantity extends StatelessWidget {
               ],
             ),
           ),
-        )
+        ),
+        Align(
+          alignment: Alignment(0.8, 0),
+          child: IconButton(
+            onPressed: onTapAddCart,
+            icon: Icon(
+              Icons.add_shopping_cart,
+              color: Colors.amber,
+              size: 30.0,
+            ),
+          ),
+        ),
       ]),
     );
   }

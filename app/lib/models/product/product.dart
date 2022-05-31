@@ -1,7 +1,60 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:http/http.dart' as http;
+import 'package:app/utils/api_service.dart';
+
+GetSingleProductResponse productFromJson(String str) =>
+    GetSingleProductResponse.fromJson(json.decode(str));
+
+class GetSingleProductResponse {
+  String id, price;
+  String? name, description;
+  List<Images> images;
+  String originalPrice;
+  int stock;
+  String createdAt, updatedAt;
+  String categoryId;
+
+  GetSingleProductResponse(
+      this.id,
+      this.name,
+      this.description,
+      this.price,
+      this.originalPrice,
+      this.stock,
+      this.createdAt,
+      this.updatedAt,
+      this.images,
+      this.categoryId);
+
+  factory GetSingleProductResponse.fromJson(Map<dynamic, dynamic> json) =>
+      GetSingleProductResponse(
+          json["id"],
+          json["name"],
+          json["description"] ?? '',
+          json["price"],
+          json["original_price"],
+          json["stock"],
+          json["created_at"],
+          json["updated_at"],
+          List<Images>.from(json["images"].map((x) => Images.fromJson(x))),
+          json['category_id']);
+}
+
+class ProductItems {
+  Future<GetSingleProductResponse> getSingleProduct(int id) async {
+    var response = await ApiService().get("/api/products/$id");
+    final Map parsed = json.decode(response.body);
+    if (response.statusCode == 200) {
+      var productResponse = GetSingleProductResponse.fromJson(parsed);
+      return productResponse;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load product');
+    }
+  }
+}
 
 class Product {
   String? id;
@@ -63,19 +116,15 @@ class Product {
   }
 
   Future<List<Product>?> loadList() async {
-    Uri link = Uri(
-        scheme: 'https',
-        host: 'food-ordering-app-149311cb.herokuapp.com',
-        path: '/api/products/all');
     try {
-      final data = await http.get(link);
-      final response = json.decode(data.body);
+      var response = await ApiService().get("/api/products/all");
+      final data = json.decode(response.body);
 
-      return ProductsResponse.fromJson(response).product;
+      return ProductsResponse.fromJson(data).product;
     } catch (e) {
       log(e.toString());
+      throw Exception('Failed to load product');
     }
-    return null;
   }
 }
 

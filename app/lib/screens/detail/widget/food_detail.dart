@@ -8,8 +8,10 @@ class FoodDetail extends StatelessWidget {
   final int? counter;
   final Function()? onTapAdd;
   final Function()? onTapMinus;
+  final Function()? onTapAddCart;
 
-  const FoodDetail(this.food, {this.counter, this.onTapAdd, this.onTapMinus});
+  const FoodDetail(this.food,
+      {this.counter, this.onTapAdd, this.onTapMinus, this.onTapAddCart});
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -47,6 +49,7 @@ class FoodDetail extends StatelessWidget {
             onTapMinus: onTapMinus,
             onTapAdd: onTapAdd,
             counter: counter,
+            onTapAddCart: onTapAddCart,
           ),
           SizedBox(height: 30),
           Row(

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:app/models/tokens/tokens.dart';
 import 'package:app/share/constants/app_config.dart';
@@ -36,12 +37,19 @@ class ApiService {
 
   Future<http.Response> post(String url, Object body) async {
     Token tokens = await getToken();
-    return await http.post(Uri.parse(baseURL + url),
-        headers: {
-          'Authorization': 'Bearer ' + tokens.token,
-          'Content-Type': 'application/json'
-        },
-        body: body);
+    print('${baseURL + url} - $body');
+    print('token: ${tokens.token}');
+    try {
+      return await http.post(Uri.parse(baseURL + url),
+          headers: {
+            'Authorization': 'Bearer ' + tokens.token,
+            'Content-Type': 'application/json'
+          },
+          body: body);
+    } catch (e) {
+      log(e.toString());
+      throw Exception('Failed to load http post');
+    }
   }
 
   Future<http.Response> put(url, Object? body) async {
