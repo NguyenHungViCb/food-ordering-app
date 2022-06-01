@@ -20,7 +20,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    cart = CartItems().GetCart();
+    cart = CartItems().getCart();
   }
 
   @override
@@ -136,7 +136,7 @@ class _BodyState extends State<Body> {
 
   void deleteCart(String id, int? quantity) async {
     try {
-      await CartItems().DeleteCart(id, quantity);
+      await CartItems().deleteCart(id, quantity);
     } catch (e) {
       log(e.toString());
     }
@@ -144,7 +144,7 @@ class _BodyState extends State<Body> {
 
   void addCart(String id, int? quantity) async {
     try {
-      await CartItems().AddCart(id, quantity);
+      await CartItems().addCart(id, quantity);
     } catch (e) {
       log(e.toString());
     }

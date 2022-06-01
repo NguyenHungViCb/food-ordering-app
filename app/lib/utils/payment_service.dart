@@ -64,8 +64,9 @@ class PaymentService {
     return _nullSafety;
   }
 
-  static checkout(dynamic paymentMethod, String address, int? voucherId) async {
+  static checkout(dynamic paymentMethod, String address) async {
     var cartId = await GlobalStorage.read(key: "cart_id");
+    var voucherId = await GlobalStorage.read(key: "voucher_id");
     var response = await ApiService().post(
         "/api/payments/stripe/confirm",
         json.encode({

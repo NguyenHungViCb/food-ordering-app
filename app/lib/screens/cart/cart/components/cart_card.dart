@@ -33,8 +33,7 @@ class CartCard extends StatelessWidget {
                         color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.network(
-                          snapshot.data?.images[0].src ?? "",
+                      child: Image.network(snapshot.data?.images[0].src ?? "",
                           fit: BoxFit.fitHeight),
                     ),
                   ),
