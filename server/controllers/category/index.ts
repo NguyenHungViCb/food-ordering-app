@@ -92,6 +92,21 @@ class CategoryController {
         count: data.count,
       }));
       return res.json({ data: category, success: true });
+    } else {
+      const categories = await Category.findAndCountAll({
+        offset: cPage * cLim,
+        limit: cLim,
+        include: [
+          {
+            model: Product,
+            as: "products",
+          },
+        ],
+      }).then((data) => ({
+        row: data.rows.map((row) => imageToArray(row)),
+        count: data.count,
+      }));
+      return res.json({ data: categories, success: true });
     }
   }
 }
