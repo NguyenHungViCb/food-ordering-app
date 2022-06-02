@@ -12,7 +12,7 @@ class GetVouchersResponse {
   String code;
   String description;
   int discount;
-  int minValue;
+  String minValue;
   DateTime validFrom, validUntil;
   String createdAt, updatedAt;
 
