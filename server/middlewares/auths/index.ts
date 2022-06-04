@@ -75,12 +75,14 @@ export async function validateRefreshToken(
 }
 
 export function tryMiddleware(
-  middleware: (req: Request, res: Response, next: NextFunction) => Promise<any>
+  middleware: (req: Request, res: Response, next: NextFunction) => Promise<any>,
+  callback?: (req: Request, res: Response, next: NextFunction) => Promise<any>
 ) {
   return async (req: Request, res: Response, next: NextFunction) => {
     try {
       await middleware(req, res, next);
     } catch (error) {
+      await callback?.(req, res, next);
       next();
     }
   };

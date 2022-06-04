@@ -27,6 +27,7 @@ import { requireValues } from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
 import {
   activeCartValidate,
+  getUnAuthCartDecorator,
   unAuthCartDecorator,
   upsertActiveCartValidate,
 } from "../../middlewares/carts";
@@ -200,7 +201,10 @@ class CartController {
   @routeConfig({
     method: "post",
     path: `${CartController.path}/items/remove`,
-    middlewares: [jwtValidate, activeCartValidate],
+    middlewares: [
+      tryMiddleware(jwtValidate),
+      getUnAuthCartDecorator(activeCartValidate),
+    ],
   })
   async removeProductsFromCart(req: Request, res: Response, __: NextFunction) {
     const { items } = req.body;
