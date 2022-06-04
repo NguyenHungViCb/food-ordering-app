@@ -1,10 +1,11 @@
+import { red } from "colors";
 import { NextFunction, Request, Response } from "express";
 import Cart from "../../models/cart";
 import { queryToNum } from "../../utils/validations/assertions";
 
 const activeCartValidate = async (
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) => {
   const { user } = req;
@@ -12,11 +13,13 @@ const activeCartValidate = async (
     where: { user_id: user.getDataValue("id") },
   });
   if (!existCart) {
-    return res.status(404).json({
-      message: "this user has no active cart",
-      data: null,
-      success: false,
-    });
+    console.log(red("THROW"));
+    throw new Error(
+      JSON.stringify({
+        code: 404,
+        message: "this user has no active cart",
+      })
+    );
   }
   req.cart = existCart;
   next();
@@ -47,7 +50,7 @@ const unAuthCartDecorator = (middleware: (...args: any[]) => Promise<any>) => {
         const existCart = await Cart.findByPk(queryToNum(cart_id));
         if (!existCart) {
           throw new Error(
-            JSON.stringify({ code: 404, message: "Cart not founded" })
+            JSON.stringify({ code: 404, message: "Cart not found" })
           );
         }
         req.cart = existCart;
@@ -61,4 +64,38 @@ const unAuthCartDecorator = (middleware: (...args: any[]) => Promise<any>) => {
   };
 };
 
-export { upsertActiveCartValidate, activeCartValidate, unAuthCartDecorator };
+const getUnAuthCart = async (req: Request, _: Response, next: NextFunction) => {
+  const { cart_id } = req.query;
+  if (cart_id) {
+    const cartId = queryToNum(cart_id);
+    const existCart = await Cart.findByPk(cartId);
+    if (!existCart) {
+      throw new Error(JSON.stringify({ code: 404, message: "Cart not found" }));
+    }
+    req.cart = existCart;
+    next();
+  } else {
+    throw new Error(JSON.stringify({ code: 400, message: "Cart not found" }));
+  }
+};
+
+const getUnAuthCartDecorator = (
+  middleware: (...args: any[]) => Promise<any>
+) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { user } = req;
+    if (user) {
+      await middleware(req, res, next);
+    } else {
+      await getUnAuthCart(req, res, next);
+    }
+  };
+};
+
+export {
+  upsertActiveCartValidate,
+  activeCartValidate,
+  unAuthCartDecorator,
+  getUnAuthCart,
+  getUnAuthCartDecorator
+};
