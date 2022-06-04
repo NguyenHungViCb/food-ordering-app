@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import { Model } from "sequelize";
-import { jwtValidate } from "../../middlewares/auths";
+import { tryMiddleware, jwtValidate } from "../../middlewares/auths";
 import { sequelize } from "../../db/config";
 import Cart from "../../models/cart";
 import CartDetail from "../../models/cart/detail";
@@ -18,26 +18,32 @@ import {
   routeConfig,
   routeDescription,
 } from "../../utils/routeConfig";
-import { isArray, isNotNull } from "../../utils/validations/assertions";
+import {
+  isArray,
+  isNotNull,
+  queryToNum,
+} from "../../utils/validations/assertions";
 import { requireValues } from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
 import {
   activeCartValidate,
+  unAuthCartDecorator,
   upsertActiveCartValidate,
 } from "../../middlewares/carts";
 import { upsert } from "../../services";
 import { decreaseQuantity, increaseQuantity } from "../../services/cart/cart";
 import { parseToJSON } from "../../utils/validations/json";
 import { errorsConverter } from "../../utils/commons";
+import { UserCreation, UserModel } from "../../types/user/userInterfaces";
 
 export interface createPayloadType {
   product_id: number;
   quantity: number;
 }
 
-const path = "/carts";
 @controller
 class CartController {
+  static path = "/carts";
   @routeDescription({
     request_payload: [getAttributes(CartDetail, ["product_id", "quantity"])],
     response_payload: createdCartPayload,
@@ -47,7 +53,7 @@ class CartController {
   })
   @routeConfig({
     method: "post",
-    path: `${path}/create/single`,
+    path: `${CartController.path}/create/single`,
     middlewares: [jwtValidate],
   })
   async createCart(req: Request, res: Response, __: NextFunction) {
@@ -126,8 +132,11 @@ class CartController {
   })
   @routeConfig({
     method: "post",
-    path: `${path}/items/add`,
-    middlewares: [jwtValidate, upsertActiveCartValidate],
+    path: `${CartController.path}/items/add`,
+    middlewares: [
+      tryMiddleware(jwtValidate),
+      unAuthCartDecorator(upsertActiveCartValidate),
+    ],
   })
   async addProductsToCart(req: Request, res: Response, __: NextFunction) {
     const { items } = req.body;
@@ -190,7 +199,7 @@ class CartController {
   })
   @routeConfig({
     method: "post",
-    path: `${path}/items/remove`,
+    path: `${CartController.path}/items/remove`,
     middlewares: [jwtValidate, activeCartValidate],
   })
   async removeProductsFromCart(req: Request, res: Response, __: NextFunction) {
@@ -264,11 +273,38 @@ class CartController {
   })
   @routeConfig({
     method: "get",
-    path: `${path}/active`,
-    middlewares: [jwtValidate],
+    path: `${CartController.path}/active`,
+    middlewares: [tryMiddleware(jwtValidate)],
   })
   async getActiveCart(req: Request, res: Response, __: NextFunction) {
     const { user } = req;
+    if (user) {
+      this.getAuthCart(user, res);
+    } else {
+      const { cart_id } = req.query;
+      if (cart_id) {
+        const cartId = queryToNum(cart_id);
+        const existCart = await Cart.findByPk(cartId, {
+          include: [{ model: CartDetail, as: "cart_details" }],
+        });
+        if (!existCart) {
+          throw new Error(
+            JSON.stringify({ code: 404, message: "Cart not found" })
+          );
+        }
+        return res.json({ data: existCart?.get(), success: true });
+      } else {
+        throw new Error(
+          JSON.stringify({ code: 404, message: "Cart not found" })
+        );
+      }
+    }
+  }
+
+  async getAuthCart(
+    user: Model<UserCreation, UserCreation | UserModel>,
+    res: Response
+  ) {
     const cart = await Cart.findOne({
       where: { user_id: user.getDataValue("id") },
       include: [{ model: CartDetail, as: "cart_details" }],

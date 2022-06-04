@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import Cart from "../../models/cart";
+import { queryToNum } from "../../utils/validations/assertions";
 
 const activeCartValidate = async (
   req: Request,
@@ -35,4 +36,29 @@ const upsertActiveCartValidate = async (
   next();
 };
 
-export { upsertActiveCartValidate, activeCartValidate };
+const unAuthCartDecorator = (middleware: (...args: any[]) => Promise<any>) => {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    const { user } = req;
+    if (user) {
+      await middleware(req, res, next);
+    } else {
+      const { cart_id } = req.query;
+      if (cart_id && typeof cart_id === "string") {
+        const existCart = await Cart.findByPk(queryToNum(cart_id));
+        if (!existCart) {
+          throw new Error(
+            JSON.stringify({ code: 404, message: "Cart not founded" })
+          );
+        }
+        req.cart = existCart;
+        next();
+      } else {
+        const newCart = await Cart.create();
+        req.cart = newCart;
+        next();
+      }
+    }
+  };
+};
+
+export { upsertActiveCartValidate, activeCartValidate, unAuthCartDecorator };
