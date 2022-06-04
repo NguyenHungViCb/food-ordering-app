@@ -24,7 +24,7 @@ export async function jwtTokenVerify<T>(
 
 export async function jwtValidate(
   req: Request,
-  res: Response,
+  _: Response,
   next: NextFunction
 ) {
   try {
@@ -41,7 +41,10 @@ export async function jwtValidate(
     });
     next();
   } catch (error: any) {
-    return res.status(400).json({ message: `UnAuthorized. ${error.message}` });
+    throw new Error(
+      JSON.stringify({ code: 400, message: `UnAuthorized. ${error.message}` })
+    );
+    // return res.status(400).json({ message: `UnAuthorized. ${error.message}` });
   }
 }
 
@@ -72,6 +75,20 @@ export async function validateRefreshToken(
   } catch (error: any) {
     return res.status(400).json({ message: `UnAuthorized. ${error.message}` });
   }
+}
+
+export function tryMiddleware(
+  middleware: (req: Request, res: Response, next: NextFunction) => Promise<any>,
+  callback?: (req: Request, res: Response, next: NextFunction) => Promise<any>
+) {
+  return async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      await middleware(req, res, next);
+    } catch (error) {
+      await callback?.(req, res, next);
+      next();
+    }
+  };
 }
 
 export async function socketJwtValidate(

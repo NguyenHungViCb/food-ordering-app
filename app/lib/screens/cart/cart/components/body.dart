@@ -20,7 +20,7 @@ class _BodyState extends State<Body> {
   @override
   void initState() {
     super.initState();
-    cart = CartItems().GetCart();
+    cart = CartItems().getCart();
   }
 
   @override
@@ -41,7 +41,7 @@ class _BodyState extends State<Body> {
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
                       setState(() {
-                        DeleteCart(
+                        deleteCart(
                             snapshot.data!.details[index].productId, null);
                         snapshot.data!.details.removeAt(index);
                       });
@@ -73,8 +73,6 @@ class _BodyState extends State<Body> {
                                   int.parse(
                                       snapshot.data!.details[index].productId)),
                               index: index),
-                          //items(context),
-                          //SizedBox(width: 100),
                           Center(
                               child: Container(
                             height: 22,
@@ -93,7 +91,7 @@ class _BodyState extends State<Body> {
                                       onTap: () {
                                         setState(() {
                                           snapshot.data!.details[index].quantity--;
-                                          DeleteCart(snapshot.data!.details[index].productId, 1);
+                                          deleteCart(snapshot.data!.details[index].productId, 1);
                                         });
                                       },
                                       child: const Icon(
@@ -109,7 +107,7 @@ class _BodyState extends State<Body> {
                                       onTap: () {
                                         setState(() {
                                           snapshot.data!.details[index].quantity++;
-                                          AddCart(snapshot.data!.details[index].productId, 1);
+                                          addCart(snapshot.data!.details[index].productId, 1);
                                         });
                                       },
                                       child: const Icon(
@@ -136,17 +134,17 @@ class _BodyState extends State<Body> {
     );
   }
 
-  void DeleteCart(String Id, int? quantity) async {
+  void deleteCart(String id, int? quantity) async {
     try {
-      await CartItems().DeleteCart(Id, quantity);
+      await CartItems().deleteCart(id, quantity);
     } catch (e) {
       log(e.toString());
     }
   }
 
-  void AddCart(String Id, int? quantity) async {
+  void addCart(String id, int? quantity) async {
     try {
-      await CartItems().AddCart(Id, quantity);
+      await CartItems().addCart(id, quantity);
     } catch (e) {
       log(e.toString());
     }

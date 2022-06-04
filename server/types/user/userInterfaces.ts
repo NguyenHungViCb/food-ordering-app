@@ -26,6 +26,7 @@ export class UserCreation extends UserModel {
     public birthday: Date,
     public stripe_id: string,
     public selected_card: string,
+    public address: string,
     public created_at?: Date,
     public updated_at?: Date
   ) {
@@ -49,4 +50,5 @@ export const userCreationResponsePayload = getAttributes(User, [
   "active",
   "created_at",
   "updated_at",
+  "address",
 ]);
