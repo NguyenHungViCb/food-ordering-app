@@ -32,6 +32,7 @@ class _OrderProgressState extends State<OrderProgress> {
   /* } */
 
   initialize() async {
+    await socket.cancel();
     await socket.connect();
     socket.onConnect((){
       print("connected");
