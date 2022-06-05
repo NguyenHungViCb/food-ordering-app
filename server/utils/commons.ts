@@ -1,5 +1,5 @@
 export const errorsConverter = {
-  jsonOrString(error: any): string | object {
+  jsonOrString(error: any): string | any {
     let err;
     try {
       err = JSON.parse(error.message);

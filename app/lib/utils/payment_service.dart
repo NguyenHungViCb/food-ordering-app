@@ -3,6 +3,9 @@ import 'dart:convert';
 import 'package:app/models/api/base_response.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class PaymentService {
   static final Map<String, dynamic> _nullSafety = {
@@ -64,20 +67,56 @@ class PaymentService {
     return _nullSafety;
   }
 
-  static checkout(dynamic paymentMethod, String address, int? voucherId) async {
-    var cartId = await GlobalStorage.read(key: "cart_id");
-    var response = await ApiService().post(
-        "/api/payments/stripe/confirm",
-        json.encode({
-          "payment_method": paymentMethod['id'],
-          "address": address,
-          "cart_id": cartId,
-          "voucher_id": voucherId
-        }));
-    if (response.statusCode == 200) {
-      print(responseFromJson(response.body).data);
-    } else {
-      print(responseFromJson(response.body).message);
+  static Future<Map<String, dynamic>> checkout(
+      context, dynamic paymentMethod, String address) async {
+    try {
+      var cartId = await GlobalStorage.read(key: "cart_id");
+      var voucherId = await GlobalStorage.read(key: "voucher_id");
+      var response = await ApiService().post(
+          "/api/payments/stripe/confirm",
+          json.encode({
+            "payment_method": paymentMethod['id'],
+            "address": address,
+            "cart_id": cartId,
+            "voucher_id": voucherId
+          }));
+      if (response.statusCode == 200) {
+        return responseFromJson(response.body).data;
+      } else {
+        FToast().init(context).showToast(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+              decoration: const BoxDecoration(
+                  color: Color(0xfffa5252),
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
+              child: Row(
+                children: [
+                  SvgPicture.asset(
+                    "assets/images/error.svg",
+                    width: 18,
+                  ),
+                  const SizedBox(
+                    width: 20,
+                  ),
+                  const Text(
+                    "An error has occured",
+                    style: TextStyle(color: Colors.white),
+                  )
+                ],
+              ),
+            ),
+            /* backgroundColor: const Color(0xfffa5252), */
+            gravity: ToastGravity.CENTER,
+            toastDuration: const Duration(seconds: 3),
+            positionedToastBuilder: (context, child) {
+              return Positioned(child: child, top: 150, left: 80);
+            });
+        return {"error": true};
+      }
+    } catch (e) {
+      print(e);
+      Fluttertoast.showToast(msg: "Failed to complete order due to some error");
+      return {"error": true};
     }
   }
 }

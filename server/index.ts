@@ -8,8 +8,12 @@ import CartController from "./controllers/cart";
 import VoucherController from "./controllers/voucher";
 import PaymentController from "./controllers/payment";
 import OrderController from "./controllers/order";
+import http from "http";
+import RootSocket from "./controllers/socket";
 
-app.listen(PORT, () => {
+const server = http.createServer(app);
+RootSocket.initialize(server);
+server.listen(PORT, () => {
   console.log(yellow.bold(`App listening on port ${PORT}`));
   new ProductController();
   new CategoryController();

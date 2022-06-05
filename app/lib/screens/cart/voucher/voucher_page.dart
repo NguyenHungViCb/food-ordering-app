@@ -1,45 +1,36 @@
-import 'package:app/components/default_button.dart';
 import 'package:flutter/material.dart';
 
-class VoucherPage extends StatefulWidget {
-  const VoucherPage({Key? key}) : super(key: key);
+import 'components/body.dart';
 
-  @override
-  VoucherPageState createState() => VoucherPageState();
-}
-
-class VoucherPageState extends State<VoucherPage> {
-  final _formKey = GlobalKey<FormState>();
-  final noteController = TextEditingController();
-
-
+class VouchersScreen extends StatelessWidget {
+  static String routeName = "/vouchers";
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: _formKey,
-      child: Expanded(
-          child: ListView(
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 30),
-                  Text("Voucher Code"),
-                  TextFormField(
-                    controller: noteController, // any number you need (It works as the rows for the textarea)
-                    keyboardType: TextInputType.multiline,
-                    maxLines: null,
-                  ),
-                  const SizedBox(height: 5),
-                  DefaultButton(
-                    press:() {},
-                    text: "Save",
-                  )
-                  // )
-                ],
-              ),
-            ],
-          )),
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5),
+      appBar: buildAppBar(context),
+      body: const VoucherPage(),
+    );
+  }
+
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: const Color(0xFFFDBF30),
+      leading: GestureDetector(
+        onTap: (){
+          Navigator.pop(context);
+        },
+        child: const Icon(Icons.arrow_back_ios),
+      ),
+      title: Row(
+        children: const [
+          SizedBox(width: 80,),
+          Text(
+            "Your Vouchers",
+            style: TextStyle(color: Colors.black),
+          ),
+        ],
+      ),
     );
   }
 }

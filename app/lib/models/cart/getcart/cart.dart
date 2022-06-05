@@ -1,14 +1,9 @@
 import 'dart:convert';
 import 'dart:developer';
-import 'package:app/models/cart/addtocart/cart_request.dart';
-import 'package:app/models/cart/addtocart/error.dart';
 import 'package:app/models/api/base_response.dart';
 import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/storage.dart';
-
 import 'package:app/utils/api_service.dart';
-
-import '../addtocart/cart_details.dart';
 
 // =================== User related models ===================
 
@@ -49,6 +44,7 @@ class GetCartResponse {
 
   String id;
   String userId;
+
   /* bool isActive; */
   DateTime createdAt;
   DateTime updatedAt;
@@ -91,11 +87,41 @@ class RemoveCartRequest {
       };
 }
 
-int Sum = 0;
-// =================== Class responsed for api called ===================
+// =================== Class response for api called ===================
 
 class CartItems {
-  Future<GetCartResponse> GetCart() async {
+  Future<double> sum() async {
+    double sum = 0;
+    var getCartResponse = await ApiService().get("/api/carts/active");
+    if (getCartResponse.statusCode == 200) {
+      var cartResponse =
+          GetCartResponse.fromJson(responseFromJson(getCartResponse.body).data);
+      for (int i = 0; i < cartResponse.details.length; i++) {
+        var prodId = cartResponse.details[i].productId;
+        var getProductResponse =
+            await ApiService().get("/api/products/$prodId");
+        final Map parsed = json.decode(getProductResponse.body);
+
+        if (getProductResponse.statusCode == 200) {
+          var productResponse = GetSingleProductResponse.fromJson(parsed);
+          sum = (cartResponse.details[i].quantity *
+                  double.tryParse(productResponse.price)!) +
+              sum;
+        } else {
+          // If the server did not return a 200 OK getCartResponse,
+          // then throw an exception.
+          throw Exception('Failed to load product');
+        }
+      }
+      return sum;
+    } else {
+      // If the server did not return a 200 OK getCartResponse,
+      // then throw an exception.
+      throw Exception('Failed to load cart');
+    }
+  }
+
+  Future<GetCartResponse> getCart() async {
     var response = await ApiService().get("/api/carts/active");
     print(responseFromJson(response.body).data);
     if (response.statusCode == 200) {
@@ -111,7 +137,7 @@ class CartItems {
     }
   }
 
-  Future<dynamic> DeleteCart(String productId, int? quantity) async {
+  Future<dynamic> deleteCart(String productId, int? quantity) async {
     try {
       await ApiService().post(
           "/api/carts/items/remove",
@@ -126,7 +152,7 @@ class CartItems {
     return null;
   }
 
-  Future<dynamic> AddCart(String productId, int? quantity) async {
+  Future<dynamic> addCart(String productId, int? quantity) async {
     try {
       await ApiService().post(
           "/api/carts/items/add",

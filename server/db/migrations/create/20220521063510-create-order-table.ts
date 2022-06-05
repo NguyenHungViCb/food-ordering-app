@@ -28,7 +28,8 @@ module.exports = {
           "canceled",
           "succeeded",
           "confirmed",
-          "processing"
+          "processing",
+          "shipping"
         ),
         allowNull: false,
       },
@@ -43,7 +44,7 @@ module.exports = {
       paid_at: {
         type: DataTypes.DATE,
       },
-      cancelled_at: {
+      canceled_at: {
         type: DataTypes.DATE,
       },
       voucher_id: {

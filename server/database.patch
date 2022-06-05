@@ -1,0 +1,445 @@
+diff --git a/server/db/migrations/create/20220502093129-create-address-table.ts b/server/db/migrations/create/20220502093129-create-address-table.ts
+new file mode 100644
+index 0000000..f4c5dbe
+--- /dev/null
++++ b/server/db/migrations/create/20220502093129-create-address-table.ts
+@@ -0,0 +1,52 @@
++import { QueryInterface, Sequelize, DataTypes } from "sequelize";
++
++module.exports = {
++  async up(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.createTable("addresses", {
++      id: {
++        type: DataTypes.BIGINT,
++        autoIncrement: true,
++        allowNull: false,
++        primaryKey: true,
++      },
++      user_id: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "users",
++          },
++          key: "id",
++        },
++        allowNull: false,
++      },
++      address: {
++        type: DataTypes.STRING,
++        allowNull: false,
++      },
++      ward: {
++        type: DataTypes.STRING,
++        allowNull: false,
++      },
++      district: {
++        type: DataTypes.STRING,
++        allowNull: false,
++      },
++      city: {
++        type: DataTypes.STRING,
++        allowNull: false,
++      },
++      created_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++      updated_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++    });
++  },
++
++  async down(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.dropTable("addresses");
++  },
++};
+diff --git a/server/db/migrations/create/20220504144404-create-voucher-detail-table.ts b/server/db/migrations/create/20220504144404-create-voucher-detail-table.ts
+new file mode 100644
+index 0000000..6551186
+--- /dev/null
++++ b/server/db/migrations/create/20220504144404-create-voucher-detail-table.ts
+@@ -0,0 +1,44 @@
++import { QueryInterface, Sequelize, DataTypes } from "sequelize";
++
++module.exports = {
++  async up(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.createTable("voucher_details", {
++      id: {
++        type: DataTypes.BIGINT,
++        autoIncrement: true,
++        allowNull: false,
++        primaryKey: true,
++      },
++      voucher_id: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "vouchers"
++          },
++          key: "id"
++        },
++      },
++      product_id: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "products",
++          },
++          key: "id"
++        }
++      },
++      created_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++      updated_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++    })
++  },
++
++  async down(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.dropTable("voucher_details")
++  }
++};
+diff --git a/server/db/migrations/create/20220504145241-create-order-table.ts b/server/db/migrations/create/20220504145241-create-order-table.ts
+new file mode 100644
+index 0000000..486a389
+--- /dev/null
++++ b/server/db/migrations/create/20220504145241-create-order-table.ts
+@@ -0,0 +1,66 @@
++import { QueryInterface, Sequelize, DataTypes } from "sequelize";
++
++module.exports = {
++  async up(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.createTable("orders", {
++      id: {
++        type: DataTypes.BIGINT,
++        autoIncrement: true,
++        allowNull: false,
++        primaryKey: true,
++      },
++      user_id: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "users"
++          }, key: "id"
++        },
++      },
++      address: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "addresses"
++          },
++          key: "id"
++        }
++      },
++      cart_id: {
++        type: DataTypes.BIGINT,
++        references: {
++          model: {
++            tableName: "carts"
++          },
++          key: "id"
++        }
++      },
++      status: {
++        type: DataTypes.ENUM("pending", "failed", "succeed"),
++        allowNull: false
++      },
++      payment_method: {
++        type: DataTypes.STRING,
++        allowNull: false
++      },
++      paid_at: {
++        type: DataTypes.DATE,
++      },
++      cancelled_at: {
++        type: DataTypes.DATE,
++      },
++      created_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++      updated_at: {
++        allowNull: false,
++        type: DataTypes.DATE,
++      },
++    })
++  },
++
++  async down(queryInterface: QueryInterface, _: Sequelize) {
++    await queryInterface.dropTable("orders")
++  }
++};
+diff --git a/server/models/address/index.ts b/server/models/address/index.ts
+new file mode 100644
+index 0000000..e3b7ae4
+--- /dev/null
++++ b/server/models/address/index.ts
+@@ -0,0 +1,55 @@
++import { DataTypes, Model } from "sequelize";
++import { modelConfig, sequelize } from "../../db/config";
++import { AddressModel, AddressCreation } from "../../types/address";
++import User from "../user";
++
++const Address = sequelize.define<
++  Model<AddressCreation, AddressModel | AddressCreation>
++>(
++  "Address",
++  {
++    id: {
++      type: DataTypes.BIGINT,
++      autoIncrement: true,
++      allowNull: false,
++      primaryKey: true,
++    },
++    user_id: {
++      type: DataTypes.BIGINT,
++      references: {
++        model: User,
++        key: "id",
++      },
++      allowNull: false,
++    },
++    address: {
++      type: DataTypes.STRING,
++      allowNull: false,
++    },
++    ward: {
++      type: DataTypes.STRING,
++      allowNull: false,
++    },
++    district: {
++      type: DataTypes.STRING,
++      allowNull: false,
++    },
++    city: {
++      type: DataTypes.STRING,
++      allowNull: false,
++    },
++  },
++  modelConfig("addresses")
++);
++
++User.hasMany(Address, {
++  as: "addresses",
++  onDelete: "cascade",
++  foreignKey: "user_id",
++});
++Address.belongsTo(User, {
++  as: "user",
++  foreignKey: "user_id",
++});
++
++export default Address;
+diff --git a/server/models/orders/index.ts b/server/models/orders/index.ts
+new file mode 100644
+index 0000000..ca0ccb3
+--- /dev/null
++++ b/server/models/orders/index.ts
+@@ -0,0 +1,49 @@
++import { DataTypes, Model } from "sequelize";
++import { modelConfig, sequelize } from "../../db/config";
++import Address from "../address";
++import Cart from "../cart";
++import User from "../user";
++
++const Order = sequelize.define("Order", {
++  id: {
++    type: DataTypes.BIGINT,
++    autoIncrement: true,
++    allowNull: false,
++    primaryKey: true,
++  },
++  user_id: {
++    type: DataTypes.BIGINT,
++    references: { model: User, key: "id" },
++  },
++  address: {
++    type: DataTypes.BIGINT,
++    references: {
++      model: Address,
++      key: "id"
++    }
++  },
++  cart_id: {
++    type: DataTypes.BIGINT,
++    references: {
++      model: Cart,
++      key: "id"
++    }
++  },
++  status: {
++    type: DataTypes.ENUM("pending", "failed", "succeed"),
++    allowNull: false
++  },
++  payment_method: {
++    type: DataTypes.STRING,
++    allowNull: false
++  },
++  paid_at: {
++    type: DataTypes.DATE,
++  },
++  cancelled_at: {
++    type: DataTypes.DATE,
++  }
++}, modelConfig("orders"))
++
++
++export default Order;
+diff --git a/server/models/voucher/detail.ts b/server/models/voucher/detail.ts
+new file mode 100644
+index 0000000..d029d73
+--- /dev/null
++++ b/server/models/voucher/detail.ts
+@@ -0,0 +1,37 @@
++import { DataTypes, Model } from "sequelize";
++import Voucher from ".";
++import { modelConfig, sequelize } from "../../db/config";
++import Product from "../product";
++
++const VoucherDetail = sequelize.define("VoucherDetail", {
++  id: {
++    type: DataTypes.BIGINT,
++    autoIncrement: true,
++    allowNull: false,
++    primaryKey: true,
++  },
++  voucher_id: {
++    type: DataTypes.BIGINT,
++    references: {
++      model: Voucher,
++      key: "id"
++    },
++  },
++  product_id: {
++    type: DataTypes.BIGINT,
++    references: {
++      model: Product,
++      key: "id"
++    }
++  }
++}, modelConfig("voucher_details"))
++
++Product.belongsToMany(Voucher, {
++  through: VoucherDetail,
++})
++
++Voucher.belongsToMany(Product, {
++  through: VoucherDetail
++})
++
++export default VoucherDetail
+diff --git a/server/models/voucher/index.ts b/server/models/voucher/index.ts
+new file mode 100644
+index 0000000..48c2dac
+--- /dev/null
++++ b/server/models/voucher/index.ts
+@@ -0,0 +1,40 @@
++import { DataTypes, Model } from "sequelize";
++import { modelConfig, sequelize } from "../../db/config";
++import { VoucherCreation, VoucherModel } from "../../types/voucher";
++
++const Voucher = sequelize.define<
++  Model<VoucherCreation, VoucherModel | VoucherCreation>
++>(
++  "Voucher",
++  {
++    id: {
++      type: DataTypes.BIGINT,
++      autoIncrement: true,
++      allowNull: false,
++      primaryKey: true,
++    },
++    code: {
++      type: DataTypes.STRING,
++      validate: {
++        max: 12,
++      },
++      allowNull: false,
++      unique: true,
++    },
++    description: {
++      type: DataTypes.STRING,
++      allowNull: true,
++    },
++    valid_from: {
++      type: DataTypes.DATE,
++      allowNull: false,
++    },
++    valid_until: {
++      type: DataTypes.DATE,
++      allowNull: false,
++    },
++  },
++  modelConfig("vouchers")
++);
++
++export default Voucher;
+diff --git a/server/types/address/index.ts b/server/types/address/index.ts
+new file mode 100644
+index 0000000..6af036f
+--- /dev/null
++++ b/server/types/address/index.ts
+@@ -0,0 +1,25 @@
++class AddressModel {
++  constructor(
++    public address: string,
++    public ward: string,
++    public district: string,
++    public city: string
++  ) {}
++}
++
++class AddressCreation extends AddressModel {
++  constructor(
++    public id: number,
++    public user_id: number,
++    public address: string,
++    public ward: string,
++    public district: string,
++    public city: string,
++    public created_at?: Date,
++    public updated_at?: Date
++  ) {
++    super(address, ward, district, city);
++  }
++}
++
++export { AddressModel, AddressCreation };
+diff --git a/server/types/voucher/index.ts b/server/types/voucher/index.ts
+new file mode 100644
+index 0000000..22e5c97
+--- /dev/null
++++ b/server/types/voucher/index.ts
+@@ -0,0 +1,23 @@
++class VoucherModel {
++  constructor(
++    public code: string,
++    public valid_from: Date,
++    public valid_until: Date
++  ) {}
++}
++
++class VoucherCreation extends VoucherModel {
++  constructor(
++    public id: number,
++    public code: string,
++    public valid_from: Date,
++    public valid_until: Date,
++    public description?: string,
++    public created_at?: Date,
++    public updated_at?: Date
++  ) {
++    super(code, valid_from, valid_until);
++  }
++}
++
++export { VoucherModel, VoucherCreation };

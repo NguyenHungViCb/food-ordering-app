@@ -33,8 +33,7 @@ class CartCard extends StatelessWidget {
                         color: const Color(0xFFFFFFFF),
                         borderRadius: BorderRadius.circular(15),
                       ),
-                      child: Image.network(
-                          snapshot.data?.images[0].src.toString() ?? "",
+                      child: Image.network(snapshot.data?.images[0].src ?? "",
                           fit: BoxFit.fitHeight),
                     ),
                   ),
@@ -44,21 +43,16 @@ class CartCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      "${snapshot.data?.name ?? ""}",
+                      snapshot.data?.name ?? "",
                       style: const TextStyle(color: Colors.black, fontSize: 16),
                       maxLines: 2,
                     ),
                     const SizedBox(height: 10),
                     Text.rich(
                       TextSpan(
-                        text: "\$${snapshot.data!.price}",
+                        text: "\$${snapshot.data?.price ?? 100}",
                         style: const TextStyle(
                             fontWeight: FontWeight.w600, color: kPrimaryColor),
-                        // children: [
-                        //   TextSpan(
-                        //       text: " x${cart.details[0].stock}",
-                        //       style: Theme.of(context).textTheme.bodyText1),
-                        // ],
                       ),
                     )
                   ],

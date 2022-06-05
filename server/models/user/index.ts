@@ -72,6 +72,9 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
     selected_card: {
       type: DataTypes.STRING,
     },
+    address: {
+      type: DataTypes.STRING
+    }
   },
   modelConfig("users")
 );

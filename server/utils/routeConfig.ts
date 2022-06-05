@@ -1,11 +1,7 @@
-import {
-  NextFunction,
-  Request,
-  RequestHandler,
-  Response,
-} from "express";
+import { NextFunction, Request, RequestHandler, Response } from "express";
 import app, { routeEvent } from "../express";
 import { BasicResponse } from "../types/commonInterfaces";
+import { errorsConverter } from "./commons";
 
 export type RouteConfig = {
   method: "post" | "get" | "delete" | "put";
@@ -67,14 +63,7 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
                 return await descriptor.value.apply(this, [req, res, next]);
               } catch (error: any) {
                 console.log(error);
-                if (error.code) {
-                  return res
-                    .status(error.code)
-                    .json({ message: error.message, success: false });
-                }
-                return res
-                  .status(500)
-                  .json({ message: error.message, success: false });
+                return errorHandler(error, res);
               }
             };
             if (middlewares && middlewares.length > 0) {
@@ -85,9 +74,7 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
                       try {
                         return await middleware.apply(this, [req, res, next]);
                       } catch (error: any) {
-                        return res
-                          .status(500)
-                          .json({ message: error.message, success: false });
+                        return errorHandler(error, res);
                       }
                     }
                 )
@@ -106,6 +93,26 @@ export function controller<T extends { new (...args: any[]): {} }>(Base: T) {
     }
   };
 }
+
+export const errorHandler = (error: any, res: Response) => {
+  const err = errorsConverter.jsonOrString(error);
+  if (typeof err === "string") {
+    return res.status(500).json({ message: err, success: false });
+  } else if (err.message) {
+    if (!err.code) {
+      return res.status(500).json({ message: err.message, success: false });
+    } else {
+      return res
+        .status(err.code)
+        .json({ message: err.message, success: false });
+    }
+  } else {
+    return res.status(500).json({
+      message: "Something went wrong",
+      success: false,
+    });
+  }
+};
 
 export type RouteDescription = {
   query?: object;
