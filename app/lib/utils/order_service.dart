@@ -21,8 +21,22 @@ class OrderService {
         var decoded = responseFromJson(response.body).data;
         return ResponseOrder.fromJson(decoded);
       }
+      return _nullSafety;
     } catch (e) {
       return _nullSafety;
+    }
+  }
+
+  cancelOrder() async {
+    try {
+      var response = await ApiService()
+          .put("/api/orders/status/update", {"status": "canceled"});
+      if (response.statusCode == 200) {
+        return true;
+      }
+      return null;
+    } catch (e) {
+      return null;
     }
   }
 }

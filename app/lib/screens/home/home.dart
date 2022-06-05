@@ -51,7 +51,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    getOrder();
     return Scaffold(
       backgroundColor: kBackground, // background color main
       drawer: ClipRRect(
@@ -151,7 +150,8 @@ class _HomePageState extends State<HomePage> {
                     updateOrder: updateOrder,
                   ),
                   onTap: () {
-                    Navigator.pushNamed(context, OrderScreen.routeName);
+                    Navigator.pushNamed(context, OrderScreen.routeName)
+                        .then((value) => getOrder());
                   },
                 )
               : const SizedBox.shrink()

@@ -25,21 +25,17 @@ class _OrderProgressState extends State<OrderProgress> {
     }
   }
 
-  /* @override */
-  /* void dispose() { */
-  /*   super.dispose(); */
-  /*   socket.cancel(); */
-  /* } */
-
   initialize() async {
     await socket.cancel();
     await socket.connect();
-    socket.onConnect((){
+    socket.onConnect(() {
       print("connected");
     });
     socket.onStatusUpdate((data) async {
       var order = await orderService.fetchOnGoingOrder();
-      widget.updateOrder(context, order);
+      if (order['status'] == "canceled") {
+        widget.updateOrder(context, OrderService().nullSafety);
+      }
     });
   }
 
