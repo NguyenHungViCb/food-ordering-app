@@ -1,10 +1,14 @@
+import 'package:app/models/order/orders.dart';
 import 'package:app/models/restaurant.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/home/widget/food_list.dart';
 import 'package:app/screens/home/widget/food_list_view.dart';
+import 'package:app/screens/home/widget/order/order_processing_card.dart';
 import 'package:app/screens/home/widget/slider_List.dart';
+import 'package:app/screens/order/order.dart';
 import 'package:app/share/constants/colors.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/order_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -27,9 +31,27 @@ class _HomePageState extends State<HomePage> {
     {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
     {"icon": 'assets/images/location.svg', "text": "Address"}
   ];
+  ResponseOrder order = OrderService().nullSafety;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  getOrder() async {
+    var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
+    if (isCheckouted == "true" || order.id == '0') {
+      var responseOrder = await OrderService().fetchOnGoingOrder();
+      await GlobalStorage.delete(key: "isCheckouted");
+      setState(() {
+        order = responseOrder;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    getOrder();
     return Scaffold(
       backgroundColor: kBackground, // background color main
       drawer: ClipRRect(
@@ -75,19 +97,19 @@ class _HomePageState extends State<HomePage> {
             Expanded(
               child: ListView.separated(
                 separatorBuilder: (context, index) =>
-                    Divider(color: Colors.black),
+                    const Divider(color: Colors.black),
                 itemCount: 3,
                 itemBuilder: (context, index) => Padding(
-                  padding: EdgeInsets.fromLTRB(20, 10, 10, 20),
+                  padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
                   child: Row(children: [
                     SvgPicture.asset(
                       controls[index]['icon']!,
                       width: 30,
                     ),
-                    SizedBox(width: 15),
+                    const SizedBox(width: 15),
                     Text(
                       controls[index]['text']!,
-                      style: TextStyle(fontWeight: FontWeight.w500),
+                      style: const TextStyle(fontWeight: FontWeight.w500),
                     )
                   ]),
                 ),
@@ -107,7 +129,7 @@ class _HomePageState extends State<HomePage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           /* CustomAppBar(), */
-         DestinationCarousel(),
+          DestinationCarousel(),
           // RestaurantInfo(),
           FoodList(selected, (int index) {
             setState(() {
@@ -122,6 +144,17 @@ class _HomePageState extends State<HomePage> {
               });
             }, pageController, restaurant),
           ),
+          order.id != "0"
+              ? GestureDetector(
+                  child: OrderProgressCard(
+                    order: order,
+                    updateOrder: updateOrder,
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, OrderScreen.routeName);
+                  },
+                )
+              : const SizedBox.shrink()
           // Container(
           //   padding: EdgeInsets.symmetric(horizontal: 25),
           //   height: 60,
@@ -152,19 +185,30 @@ class _HomePageState extends State<HomePage> {
           // )
         ],
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.pushNamed(context, CartScreen.routeName);
-        },
-        backgroundColor: kPrimaryColor,
-        elevation: 2,
-        child: const Icon(
-          Icons.shopping_bag_outlined,
-          color: Colors.black,
-          size: 30,
-        ),
-      ),
+      floatingActionButton: order.id == "0"
+          ? FloatingActionButton(
+              onPressed: () async {
+                await Navigator.pushNamed(context, CartScreen.routeName)
+                    .then((value) async {
+                  await getOrder();
+                });
+              },
+              backgroundColor: kPrimaryColor,
+              elevation: 2,
+              child: const Icon(
+                Icons.shopping_bag_outlined,
+                color: Colors.black,
+                size: 30,
+              ),
+            )
+          : const SizedBox.shrink(),
     );
+  }
+
+  updateOrder(context, _order) {
+    setState(() {
+      order = _order;
+    });
   }
 }
 

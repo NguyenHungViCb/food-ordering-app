@@ -1,10 +1,15 @@
+import 'dart:convert';
+
+import 'package:app/screens/home/home.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/screens/cart/voucher/voucher_page.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/payment_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 
@@ -26,12 +31,20 @@ class _CheckoutCardState extends State<CheckoutCard> {
     super.initState();
     sumPrice = CartItems().sum();
   }
+
   getDefaultMethod() async {
-    var defaultMethod = await PaymentService.fetchDefaultMethod();
-    if (paymentMethod == null || paymentMethod['id'] != defaultMethod['id']) {
-      setState(() {
-        paymentMethod = defaultMethod;
-      });
+    var savedToken = await GlobalStorage.read(key: "tokens");
+    if (savedToken != null) {
+      var decoded = json.decode(savedToken);
+      if (decoded != null && decoded['token'] != null) {
+        var defaultMethod = await PaymentService.fetchDefaultMethod();
+        if (paymentMethod == null ||
+            paymentMethod['id'] != defaultMethod['id']) {
+          setState(() {
+            paymentMethod = defaultMethod;
+          });
+        }
+      }
     }
   }
 
@@ -69,24 +82,63 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   Row(
                     children: [
                       GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, Payment.routeName)
-                              .then((value) => setState(() {}));
+                        onTap: () async {
+                          var savedToken =
+                              await GlobalStorage.read(key: "tokens");
+                          if (savedToken != null) {
+                            var decoded = json.decode(savedToken);
+                            if (decoded != null && decoded['token'] != null) {
+                              Navigator.pushNamed(context, Payment.routeName)
+                                  .then((value) => setState(() {}));
+                            }
+                          } else {
+                            FToast().init(context).showToast(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xfffa5252),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/images/error.svg",
+                                        width: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      const Text(
+                                        "Please login to add payment method",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                /* backgroundColor: const Color(0xfffa5252), */
+                                gravity: ToastGravity.CENTER,
+                                toastDuration: const Duration(seconds: 3),
+                                positionedToastBuilder: (context, child) {
+                                  return Positioned(
+                                      child: child, top: 150, left: 80);
+                                });
+                          }
                         },
                         child: paymentMethod == null
                             ? const Text("Add Payment Method")
                             : Row(
-                          children: [
-                            SvgPicture.asset(
-                              paymentMethod['card']["brand"] == 'visa'
-                                  ? "assets/images/visa.svg"
-                                  : "assets/images/mastercard.svg",
-                              width: 30,
-                            ),
-                            const SizedBox(width: 20),
-                            Text(paymentMethod['card']['last4'])
-                          ],
-                        ),
+                                children: [
+                                  SvgPicture.asset(
+                                    paymentMethod['card']["brand"] == 'visa'
+                                        ? "assets/images/visa.svg"
+                                        : "assets/images/mastercard.svg",
+                                    width: 30,
+                                  ),
+                                  const SizedBox(width: 20),
+                                  Text(paymentMethod['card']['last4'])
+                                ],
+                              ),
                       ),
                       const Spacer(),
                       InkWell(
@@ -94,7 +146,8 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         onTap: () {
                           // displayBottomSheet(
                           //     context, const AuthBottomSheet(child: Voucher()));
-                          Navigator.pushNamed(context, VouchersScreen.routeName);
+                          Navigator.pushNamed(
+                              context, VouchersScreen.routeName);
                         },
                       ),
                       const SizedBox(width: 10),
@@ -114,8 +167,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           text: "Total:\n",
                           children: [
                             TextSpan(
-                              text:  "\$ ${snapshot.data}",
-                              style: TextStyle(fontSize: 16, color: Colors.black),
+                              text: "\$ ${snapshot.data}",
+                              style:
+                                  const TextStyle(fontSize: 16, color: Colors.black),
                             ),
                           ],
                         ),
@@ -125,7 +179,19 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         child: DefaultButton(
                             text: "Check Out",
                             press: () async {
-                              PaymentService.checkout(paymentMethod, "test");
+                              // Replace this hard code id by allow user to select voucher
+                              // You can pass null to skip apply voucher
+                              var response = await PaymentService.checkout(
+                                  context, paymentMethod, "test");
+                              if (response["error"] != true) {
+                                await GlobalStorage.write(
+                                    key: "isCheckouted", value: "true");
+                                Navigator.popUntil(
+                                    context,
+                                    (route) =>
+                                        route.settings.name ==
+                                        HomePage.routeName);
+                              }
                             }),
                       ),
                     ],
@@ -135,19 +201,18 @@ class _CheckoutCardState extends State<CheckoutCard> {
             ),
           );
         });
-
   }
-}
 
-displayBottomSheet(context, Widget sheet) {
-  return showModalBottomSheet(
-      isScrollControlled: true,
-      isDismissible: true,
-      shape: const RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      context: context,
-      builder: (context) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 18),
-            child: sheet,
-          )).then((value) => {});
+  displayBottomSheet(context, Widget sheet) {
+    return showModalBottomSheet(
+        isScrollControlled: true,
+        isDismissible: true,
+        shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+        context: context,
+        builder: (context) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 18),
+              child: sheet,
+            )).then((value) => {});
+  }
 }

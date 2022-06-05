@@ -1,11 +1,12 @@
+import 'package:app/share/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {
   final IconData leftIcon;
-  final IconData rightIcon;
+  final IconData?  rightIcon;
   final Function? leftCallback;
 
-  CustomAppBar(this.leftIcon, this.rightIcon, {this.leftCallback});
+  const CustomAppBar(this.leftIcon, this.rightIcon, {this.leftCallback});
 
   @override
   Widget build(BuildContext context) {
@@ -13,16 +14,17 @@ class CustomAppBar extends StatelessWidget {
       padding: EdgeInsets.only(
         top: MediaQuery.of(context).padding.top,
         left: 25,
-        right:25,
+        right: 25,
       ),
+      decoration: const BoxDecoration(color: kBackground),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: leftCallback !=null ? () => leftCallback!(context) : null,
+            onTap: leftCallback != null ? () => leftCallback!(context) : null,
             child: _buildIcon(leftIcon),
           ),
-          _buildIcon(rightIcon),
+          rightIcon != null ? _buildIcon(rightIcon as IconData) : SizedBox.shrink(),
         ],
       ),
     );
@@ -30,12 +32,12 @@ class CustomAppBar extends StatelessWidget {
 
   Widget _buildIcon(IconData icon) {
     return Container(
-            padding: EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Colors.white,
-            ),
-            child: Icon(icon),
-          );
+      padding: const EdgeInsets.all(8),
+      decoration: const BoxDecoration(
+        shape: BoxShape.circle,
+        color: kBackground,
+      ),
+      child: Icon(icon),
+    );
   }
 }
