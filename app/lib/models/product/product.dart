@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:developer';
 
 import 'package:app/utils/api_service.dart';
 
@@ -69,16 +68,16 @@ class Product {
   String? updatedAt;
 
   Product(
-      {this.id,
-      this.name,
-      this.description,
-      this.price,
-      this.originalPrice,
-      this.stock,
-      this.categoryId,
-      this.images,
-      this.createdAt,
-      this.updatedAt});
+    this.id,
+    this.name,
+    this.description,
+    this.price,
+    this.originalPrice,
+    this.stock,
+    this.categoryId,
+    this.images,
+    this.createdAt,
+    this.updatedAt);
 
   Product.fromJson(Map<String, dynamic> json) {
     id = json['id'];
@@ -99,7 +98,7 @@ class Product {
   }
 
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> data = Map<String, dynamic>();
+    final Map<String, dynamic> data = <String, dynamic>{};
     data['id'] = id;
     data['name'] = name;
     data['description'] = description;
@@ -115,17 +114,6 @@ class Product {
     return data;
   }
 
-  Future<List<Product>?> loadList() async {
-    try {
-      var response = await ApiService().get("/api/products/all");
-      final data = json.decode(response.body);
-
-      return ProductsResponse.fromJson(data).product;
-    } catch (e) {
-      log(e.toString());
-      throw Exception('Failed to load product');
-    }
-  }
 }
 
 class Images {

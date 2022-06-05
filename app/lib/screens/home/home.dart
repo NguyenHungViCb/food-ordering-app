@@ -1,4 +1,4 @@
-import 'package:app/models/product/product.dart';
+import 'package:app/models/category.dart';
 import 'package:app/models/order/orders.dart';
 import 'package:app/models/restaurant.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
@@ -9,7 +9,9 @@ import 'package:app/screens/home/widget/slider_List.dart';
 import 'package:app/screens/order/order.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/category_service.dart';
 import 'package:app/utils/order_service.dart';
+import 'package:app/utils/product_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -28,6 +30,7 @@ class _HomePageState extends State<HomePage> {
   var selected = 0;
   final pageController = PageController();
   Restaurant? restaurant;
+  List<Category> categories = [CategoryService().nullSafety];
   final controls = [
     {"icon": 'assets/images/account.svg', "text": "Account"},
     {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
@@ -49,18 +52,24 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance?.addPostFrameCallback((timeStamp) async {
-      final products = await Product().loadList();
-      print(products);
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final products = await ProductService().loadList();
       setState(() {
         restaurant = Restaurant.generateRestaurant(list: products);
+      });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final _categories = await CategoryService().fetchAllCategories();
+      setState(() {
+        categories = _categories;
       });
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    getOrder();
+    // getOrder();
+    print(categories.length);
     return Scaffold(
       backgroundColor: kBackground,
       // background color main
@@ -141,60 +150,30 @@ class _HomePageState extends State<HomePage> {
           /* CustomAppBar(), */
           DestinationCarousel(),
           // RestaurantInfo(),
-          if (restaurant != null)
-            FoodList(selected, (int index) {
+          CategoryList(selected, (int index) {
+            setState(() {
+              selected = index;
+            });
+            pageController.jumpToPage(index);
+          }, categories),
+          Expanded(
+            child: FoodListView(selected, (int index) {
               setState(() {
                 selected = index;
               });
-              pageController.jumpToPage(index);
-            }, restaurant!),
-          if (restaurant != null)
-            Expanded(
-              child: FoodListView(selected, (int index) {
-                setState(() {
-                  selected = index;
-                });
-              }, pageController, restaurant!),
-            ),
-            order.id != "0"
-                          ? GestureDetector(
-                              child: OrderProgressCard(
-                                order: order,
-                                updateOrder: updateOrder,
-                              ),
-                              onTap: () {
-                                Navigator.pushNamed(context, OrderScreen.routeName);
-                              },
-                            )
-                          : const SizedBox.shrink()
-          // Container(
-          //   padding: EdgeInsets.symmetric(horizontal: 25),
-          //   height: 60,
-          //   child: SmoothPageIndicator(
-          //       controller: pageController,
-          //       count: restaurant.menu.length,
-          //   effect: CustomizableEffect(
-          //       dotDecoration: DotDecoration(
-          //         width: 8,
-          //         height: 8,
-          //           color:Colors.grey.withOpacity(0.5),
-          //         borderRadius: BorderRadius.circular(8),
-          //       ),
-          //       activeDotDecoration: DotDecoration(
-          //         width: 10,
-          //         height: 10,
-          //         color: kBackground,
-          //         borderRadius: BorderRadius.circular(10),
-          //         dotBorder: DotBorder(
-          //           color: kPrimaryColor,
-          //           padding: 2,
-          //           width: 2,
-          //         )
-          //       ),
-          //   ),
-          //     onDotClicked: (index)=>pageController.jumpToPage(index),
-          //   ),
-          // )
+            }, pageController, categories),
+          ),
+          order.id != "0"
+              ? GestureDetector(
+                  child: OrderProgressCard(
+                    order: order,
+                    updateOrder: updateOrder,
+                  ),
+                  onTap: () {
+                    Navigator.pushNamed(context, OrderScreen.routeName);
+                  },
+                )
+              : const SizedBox.shrink()
         ],
       ),
       floatingActionButton: order.id == "0"

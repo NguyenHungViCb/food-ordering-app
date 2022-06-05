@@ -13,7 +13,11 @@ import {
 } from "../../utils/routeConfig";
 import validate from "../../utils/validations/modelValidation";
 import Product from "../../models/product";
-import { productSchemaPlainObj } from "../../types/product/productInterface";
+import {
+  ProductCreation,
+  ProductModel,
+  productSchemaPlainObj,
+} from "../../types/product/productInterface";
 import { isArray } from "../../utils/validations/assertions";
 import { imageToArray } from "../../utils/modelUtils";
 
@@ -103,7 +107,30 @@ class CategoryController {
           },
         ],
       }).then((data) => ({
-        row: data.rows.map((row) => imageToArray(row)),
+        row: data.rows.map((row) => ({
+          ...row.get(),
+          images: (row?.getDataValue("images") as string)
+            .split(";")
+            .map((url) => ({
+              src: url,
+            }))
+            .filter((item) => item.src.trim() !== ""),
+          products:
+          ( // @ts-ignore
+            row.getDataValue("products") as Model<
+              ProductCreation,
+              ProductCreation | ProductModel
+            >[]
+          ).map((product) => ({
+            ...product.get(),
+            images: (product.getDataValue("images") as string)
+              .split(";")
+              .map((url) => ({
+                src: url,
+              }))
+              .filter((item) => item.src.trim() !== ""),
+          })),
+        })),
         count: data.count,
       }));
       return res.json({ data: categories, success: true });
