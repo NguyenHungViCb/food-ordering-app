@@ -1,5 +1,6 @@
 import 'package:app/models/cart/addtocart/cart.dart';
 import 'package:app/models/cart/addtocart/cart_request.dart';
+import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/models/product/product.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/detail/widget/food_detail.dart';
@@ -10,7 +11,6 @@ import 'package:flutter/material.dart';
 
 class DetailPage extends StatefulWidget {
   final Product food;
-
   DetailPage(this.food);
 
   @override
@@ -25,7 +25,9 @@ class _DetailPageState extends State<DetailPage> {
       if (tick) {
         counter -= 1;
       } else {
-        counter += 1;
+        if( counter < int.parse(widget.food.stock.toString()) ) {
+          counter += 1;
+        }
       }
       if (counter < 0) counter = 0;
     });
@@ -33,9 +35,8 @@ class _DetailPageState extends State<DetailPage> {
 
   void _onTapAddCart() {
     if (widget.food.id != null) {
-      final item =
-          CartRequest(productId: int.parse(widget.food.id!), quantity: counter);
-      Cart().AddtoCart(item);
+
+      CartItems().addCart(widget.food.id! , counter);
     }
   }
 
@@ -70,20 +71,20 @@ class _DetailPageState extends State<DetailPage> {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              Icon(
+              const Icon(
                 Icons.shopping_bag_outlined,
                 color: Colors.black,
                 size: 30,
               ),
               Container(
-                padding: EdgeInsets.all(15),
-                decoration: BoxDecoration(
+                padding: const EdgeInsets.all(15),
+                decoration: const BoxDecoration(
                   color: Colors.white,
                   shape: BoxShape.circle,
                 ),
                 child: Text(
                   counter.toString(),
-                  style: TextStyle(
+                  style: const TextStyle(
                     color: Colors.black,
                     fontSize: 18,
                     fontWeight: FontWeight.bold,

@@ -5,6 +5,7 @@ import 'package:app/models/product/product.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../../share/constants/storage.dart';
 import '../../../../size_config.dart';
 import 'cart_card.dart';
 
@@ -14,9 +15,8 @@ class Body extends StatefulWidget {
 }
 
 class _BodyState extends State<Body> {
-  late Future<GetSingleProductResponse> product;
   late Future<GetCartResponse> cart;
-
+  late int stock;
   @override
   void initState() {
     super.initState();
@@ -90,7 +90,10 @@ class _BodyState extends State<Body> {
                                   InkWell(
                                       onTap: () {
                                         setState(() {
-                                          snapshot.data!.details[index].quantity--;
+                                          if(snapshot.data!.details[index].quantity > 1)
+                                            {
+                                              snapshot.data!.details[index].quantity--;
+                                            }
                                           deleteCart(snapshot.data!.details[index].productId, 1);
                                         });
                                       },
@@ -104,10 +107,16 @@ class _BodyState extends State<Body> {
                                     style: const TextStyle(color: Colors.black),
                                   ),
                                   InkWell(
-                                      onTap: () {
-                                        setState(() {
-                                          snapshot.data!.details[index].quantity++;
-                                          addCart(snapshot.data!.details[index].productId, 1);
+                                      onTap: () async {
+                                        getStock(snapshot.data!.details[index].productId);
+                                        var stock = await GlobalStorage.read(key: "stock");
+                                        setState(()  {
+                                          if(snapshot.data!.details[index].quantity <
+                                              int.parse(stock!))
+                                          {
+                                            snapshot.data!.details[index].quantity++;
+                                            addCart(snapshot.data!.details[index].productId, 1);
+                                          }
                                         });
                                       },
                                       child: const Icon(
@@ -144,11 +153,17 @@ class _BodyState extends State<Body> {
 
   void addCart(String id, int? quantity) async {
     try {
-      await CartItems().addCart(id, quantity);
+      var response = await CartItems().addCart(id, quantity);
     } catch (e) {
       log(e.toString());
     }
   }
-  void sum() {}
+  void getStock(String id) async {
+    try {
+      var response = await CartItems().getStock(id);
+    } catch (e) {
+      log(e.toString());
+    }
+  }
 }
 

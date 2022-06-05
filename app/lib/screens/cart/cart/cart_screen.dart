@@ -21,7 +21,7 @@ class CartScreen extends StatelessWidget {
       backgroundColor: const Color(0xFFFDBF30),
       leading: GestureDetector(
         onTap: (){
-          Navigator.pushNamed(context, HomePage.routeName);
+          Navigator.pop(context);
         },
         child: const Icon(Icons.arrow_back_ios),
       ),

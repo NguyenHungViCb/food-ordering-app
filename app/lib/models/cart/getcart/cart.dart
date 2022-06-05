@@ -1,9 +1,11 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:app/models/api/base_response.dart';
+import 'package:app/models/cart/addtocart/cart.dart';
 import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
+import 'package:http/src/response.dart';
 
 // =================== User related models ===================
 
@@ -36,16 +38,13 @@ class GetCartResponse {
   GetCartResponse(
     this.id,
     this.userId,
-    /* this.isActive, */
     this.createdAt,
     this.updatedAt,
     this.details,
   );
 
   String id;
-  String userId;
-
-  /* bool isActive; */
+  String? userId;
   DateTime createdAt;
   DateTime updatedAt;
   List<CartDetails> details;
@@ -54,7 +53,6 @@ class GetCartResponse {
       GetCartResponse(
         json["id"],
         json["user_id"],
-        /* json["is_active"], */
         DateTime.parse(json["updated_at"]),
         DateTime.parse(json["created_at"]),
         List<CartDetails>.from(
@@ -92,7 +90,8 @@ class RemoveCartRequest {
 class CartItems {
   Future<double> sum() async {
     double sum = 0;
-    var getCartResponse = await ApiService().get("/api/carts/active");
+    var cartId = await GlobalStorage.read(key: "cart_id");
+    var getCartResponse = await ApiService().get("/api/carts/active?cart_id=$cartId");
     if (getCartResponse.statusCode == 200) {
       var cartResponse =
           GetCartResponse.fromJson(responseFromJson(getCartResponse.body).data);
@@ -120,15 +119,29 @@ class CartItems {
       throw Exception('Failed to load cart');
     }
   }
-
+  Future<int> getStock(String id) async {
+    var response = await ApiService().get("/api/products/$id");
+    final Map parsed = json.decode(response.body);
+    if (response.statusCode == 200) {
+      var productResponse = GetSingleProductResponse.fromJson(parsed);
+      GlobalStorage.write(key: "stock", value: productResponse.stock.toString());
+      GlobalStorage.read(key: "stock").then((value) => print(value));
+      return productResponse.stock;
+    } else {
+      // If the server did not return a 200 OK response,
+      // then throw an exception.
+      throw Exception('Failed to load product');
+    }
+  }
   Future<GetCartResponse> getCart() async {
-    var response = await ApiService().get("/api/carts/active");
+    var cartId = await GlobalStorage.read(key: "cart_id");
+    var response = await ApiService().get("/api/carts/active?cart_id=$cartId");
+
     print(responseFromJson(response.body).data);
     if (response.statusCode == 200) {
       //var cartDetails = GetCartItems();
       var cartResponse =
           GetCartResponse.fromJson(responseFromJson(response.body).data);
-      GlobalStorage.write(key: "cart_id", value: cartResponse.id);
       return cartResponse;
     } else {
       // If the server did not return a 200 OK response,
@@ -139,8 +152,9 @@ class CartItems {
 
   Future<dynamic> deleteCart(String productId, int? quantity) async {
     try {
+      var cartId = await GlobalStorage.read(key: "cart_id");
       await ApiService().post(
-          "/api/carts/items/remove",
+          "/api/carts/items/remove?cart_id=$cartId",
           json.encode({
             "items": [
               {"product_id": productId, "quantity": quantity}
@@ -154,13 +168,41 @@ class CartItems {
 
   Future<dynamic> addCart(String productId, int? quantity) async {
     try {
-      await ApiService().post(
-          "/api/carts/items/add",
-          json.encode({
-            "items": [
-              {"product_id": productId, "quantity": quantity}
-            ]
-          }));
+      var cartId = await GlobalStorage.read(key: "cart_id");
+      Response response;
+      if(cartId != null)
+        {
+          response = await ApiService().post(
+              "/api/carts/items/add?cart_id=$cartId",
+              json.encode({
+                "items": [
+                  {"product_id": productId, "quantity": quantity}
+                ]
+              }));
+        }
+      else{
+        response = await ApiService().post(
+            "/api/carts/items/add",
+            json.encode({
+              "items": [
+                {"product_id": productId, "quantity": quantity}
+              ]
+            }));
+      }
+
+      if (response.statusCode == 200) {
+        print(responseFromJson(response.body).data);
+        var cartResponse =
+        CartResponse.fromJson(responseFromJson(response.body).data);
+        GlobalStorage.write(key: "cart_id", value: cartResponse.id);
+        GlobalStorage.read(key: "cart_id").then((value) => print(value));
+        return cartResponse;
+      }
+      else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        throw Exception('Failed to load cart');
+      }
     } catch (e) {
       log(e.toString());
     }
