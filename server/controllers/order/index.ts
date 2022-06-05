@@ -30,7 +30,7 @@ class OrderController {
   }
 
   @routeConfig({
-    method: "post",
+    method: "put",
     path: `${OrderController.path}/status/update`,
     middlewares: [jwtValidate],
   })

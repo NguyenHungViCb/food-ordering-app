@@ -206,7 +206,7 @@ class PaymentController {
     // return empty if user haven't add any card before
     if (
       !user.getDataValue("stripe_id") ||
-      user.getDataValue("stripe_id") == ""
+      user.getDataValue("stripe_id").trim() == ""
     ) {
       return res.json({ data: [], success: true });
     }

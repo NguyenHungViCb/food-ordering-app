@@ -4,7 +4,6 @@ import 'package:app/models/api/base_response.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/widgets.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -69,7 +68,7 @@ class PaymentService {
   }
 
   static Future<Map<String, dynamic>> checkout(
-      context, dynamic paymentMethod, String address, int? voucherId) async {
+      context, dynamic paymentMethod, String address) async {
     try {
       var cartId = await GlobalStorage.read(key: "cart_id");
       var voucherId = await GlobalStorage.read(key: "voucher_id");

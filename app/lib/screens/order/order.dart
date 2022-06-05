@@ -24,16 +24,22 @@ class _OrderScreenState extends State<OrderScreen> {
   void initState() {
     super.initState();
     initialize();
-    fetchOrder();
   }
 
   fetchOrder() async {
-    order = await OrderService().fetchOnGoingOrder();
+    var order = await OrderService().fetchOnGoingOrder();
+    return order;
   }
 
   initialize() async {
     await socket.cancel();
     await socket.connect();
+    if(order.id == "0"){
+      ResponseOrder _order = await OrderService().fetchOnGoingOrder();
+      setState((){
+        order = _order;
+      });
+    }
     socket.onStatusUpdate((data) async {
       ResponseOrder _order = await OrderService().fetchOnGoingOrder();
       setState(() {

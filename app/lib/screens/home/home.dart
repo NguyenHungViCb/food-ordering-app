@@ -31,7 +31,7 @@ class _HomePageState extends State<HomePage> {
     {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
     {"icon": 'assets/images/location.svg', "text": "Address"}
   ];
-  late ResponseOrder order = OrderService().nullSafety;
+  ResponseOrder order = OrderService().nullSafety;
 
   @override
   void initState() {

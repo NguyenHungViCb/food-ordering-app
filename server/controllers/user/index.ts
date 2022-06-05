@@ -111,7 +111,7 @@ class UserController {
       "active",
       "created_at",
       "updated_at",
-      "address",
+      "address"
     ]);
     return res.status(200).json({ data: values, success: true });
   }
@@ -181,9 +181,7 @@ class UserController {
     const { user } = req;
     const { address, ward, district, city } = req.body;
     requireValues([address, ward, district, city]);
-    const updatedAddress = await user.update({
-      address: `${address}, ${ward}, ${district}, ${city}`,
-    });
+    const updatedAddress = await user.update({ address: `${address}, ${ward}, ${district}, ${city}` });
     return res.json({ data: updatedAddress, success: true });
   }
 }

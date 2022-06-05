@@ -28,7 +28,8 @@ module.exports = {
           "canceled",
           "succeeded",
           "confirmed",
-          "processing"
+          "processing",
+          "shipping"
         ),
         allowNull: false,
       },

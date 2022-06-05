@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'package:app/models/api/base_response.dart';
+import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/storage.dart';
-
 import 'package:app/utils/api_service.dart';
 
 // =================== User related models ===================
