@@ -37,8 +37,6 @@ class ApiService {
 
   Future<http.Response> post(String url, Object body) async {
     Token tokens = await getToken();
-    print('${baseURL + url} - $body');
-    print('token: ${tokens.token}');
     try {
       return await http.post(Uri.parse(baseURL + url),
           headers: {

@@ -21,6 +21,7 @@ class OrderService {
         var decoded = responseFromJson(response.body).data;
         return ResponseOrder.fromJson(decoded);
       }
+      return _nullSafety;
     } catch (e) {
       return _nullSafety;
     }

@@ -7,11 +7,14 @@ import 'package:app/screens/home/widget/food_list_view.dart';
 import 'package:app/screens/home/widget/order/order_processing_card.dart';
 import 'package:app/screens/home/widget/slider_List.dart';
 import 'package:app/screens/order/order.dart';
+import 'package:app/screens/welcome/welcome.dart';
+import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/category_service.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:app/utils/product_service.dart';
+import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -31,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   final pageController = PageController();
   Restaurant? restaurant;
   List<Category> categories = [CategoryService().nullSafety];
+  bool isLogin = false;
   final controls = [
     {"icon": 'assets/images/account.svg', "text": "Account"},
     {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
@@ -64,18 +68,25 @@ class _HomePageState extends State<HomePage> {
         categories = _categories;
       });
     });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      UserService().isLogin().then((value) => {
+            setState(() {
+              isLogin = value;
+            })
+          });
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     // getOrder();
-    print(categories.length);
     return Scaffold(
       backgroundColor: kBackground,
       // background color main
       drawer: ClipRRect(
         child: Drawer(
-          child: Column(children: [
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
             Container(
                 padding: const EdgeInsets.fromLTRB(20, 70, 15, 50),
                 decoration: const BoxDecoration(
@@ -95,22 +106,29 @@ class _HomePageState extends State<HomePage> {
                     const SizedBox(
                       width: 20,
                     ),
-                    Flexible(
-                        child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: const [
-                        Text(
-                          "Nguyễn Hùng Vĩ",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
+                    GestureDetector(
+                      child: Flexible(
+                          child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            isLogin == false ? "Anonymous" : "Your name",
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500,
+                            ),
                           ),
-                        ),
-                        Text("lorem ipsum",
-                            style:
-                                TextStyle(fontSize: 15, color: Colors.black38))
-                      ],
-                    )),
+                          isLogin == false
+                              ? const Text("Click to login",
+                                  style: TextStyle(
+                                      fontSize: 15, color: Colors.black38))
+                              : const SizedBox.shrink()
+                        ],
+                      )),
+                      onTap: () {
+                        Navigator.pushNamed(context, WelcomeScreen.routeName);
+                      },
+                    ),
                   ],
                 )),
             Expanded(
@@ -133,6 +151,18 @@ class _HomePageState extends State<HomePage> {
                   ]),
                 ),
               ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
+              child: DangerousButton(
+                  onPressed: (context) async {
+                    await GlobalStorage.delete(key: "tokens");
+                    await GlobalStorage.delete(key: "cart_id");
+                    setState(() {
+                      isLogin = false;
+                    });
+                  },
+                  text: "Log out"),
             )
           ]),
         ),
@@ -150,14 +180,14 @@ class _HomePageState extends State<HomePage> {
           /* CustomAppBar(), */
           DestinationCarousel(),
           // RestaurantInfo(),
-          CategoryList(selected, (int index) {
+          CategoryList(selected, (context, int index) {
             setState(() {
               selected = index;
             });
             pageController.jumpToPage(index);
           }, categories),
           Expanded(
-            child: FoodListView(selected, (int index) {
+            child: FoodListView(selected, (context, int index) {
               setState(() {
                 selected = index;
               });

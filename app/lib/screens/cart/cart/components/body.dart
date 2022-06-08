@@ -90,11 +90,16 @@ class _BodyState extends State<Body> {
                                   InkWell(
                                       onTap: () {
                                         setState(() {
-                                          if(snapshot.data!.details[index].quantity > 1)
-                                            {
-                                              snapshot.data!.details[index].quantity--;
-                                            }
-                                          deleteCart(snapshot.data!.details[index].productId, 1);
+                                          if (snapshot.data!.details[index]
+                                                  .quantity >
+                                              1) {
+                                            snapshot.data!.details[index]
+                                                .quantity--;
+                                          }
+                                          deleteCart(
+                                              snapshot.data!.details[index]
+                                                  .productId,
+                                              1);
                                         });
                                       },
                                       child: const Icon(
@@ -108,14 +113,20 @@ class _BodyState extends State<Body> {
                                   ),
                                   InkWell(
                                       onTap: () async {
-                                        getStock(snapshot.data!.details[index].productId);
-                                        var stock = await GlobalStorage.read(key: "stock");
-                                        setState(()  {
-                                          if(snapshot.data!.details[index].quantity <
-                                              int.parse(stock!))
-                                          {
-                                            snapshot.data!.details[index].quantity++;
-                                            addCart(snapshot.data!.details[index].productId, 1);
+                                        getStock(snapshot
+                                            .data!.details[index].productId);
+                                        var stock = await GlobalStorage.read(
+                                            key: "stock");
+                                        setState(() {
+                                          if (snapshot.data!.details[index]
+                                                  .quantity <
+                                              int.parse(stock!)) {
+                                            snapshot.data!.details[index]
+                                                .quantity++;
+                                            addCart(
+                                                snapshot.data!.details[index]
+                                                    .productId,
+                                                1);
                                           }
                                         });
                                       },
@@ -145,7 +156,7 @@ class _BodyState extends State<Body> {
 
   void deleteCart(String id, int? quantity) async {
     try {
-      await CartItems().deleteCart(id, quantity);
+      await CartItems().deleteCart(context, id, quantity);
     } catch (e) {
       log(e.toString());
     }
@@ -153,11 +164,12 @@ class _BodyState extends State<Body> {
 
   void addCart(String id, int? quantity) async {
     try {
-      var response = await CartItems().addCart(id, quantity);
+      var response = await CartItems().addCart(context, id, quantity);
     } catch (e) {
       log(e.toString());
     }
   }
+
   void getStock(String id) async {
     try {
       var response = await CartItems().getStock(id);
@@ -166,4 +178,3 @@ class _BodyState extends State<Body> {
     }
   }
 }
-
