@@ -1,7 +1,7 @@
 import 'package:app/models/order/orders.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class OrderProgress extends StatefulWidget {
   final ResponseOrder order;
@@ -17,24 +17,23 @@ class OrderProgress extends StatefulWidget {
 class _OrderProgressState extends State<OrderProgress> {
   OrderService orderService = OrderService();
   late OrderSocket socket = OrderSocket();
+
   @override
   void initState() {
     super.initState();
-    if (widget.order.id != "0") {
-      initialize();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await initialized();
+    });
   }
 
-  initialize() async {
-    await socket.cancel();
+  initialized() async {
     await socket.connect();
-    socket.onConnect(() {
-      print("connected");
-    });
     socket.onStatusUpdate((data) async {
-      var order = await orderService.fetchOnGoingOrder();
-      if (order['status'] == "canceled") {
-        widget.updateOrder(context, OrderService().nullSafety);
+      ResponseOrder order = await orderService.fetchOnGoingOrder();
+      if (order.status == "canceled" || order.status == "succeeded") {
+        return widget.updateOrder(context, OrderService().nullSafety);
+      } else {
+        widget.updateOrder(context, order);
       }
     });
   }

@@ -39,41 +39,76 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   initialize() async {
-    await socket.cancel();
+    // await socket.cancel();
     await socket.connect();
     socket.onStatusUpdate((data) async {
       ResponseOrder _order = await OrderService().fetchOnGoingOrder();
-      if (_order.status == "canceled") {
-        FToast().init(context).showToast(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              decoration: const BoxDecoration(
-                  color: Color(0xfffa5252),
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Row(
-                children: [
-                  SvgPicture.asset(
-                    "assets/images/error.svg",
-                    width: 18,
-                  ),
-                  const SizedBox(
-                    width: 20,
-                  ),
-                  const Text(
-                    "Order has been canceled. A refund will be transfer to your account soon",
-                    style: TextStyle(color: Colors.white),
-                  )
-                ],
+      if (_order.id == "0") {
+        if (data == 'canceled') {
+          FToast().init(context).showToast(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: const BoxDecoration(
+                    color: Color(0xfffa5252),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/images/error.svg",
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Text(
+                      "Order has been canceled. A refund will be transfer to your account soon",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
               ),
-            ),
-            /* backgroundColor: const Color(0xfffa5252), */
-            gravity: ToastGravity.CENTER,
-            toastDuration: const Duration(seconds: 3),
-            positionedToastBuilder: (context, child) {
-              return Positioned(child: child, top: 150, left: 80);
-            });
-        Navigator.popUntil(
-            context, (route) => route.settings.name == HomePage.routeName);
+              /* backgroundColor: const Color(0xfffa5252), */
+              gravity: ToastGravity.CENTER,
+              toastDuration: const Duration(seconds: 3),
+              positionedToastBuilder: (context, child) {
+                return Positioned(child: child, top: 150, left: 80);
+              });
+          Navigator.popUntil(
+              context, (route) => route.settings.name == HomePage.routeName);
+        } else {
+          FToast().init(context).showToast(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: const BoxDecoration(
+                    color: Color(0xfffa5252),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/images/error.svg",
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Text(
+                      "Order has complete",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              /* backgroundColor: const Color(0xfffa5252), */
+              gravity: ToastGravity.CENTER,
+              toastDuration: const Duration(seconds: 3),
+              positionedToastBuilder: (context, child) {
+                return Positioned(child: child, top: 150, left: 80);
+              });
+          Navigator.popUntil(
+              context, (route) => route.settings.name == HomePage.routeName);
+        }
       }
       setState(() {
         order = _order;

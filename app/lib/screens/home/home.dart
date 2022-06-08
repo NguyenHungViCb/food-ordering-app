@@ -36,17 +36,30 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getOrder();
+    });
   }
 
   getOrder() async {
     var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
+    print({"isCheckouted": isCheckouted});
+    print(order.id);
     if (isCheckouted == "true" || order.id == '0') {
+      print("GET ORDER");
       var responseOrder = await OrderService().fetchOnGoingOrder();
+      print(responseOrder.id);
       await GlobalStorage.delete(key: "isCheckouted");
       setState(() {
         order = responseOrder;
       });
     }
+  }
+
+  updateOrder(context, _order) {
+    setState(() {
+      order = _order;
+    });
   }
 
   @override
@@ -143,8 +156,7 @@ class _HomePageState extends State<HomePage> {
               });
             }, pageController, restaurant),
           ),
-          order.id != "0"
-              ? GestureDetector(
+          GestureDetector(
                   child: OrderProgressCard(
                     order: order,
                     updateOrder: updateOrder,
@@ -154,7 +166,6 @@ class _HomePageState extends State<HomePage> {
                         .then((value) => getOrder());
                   },
                 )
-              : const SizedBox.shrink()
           // Container(
           //   padding: EdgeInsets.symmetric(horizontal: 25),
           //   height: 60,
@@ -187,8 +198,8 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () async {
-                await Navigator.pushNamed(context, CartScreen.routeName)
+              onPressed: () {
+                Navigator.pushNamed(context, CartScreen.routeName)
                     .then((value) async {
                   await getOrder();
                 });
@@ -205,11 +216,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  updateOrder(context, _order) {
-    setState(() {
-      order = _order;
-    });
-  }
 }
 
 //test

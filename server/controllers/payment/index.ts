@@ -59,6 +59,14 @@ class PaymentController {
         },
         { transaction }
       );
+      console.log({ created_at: createdOrder.getDataValue("created_at") });
+      await createdOrder.update(
+        {
+          status_history:
+            createdOrder.getDataValue("created_at") + "-" + "pending",
+        },
+        { transaction }
+      );
       // Find all items in cart
       const cartLineItems = await CartDetail.findAll({
         where: { cart_id: cart.getDataValue("id") },

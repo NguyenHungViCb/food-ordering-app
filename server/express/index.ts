@@ -11,7 +11,9 @@ const app = express();
 app.use(express.json());
 app.use(
   cors({
-    origin: "*", // May be we don't need this
+    origin: ["http://localhost:3000"], // May be we don't need this
+    methods: "GET,POST,PUT,DELETE",
+    credentials: true,
   })
 );
 app.engine(".html", require("ejs").__express);
