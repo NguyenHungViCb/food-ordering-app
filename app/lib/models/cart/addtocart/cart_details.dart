@@ -2,21 +2,21 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:core';
 
-class CartDetails
+class AddCartDetails
 {
-  int id;
+  String id;
   int quantity;
-  int productId;
+  String productId;
   DateTime createdAt;
   DateTime updatedAt;
+  String cartId;
+  AddCartDetails(this.id, this.quantity, this.productId, this.createdAt,this.updatedAt, this.cartId);
 
-  CartDetails(this.id, this.quantity, this.productId, this.createdAt,this.updatedAt);
-
-  Map<String, dynamic> toJson() => {
-    "id": id,
-    "quantity": quantity,
-    "product_id":productId,
-    "updated_at": updatedAt.toIso8601String(),
-    "created_at": createdAt.toIso8601String(),
-  };
+  factory AddCartDetails.fromJson(Map<dynamic, dynamic> json) => AddCartDetails(
+      json["id"],
+      json["quantity"],
+      json["product_id"],
+      DateTime.parse(json["created_at"]),
+      DateTime.parse(json["updated_at"]),
+      json["cart_id"]);
 }

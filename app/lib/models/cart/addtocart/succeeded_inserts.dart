@@ -5,8 +5,7 @@ class SucceededInserts
 
   SucceededInserts(this.productId, this.quantity);
 
-  Map<String, dynamic> toJson() => {
-    "product_id": productId,
-    "quantity":quantity
-  };
+  factory SucceededInserts.fromJson(Map<String, dynamic> json) => SucceededInserts(
+      json["product_id"],
+      json["quantity"]);
 }

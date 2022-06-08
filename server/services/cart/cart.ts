@@ -7,12 +7,13 @@ const increaseQuantity = async (
   max: number,
   transaction?: Transaction
 ) => {
-  if (detail.getDataValue("quantity") + quantity <= max) {
+  const m = Math.min(10, max);
+  if (quantity >= 1 && detail.getDataValue("quantity") + quantity <= m) {
     return await detail.increment({ quantity: quantity }, { transaction });
   } else {
     throw new Error(
       JSON.stringify({
-        message: "exceed quantity",
+        message: m === max ? "exceed quantity" : "You can only add 10 item or less",
         request: detail.getDataValue("quantity") + quantity,
         stock: max,
       })

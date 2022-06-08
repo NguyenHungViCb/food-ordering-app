@@ -1,10 +1,12 @@
-import 'package:app/models/food.dart';
+import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class FoodImg extends StatelessWidget {
-final Food food;
-FoodImg(this.food);
+  final Product food;
+
+  FoodImg(this.food);
+
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -18,7 +20,7 @@ FoodImg(this.food);
                 child: Container(),
               ),
               Expanded(
-                  flex:1,
+                  flex: 1,
                   child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.only(
@@ -36,19 +38,17 @@ FoodImg(this.food);
               margin: EdgeInsets.all(15),
               width: 250,
               height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                boxShadow: [
-                  BoxShadow(
+              decoration: BoxDecoration(shape: BoxShape.circle, boxShadow: [
+                BoxShadow(
                   color: Colors.grey.withOpacity(0.3),
-                    offset: Offset(-1,10),
-                    blurRadius: 10,
-                  )
-                ]
+                  offset: Offset(-1, 10),
+                  blurRadius: 10,
+                )
+              ]),
+              child: Image.network(
+                food.images?[0].src ?? '',
+                fit: BoxFit.cover,
               ),
-              child: Image.asset(
-                food.imgUrl,
-              fit: BoxFit.cover,),
             ),
           )
         ],

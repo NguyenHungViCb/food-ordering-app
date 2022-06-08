@@ -1,12 +1,11 @@
 class FailedInserts
 {
-  int productId;
+  String productId;
   int quantity;
 
   FailedInserts(this.productId, this.quantity);
 
-  Map<String, dynamic> toJson() => {
-    "product_id": productId,
-    "quantity":quantity
-  };
+  factory FailedInserts.fromJson(Map<String, dynamic> json) => FailedInserts(
+      json['item']["product_id"],
+      json['item']["quantity"]);
 }

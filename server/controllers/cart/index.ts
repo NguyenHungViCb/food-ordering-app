@@ -110,7 +110,7 @@ class CartController {
       // rollback if new updated quantity > stock
       failedInsert = {
         item,
-        error: errorsConverter.jsonOrString(error.message),
+        error: errorsConverter.jsonOrString(error),
       };
       await transaction.rollback();
     }
@@ -150,7 +150,7 @@ class CartController {
     let total = 0;
     for (const item of items) {
       const result = await this.addSingleProductToCart(item, cart);
-      if (result.succeededInsert) {
+      if (result.succeededInsert && result.succeededInsert.value) {
         succeededInserts.push(result.succeededInsert.value);
         total += result.succeededInsert.total;
       }
@@ -319,6 +319,28 @@ class CartController {
     return res
       .status(404)
       .json({ message: "No cart found", data: null, success: false });
+  }
+
+  @routeConfig({
+    method: "get",
+    path: `${CartController.path}/items/count`,
+    middlewares: [
+      tryMiddleware(jwtValidate),
+      getUnAuthCartDecorator(activeCartValidate),
+    ],
+  })
+  async countItem(req: Request, res: Response, __: NextFunction) {
+    const { product_id } = req.query;
+    console.log({ product_id });
+    const { cart } = req;
+    const productId = queryToNum(product_id);
+    const existCart = await CartDetail.findOne({
+      where: { cart_id: cart.getDataValue("id"), product_id: productId },
+    });
+    return res.json({
+      data: existCart?.getDataValue("quantity") || 0,
+      success: true,
+    });
   }
 }
 
