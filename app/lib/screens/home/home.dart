@@ -42,15 +42,33 @@ class _HomePageState extends State<HomePage> {
   ];
   ResponseOrder order = OrderService().nullSafety;
 
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getOrder();
+    });
+  }
+
   getOrder() async {
     var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
+    print({"isCheckouted": isCheckouted});
+    print(order.id);
     if (isCheckouted == "true" || order.id == '0') {
+      print("GET ORDER");
       var responseOrder = await OrderService().fetchOnGoingOrder();
+      print(responseOrder.id);
       await GlobalStorage.delete(key: "isCheckouted");
       setState(() {
         order = responseOrder;
       });
     }
+  }
+
+  updateOrder(context, _order) {
+    setState(() {
+      order = _order;
+    });
   }
 
   @override
@@ -79,7 +97,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    // getOrder();
     return Scaffold(
       backgroundColor: kBackground,
       // background color main
@@ -193,23 +210,22 @@ class _HomePageState extends State<HomePage> {
               });
             }, pageController, categories),
           ),
-          order.id != "0"
-              ? GestureDetector(
+          GestureDetector(
                   child: OrderProgressCard(
                     order: order,
                     updateOrder: updateOrder,
                   ),
                   onTap: () {
-                    Navigator.pushNamed(context, OrderScreen.routeName);
+                    Navigator.pushNamed(context, OrderScreen.routeName)
+                        .then((value) => getOrder());
                   },
                 )
-              : const SizedBox.shrink()
         ],
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () async {
-                await Navigator.pushNamed(context, CartScreen.routeName)
+              onPressed: () {
+                Navigator.pushNamed(context, CartScreen.routeName)
                     .then((value) async {
                   await getOrder();
                 });
@@ -226,11 +242,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  updateOrder(context, _order) {
-    setState(() {
-      order = _order;
-    });
-  }
 }
 
 //test

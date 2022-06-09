@@ -3,10 +3,13 @@ import 'package:app/screens/order/item.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/models/order/orders.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:app/screens/home/home.dart';
 
 class OrderScreen extends StatefulWidget {
   static const routeName = '/order';
@@ -27,21 +30,86 @@ class _OrderScreenState extends State<OrderScreen> {
   }
 
   fetchOrder() async {
-    var order = await OrderService().fetchOnGoingOrder();
-    return order;
-  }
-
-  initialize() async {
-    await socket.cancel();
-    await socket.connect();
-    if(order.id == "0"){
-      ResponseOrder _order = await OrderService().fetchOnGoingOrder();
-      setState((){
+    if (order.id == "0") {
+      var _order = await OrderService().fetchOnGoingOrder();
+      setState(() {
         order = _order;
       });
     }
+  }
+
+  initialize() async {
+    // await socket.cancel();
+    await socket.connect();
     socket.onStatusUpdate((data) async {
       ResponseOrder _order = await OrderService().fetchOnGoingOrder();
+      if (_order.id == "0") {
+        if (data == 'canceled') {
+          FToast().init(context).showToast(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: const BoxDecoration(
+                    color: Color(0xfffa5252),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/images/error.svg",
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Text(
+                      "Order has been canceled. A refund will be transfer to your account soon",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              /* backgroundColor: const Color(0xfffa5252), */
+              gravity: ToastGravity.CENTER,
+              toastDuration: const Duration(seconds: 3),
+              positionedToastBuilder: (context, child) {
+                return Positioned(child: child, top: 150, left: 80);
+              });
+          Navigator.popUntil(
+              context, (route) => route.settings.name == HomePage.routeName);
+        } else {
+          FToast().init(context).showToast(
+              child: Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                decoration: const BoxDecoration(
+                    color: Color(0xfffa5252),
+                    borderRadius: BorderRadius.all(Radius.circular(5))),
+                child: Row(
+                  children: [
+                    SvgPicture.asset(
+                      "assets/images/error.svg",
+                      width: 18,
+                    ),
+                    const SizedBox(
+                      width: 20,
+                    ),
+                    const Text(
+                      "Order has complete",
+                      style: TextStyle(color: Colors.white),
+                    )
+                  ],
+                ),
+              ),
+              /* backgroundColor: const Color(0xfffa5252), */
+              gravity: ToastGravity.CENTER,
+              toastDuration: const Duration(seconds: 3),
+              positionedToastBuilder: (context, child) {
+                return Positioned(child: child, top: 150, left: 80);
+              });
+          Navigator.popUntil(
+              context, (route) => route.settings.name == HomePage.routeName);
+        }
+      }
       setState(() {
         order = _order;
       });
@@ -50,6 +118,7 @@ class _OrderScreenState extends State<OrderScreen> {
 
   @override
   Widget build(BuildContext context) {
+    fetchOrder();
     Map<String, double?> status = OrderProgressService().getStatus(order);
     return Scaffold(
       appBar: PreferredSize(
@@ -217,7 +286,82 @@ class _OrderScreenState extends State<OrderScreen> {
               children: [
                 SizedBox(
                     width: MediaQuery.of(context).size.width * 100,
-                    child: DangerousButton(onPressed: () {}, text: "Cancel"))
+                    child: DangerousButton(
+                        onPressed: (context) async {
+                          var result = await OrderService().cancelOrder();
+                          if (result == null) {
+                            FToast().init(context).showToast(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xfffa5252),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/images/error.svg",
+                                        width: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      const Text(
+                                        "An error has occured",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                /* backgroundColor: const Color(0xfffa5252), */
+                                gravity: ToastGravity.CENTER,
+                                toastDuration: const Duration(seconds: 3),
+                                positionedToastBuilder: (context, child) {
+                                  return Positioned(
+                                      child: child, top: 150, left: 80);
+                                });
+                          } else {
+                            await GlobalStorage.write(
+                                key: "isCheckouted", value: "true");
+                            FToast().init(context).showToast(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xff37b24d),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/images/error.svg",
+                                        width: 18,
+                                      ),
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      const Text(
+                                        "Canceled order successful",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                /* backgroundColor: const Color(0xfffa5252), */
+                                gravity: ToastGravity.CENTER,
+                                toastDuration: const Duration(seconds: 3),
+                                positionedToastBuilder: (context, child) {
+                                  return Positioned(
+                                      child: child, top: 150, left: 80);
+                                });
+                            Navigator.popUntil(
+                                context,
+                                (route) =>
+                                    route.settings.name == HomePage.routeName);
+                          }
+                        },
+                        text: "Cancel"))
               ],
             )
           ],

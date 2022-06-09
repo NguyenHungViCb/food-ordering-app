@@ -42,10 +42,10 @@ class PaymentController {
     const transaction = await sequelize.transaction();
     try {
       let paymentStatus: ORDER_STATUS;
-      if (status === ORDER_STATUS.succeeded) {
-        paymentStatus = ORDER_STATUS.pending;
-      } else {
+      if (status === ORDER_STATUS.canceled) {
         paymentStatus = ORDER_STATUS.canceled;
+      } else {
+        paymentStatus = ORDER_STATUS.pending;
       }
       const createdOrder = await Order.create(
         {
@@ -56,6 +56,14 @@ class PaymentController {
           status: paymentStatus,
           address,
           voucher_id: voucherId,
+        },
+        { transaction }
+      );
+      console.log({ created_at: createdOrder.getDataValue("created_at") });
+      await createdOrder.update(
+        {
+          status_history:
+            createdOrder.getDataValue("created_at") + "-" + "pending",
         },
         { transaction }
       );
@@ -174,22 +182,28 @@ class PaymentController {
       amount: total * 100,
       currency: "usd",
       customer: user.getDataValue("stripe_id"),
-      off_session: true,
-      confirm: true,
+      // off_session: true,
+      // confirm: true,
       payment_method: payment_method,
     });
     const paymentMethod = await stripe.paymentMethods.retrieve(payment_method);
-    await this.placeOrder({
+    const createdOrder = await this.placeOrder({
       userId: user.getDataValue("id"),
       paymentMethod: paymentMethod.card?.brand || "stripe",
       paymentDetail: paymentMethod.card?.last4 || "",
-      paidAt: new Date(paymentIntent.created),
+      paidAt: new Date(paymentIntent.created * 1000),
       // @ts-ignore
       status: paymentIntent.status,
       cart: cart,
       address: address,
       voucherId: voucher_id,
     });
+    await stripe.paymentIntents.update(paymentIntent.id, {
+      metadata: {
+        order: createdOrder.id,
+      },
+    });
+    await stripe.paymentIntents.confirm(paymentIntent.id);
     return res.json({ data: paymentIntent, success: true });
   }
 

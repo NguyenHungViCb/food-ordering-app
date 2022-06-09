@@ -33,6 +33,9 @@ module.exports = {
         ),
         allowNull: false,
       },
+      status_history: {
+        type: DataTypes.STRING,
+      },
       payment_method: {
         type: DataTypes.STRING,
         allowNull: false,
