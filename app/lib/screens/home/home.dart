@@ -42,14 +42,6 @@ class _HomePageState extends State<HomePage> {
   ];
   ResponseOrder order = OrderService().nullSafety;
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await getOrder();
-    });
-  }
-
   getOrder() async {
     var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
     print({"isCheckouted": isCheckouted});
@@ -92,6 +84,9 @@ class _HomePageState extends State<HomePage> {
               isLogin = value;
             })
           });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getOrder();
     });
   }
 

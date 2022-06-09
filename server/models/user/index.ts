@@ -73,8 +73,8 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
       type: DataTypes.STRING,
     },
     address: {
-      type: DataTypes.STRING
-    }
+      type: DataTypes.STRING,
+    },
   },
   modelConfig("users")
 );
