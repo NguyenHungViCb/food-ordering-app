@@ -1,5 +1,7 @@
 import 'package:app/routes.dart';
+import 'package:app/screens/home/home.dart';
 import 'package:app/share/constants/app_config.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/material.dart';
@@ -14,6 +16,7 @@ void main() async {
   // load environment variables
   // all variables should have an alias in app_config
   await Stripe.instance.applySettings();
+  await GlobalStorage.deleteAll();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: WelcomeScreen.routeName,

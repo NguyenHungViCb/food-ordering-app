@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/screens/cart/voucher/voucher_page.dart';
@@ -12,6 +13,8 @@ import 'package:app/components/default_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
+import '../../../welcome/auth_bottom_sheet.dart';
+import '../../checkout/components/body.dart';
 
 class CheckoutCard extends StatefulWidget {
   const CheckoutCard({
@@ -25,11 +28,13 @@ class CheckoutCard extends StatefulWidget {
 class _CheckoutCardState extends State<CheckoutCard> {
   dynamic paymentMethod;
   late Future<double> sumPrice;
+  dynamic vouchers;
 
   @override
   void initState() {
     super.initState();
     sumPrice = CartItems().sum();
+    getTextFromFile();
   }
 
   getDefaultMethod() async {
@@ -141,21 +146,94 @@ class _CheckoutCardState extends State<CheckoutCard> {
                               ),
                       ),
                       const Spacer(),
-                      InkWell(
-                        child: const Text("Add voucher code"),
-                        onTap: () {
-                          // displayBottomSheet(
-                          //     context, const AuthBottomSheet(child: Voucher()));
-                          Navigator.pushNamed(
-                              context, VouchersScreen.routeName);
-                        },
+                      Column(
+                        children: [
+                          Row(
+                            children: [
+                              InkWell(
+                                child: const Text("Address"),
+                                onTap: () async {
+                                  String? savedToken =
+                                      await GlobalStorage.read(key: "tokens");
+                                  if (savedToken != null) {
+                                    displayBottomSheet(
+                                        context,
+                                        const AuthBottomSheet(
+                                            child: Checkout()));
+                                  } else {
+                                    FToast().init(context).showToast(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          decoration: const BoxDecoration(
+                                              color: Color(0xfffa5252),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5))),
+                                          child: Row(
+                                            children: [
+                                              SvgPicture.asset(
+                                                "assets/images/error.svg",
+                                                width: 18,
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              const Text(
+                                                "Please login to view/update address",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        /* backgroundColor: const Color(0xfffa5252), */
+                                        gravity: ToastGravity.CENTER,
+                                        toastDuration:
+                                            const Duration(seconds: 3),
+                                        positionedToastBuilder:
+                                            (context, child) {
+                                          return Positioned(
+                                              child: child, top: 150, left: 80);
+                                        });
+                                  }
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              const Icon(
+                                Icons.arrow_forward_ios,
+                                size: 12,
+                                color: kTextColor,
+                              )
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              InkWell(
+                                child: Text(vouchers),
+                                onTap: () {
+                                  Navigator.pushNamed(
+                                      context, VouchersScreen.routeName);
+                                },
+                              ),
+                              const SizedBox(width: 10),
+                              vouchers != "Add voucher code"
+                                  ? IconButton(
+                                      icon: Icon(Icons.dangerous),
+                                      onPressed: () async {
+                                        setState(() async {
+                                         await GlobalStorage.delete(key: "code");
+
+                                      });
+                                    })
+                                  : const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 12,
+                                      color: kTextColor,
+                                    )
+                            ],
+                          )
+                        ],
                       ),
-                      const SizedBox(width: 10),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: kTextColor,
-                      )
                     ],
                   ),
                   SizedBox(height: getProportionateScreenHeight(20)),
@@ -168,8 +246,8 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           children: [
                             TextSpan(
                               text: "\$ ${snapshot.data}",
-                              style:
-                                  const TextStyle(fontSize: 16, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black),
                             ),
                           ],
                         ),
@@ -214,5 +292,25 @@ class _CheckoutCardState extends State<CheckoutCard> {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: sheet,
             )).then((value) => {});
+  }
+
+  Future<String> getVouchers() async {
+    var voucherCode = await GlobalStorage.read(key: "code");
+    print(voucherCode.toString());
+    if (voucherCode.toString() != "null") {
+      return voucherCode.toString();
+    } else {
+        return "Add voucher code";
+    }
+  }
+  void getTextFromFile() async {
+    try {
+      String data = await getVouchers();
+      setState(() {
+        vouchers = data;
+      });
+    } catch (ex) {
+      print(ex);
+    }
   }
 }

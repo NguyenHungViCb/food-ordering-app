@@ -78,7 +78,7 @@ class VoucherPageState extends State<VoucherPage> {
                                         ),
                                       ),
                                     ),
-                                    Divider(
+                                    const Divider(
                                         color: Colors.white, height: 5),
                                     Expanded(
                                       child: Center(
@@ -123,9 +123,15 @@ class VoucherPageState extends State<VoucherPage> {
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          onTap: () {
-                                            addVouchersHandler(context,
-                                                snapshot.data![index].id);
+                                          onTap: () async {
+                                            setState(() async {
+                                              addVouchersHandler(context,
+                                                  snapshot.data![index].id,
+                                                  snapshot.data![index].code,
+                                                  snapshot.data![index].discount);
+                                              await Navigator.pushNamed(context, CartScreen.routeName);
+
+                                              });
                                           },
                                         )
                                       ],
@@ -176,9 +182,12 @@ class VoucherPageState extends State<VoucherPage> {
     );
   }
 
-  void addVouchersHandler(context, id) async {
+  void addVouchersHandler(context, id, code, discount) async {
     GlobalStorage.write(key: "voucher_id", value: id);
     GlobalStorage.read(key: "voucher_id").then((value) => print(value));
-    Navigator.pushNamed(context, CartScreen.routeName);
+    GlobalStorage.write(key: "code", value: code);
+    GlobalStorage.read(key: "code").then((value) => print("code discount: " + value!));
+    GlobalStorage.write(key: "discount", value: discount.toString());
+    GlobalStorage.read(key: "discount").then((value) => print("discount percent: " + value!));
   }
 }
