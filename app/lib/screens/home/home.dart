@@ -1,3 +1,4 @@
+import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/models/category.dart';
 import 'package:app/models/order/orders.dart';
 import 'package:app/models/restaurant.dart';
@@ -11,12 +12,14 @@ import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/cart_service.dart';
 import 'package:app/utils/category_service.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:app/utils/product_service.dart';
 import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 import '../../widgets/custom_app_bar.dart';
 
@@ -31,6 +34,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var selected = 0;
+  var countCartItems = 0;
   final pageController = PageController();
   Restaurant? restaurant;
   List<Category> categories = [CategoryService().nullSafety];
@@ -41,14 +45,6 @@ class _HomePageState extends State<HomePage> {
     {"icon": 'assets/images/location.svg', "text": "Address"}
   ];
   ResponseOrder order = OrderService().nullSafety;
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await getOrder();
-    });
-  }
 
   getOrder() async {
     var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
@@ -64,7 +60,6 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
-
   updateOrder(context, _order) {
     setState(() {
       order = _order;
@@ -74,6 +69,9 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getOrder();
+    });
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final products = await ProductService().loadList();
       setState(() {
@@ -92,6 +90,12 @@ class _HomePageState extends State<HomePage> {
               isLogin = value;
             })
           });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final count = await CartService().countItemInCart();
+      setState(() {
+        countCartItems = count;
+      });
     });
   }
 
@@ -224,11 +228,51 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, CartScreen.routeName)
-                    .then((value) async {
-                  await getOrder();
-                });
+              onPressed: () async {
+
+                if(countCartItems >0)
+                  {
+                    Navigator.pushNamed(context, CartScreen.routeName)
+                        .then((value) async {
+                      await getOrder();
+                    });
+                  }
+                else {
+                  FToast().init(context).showToast(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        decoration: const BoxDecoration(
+                            color: Color(0xfffa5252),
+                            borderRadius: BorderRadius.all(
+                                Radius.circular(5))),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              "assets/images/error.svg",
+                              width: 18,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            const Text(
+                              "Your cart is empty",
+                              style: TextStyle(
+                                  color: Colors.white),
+                            )
+                          ],
+                        ),
+                      ),
+                      /* backgroundColor: const Color(0xfffa5252), */
+                      gravity: ToastGravity.CENTER,
+                      toastDuration:
+                      const Duration(seconds: 3),
+                      positionedToastBuilder:
+                          (context, child) {
+                        return Positioned(
+                            child: child, top: 150, left: 80);
+                      });
+                }
               },
               backgroundColor: kPrimaryColor,
               elevation: 2,

@@ -4,14 +4,14 @@ import 'package:app/screens/cart/update_address/update_address_screen.dart';
 import 'package:app/size_config.dart';
 import 'package:flutter/material.dart';
 
-class CheckoutForm extends StatefulWidget {
-  const CheckoutForm({Key? key}) : super(key: key);
+class AddressForm extends StatefulWidget {
+  const AddressForm({Key? key}) : super(key: key);
 
   @override
-  CheckoutFormState createState() => CheckoutFormState();
+  AddressFormState createState() => AddressFormState();
 }
 
-class CheckoutFormState extends State<CheckoutForm> {
+class AddressFormState extends State<AddressForm> {
   final _formKey = GlobalKey<FormState>();
   final noteController = TextEditingController();
   late Future<GetUserInfo> userInfo;
@@ -52,17 +52,8 @@ class CheckoutFormState extends State<CheckoutForm> {
                         ),
                         const SizedBox(height: 5),
                         Text(snapshot.data!.address),
-
                         const Divider(
                             color: Colors.white, height: 10),
-                        // TextFormField(
-                        //   controller: TextEditingController(text: snapshot.data!.firstName + snapshot.data!.lastName +
-                        //       '|' + snapshot.data!.email),
-                        //   minLines: 3, // any number you need (It works as the rows for the textarea)
-                        //   keyboardType: TextInputType.multiline,
-                        //   maxLines: null,
-                        //
-                        // ),
                         const SizedBox(height: 15),
                         DefaultButton(
                           press:() {

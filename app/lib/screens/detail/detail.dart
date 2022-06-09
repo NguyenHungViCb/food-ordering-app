@@ -10,6 +10,8 @@ import 'package:app/utils/cart_service.dart';
 import 'package:app/utils/user_service.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class DetailPage extends StatefulWidget {
   final Product food;
@@ -22,7 +24,7 @@ class DetailPage extends StatefulWidget {
 class _DetailPageState extends State<DetailPage> {
   int counter = -1;
   int inCart = 0;
-
+  int countCartItems = 0;
   void _counter({bool tick = false}) {
     if (counter == -1) {
       setState(() {
@@ -95,6 +97,12 @@ class _DetailPageState extends State<DetailPage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await getQuantityInCart();
     });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final count = await CartService().countItemInCart();
+      setState(() {
+        countCartItems = count;
+      });
+    });
   }
 
   @override
@@ -150,9 +158,49 @@ class _DetailPageState extends State<DetailPage> {
               )
             ],
           ),
-          onPressed: () {
-            Navigator.pushNamed(context, CartScreen.routeName)
-                .then((value) async => {await getQuantityInCart()});
+          onPressed: () async {
+            if(countCartItems >0 || inCart > 0)
+            {
+              Navigator.pushNamed(context, CartScreen.routeName)
+                  .then((value) async => {await getQuantityInCart()});
+            }
+            else {
+              FToast().init(context).showToast(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 10),
+                    decoration: const BoxDecoration(
+                        color: Color(0xfffa5252),
+                        borderRadius: BorderRadius.all(
+                            Radius.circular(5))),
+                    child: Row(
+                      children: [
+                        SvgPicture.asset(
+                          "assets/images/error.svg",
+                          width: 18,
+                        ),
+                        const SizedBox(
+                          width: 20,
+                        ),
+                        const Text(
+                          "Your cart is empty",
+                          style: TextStyle(
+                              color: Colors.white),
+                        )
+                      ],
+                    ),
+                  ),
+                  /* backgroundColor: const Color(0xfffa5252), */
+                  gravity: ToastGravity.CENTER,
+                  toastDuration:
+                  const Duration(seconds: 3),
+                  positionedToastBuilder:
+                      (context, child) {
+                    return Positioned(
+                        child: child, top: 150, left: 80);
+                  });
+            }
+
           },
         ),
       ),

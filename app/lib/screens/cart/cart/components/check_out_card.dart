@@ -14,7 +14,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 import '../../../welcome/auth_bottom_sheet.dart';
-import '../../checkout/components/body.dart';
+import '../../address/components/body.dart';
 
 class CheckoutCard extends StatefulWidget {
   const CheckoutCard({
@@ -159,7 +159,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                     displayBottomSheet(
                                         context,
                                         const AuthBottomSheet(
-                                            child: Checkout()));
+                                            child: Address()));
                                   } else {
                                     FToast().init(context).showToast(
                                         child: Container(
@@ -210,9 +210,51 @@ class _CheckoutCardState extends State<CheckoutCard> {
                             children: [
                               InkWell(
                                 child: Text(vouchers),
-                                onTap: () {
-                                  Navigator.pushNamed(
-                                      context, VouchersScreen.routeName);
+                                onTap: () async {
+                                  String? savedToken =
+                                      await GlobalStorage.read(key: "tokens");
+                                  if (savedToken != null) {
+                                    Navigator.pushNamed(
+                                        context, VouchersScreen.routeName);
+                                  }
+                                  else {
+                                    FToast().init(context).showToast(
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                              horizontal: 20, vertical: 10),
+                                          decoration: const BoxDecoration(
+                                              color: Color(0xfffa5252),
+                                              borderRadius: BorderRadius.all(
+                                                  Radius.circular(5))),
+                                          child: Row(
+                                            children: [
+                                              SvgPicture.asset(
+                                                "assets/images/error.svg",
+                                                width: 18,
+                                              ),
+                                              const SizedBox(
+                                                width: 20,
+                                              ),
+                                              const Text(
+                                                "Please login to add vouchers",
+                                                style: TextStyle(
+                                                    color: Colors.white),
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                        /* backgroundColor: const Color(0xfffa5252), */
+                                        gravity: ToastGravity.CENTER,
+                                        toastDuration:
+                                        const Duration(seconds: 3),
+                                        positionedToastBuilder:
+                                            (context, child) {
+                                          return Positioned(
+                                              child: child, top: 150, left: 80);
+                                        });
+                                  }
+
+
                                 },
                               ),
                               const SizedBox(width: 10),

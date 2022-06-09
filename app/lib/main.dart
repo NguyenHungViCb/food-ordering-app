@@ -15,7 +15,6 @@ void main() async {
   // load environment variables
   // all variables should have an alias in app_config
   await Stripe.instance.applySettings();
-  await GlobalStorage.deleteAll();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: HomePage.routeName,
