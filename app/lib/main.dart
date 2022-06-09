@@ -3,7 +3,6 @@ import 'package:app/screens/home/home.dart';
 import 'package:app/share/constants/app_config.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';
 
@@ -19,7 +18,7 @@ void main() async {
   await GlobalStorage.deleteAll();
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
-    initialRoute: WelcomeScreen.routeName,
+    initialRoute: HomePage.routeName,
     routes: routes,
     theme: ThemeData(primaryColor: const Color.fromARGB(1, 238, 77, 42)),
   ));

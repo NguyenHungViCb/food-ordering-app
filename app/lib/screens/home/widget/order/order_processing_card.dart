@@ -38,6 +38,9 @@ class _OrderProgressCardState extends State<OrderProgressCard> {
   @override
   Widget build(BuildContext context) {
     /* var status = OrderProgressService().getStatus(widget.order); */
+    if (widget.order.id == "0") {
+      return const SizedBox.shrink();
+    }
     return Container(
         padding: EdgeInsets.symmetric(
           vertical: getProportionateScreenWidth(15),

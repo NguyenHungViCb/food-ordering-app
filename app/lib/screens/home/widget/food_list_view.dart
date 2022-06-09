@@ -1,5 +1,4 @@
 import 'package:app/models/category.dart';
-import 'package:app/models/restaurant.dart';
 import 'package:app/screens/detail/detail.dart';
 import 'package:app/screens/home/widget/food_item.dart';
 import 'package:flutter/material.dart';
@@ -21,9 +20,8 @@ class FoodListView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 25),
       child: PageView(
         controller: pageController,
-        onPageChanged: (index) => callback(index),
-        children: categories[selected]
-            .products
+        onPageChanged: (index) => callback(context, index),
+        children: categories
             .map((e) => ListView.separated(
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) => GestureDetector(

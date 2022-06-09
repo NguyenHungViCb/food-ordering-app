@@ -23,6 +23,7 @@ export class OrderCreation extends OrderModel {
     public user_id: number,
     public address: string,
     public status: ORDER_STATUS,
+    public status_history: string,
     public payment_method: string,
     public payment_detail: string,
     public voucher_id: number,

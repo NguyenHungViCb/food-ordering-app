@@ -1,6 +1,7 @@
 import { DataTypes, Model } from "sequelize";
 import { modelConfig, sequelize } from "../../db/config";
 import { OrderCreation, OrderModel, ORDER_STATUS } from "../../types/order";
+import Product from "../product";
 import User from "../user";
 import Voucher from "../voucher";
 import OrderDetail from "./details";
@@ -28,6 +29,9 @@ const Order = sequelize.define<
       type: DataTypes.ENUM(...(Object.values(ORDER_STATUS) as string[])),
       allowNull: false,
     },
+    status_history: {
+      type: DataTypes.TEXT("long"),
+    },
     payment_method: {
       type: DataTypes.STRING,
       allowNull: false,
@@ -53,14 +57,31 @@ const Order = sequelize.define<
   modelConfig("orders")
 );
 
+Order.belongsTo(User, {
+  as: "user",
+  foreignKey: "user_id",
+});
+User.hasMany(Order, {
+  as: "orders",
+  foreignKey: "user_id",
+});
 Order.hasMany(OrderDetail, {
   as: "details",
   foreignKey: "order_id",
 });
-
 OrderDetail.belongsTo(Order, {
-  as: 'details',
-  foreignKey: "order_id"
-})
+  as: "details",
+  foreignKey: "order_id",
+});
+OrderDetail.hasOne(Product, {
+  as: "product",
+  foreignKey: "id",
+  sourceKey: "product_id",
+});
+Order.hasOne(Voucher, {
+  as: "voucher",
+  foreignKey: "id",
+  sourceKey: "voucher_id",
+});
 
 export default Order;

@@ -12,7 +12,7 @@ class CategoryList extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final category = restaurant.menu.keys.toList();
+    print({"selected": selected}); // final category = restaurant.menu.keys.toList();
     return Container(
       height: 100,
       padding: const EdgeInsets.symmetric(vertical: 30),
@@ -20,9 +20,10 @@ class CategoryList extends StatelessWidget {
           padding: const EdgeInsets.symmetric(horizontal: 25),
           scrollDirection: Axis.horizontal,
           itemBuilder: (context, index) => GestureDetector(
-                onTap: () => callback(index),
+                onTap: () => callback(context, index),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
                   decoration: BoxDecoration(
                     borderRadius: BorderRadius.circular(20),
                     color: selected == index ? kPrimaryColor : Colors.white,

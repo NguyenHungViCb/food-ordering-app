@@ -2,12 +2,7 @@ import http from "http";
 import { Server, Socket } from "socket.io";
 import { DefaultEventsMap } from "socket.io/dist/typed-events";
 import { green } from "colors";
-import { extractTokenFromHeader } from "../middlewares/auths/tokenExtractStrategies";
-import { Model } from "sequelize";
-import { UserCreation, UserModel } from "../types/user/userInterfaces";
-import { JWT_SECRET } from "../utils/AppConfig";
-import { jwtTokenVerify, socketJwtValidate } from "../middlewares/auths";
-import User from "../models/user";
+import { socketJwtValidate } from "../middlewares/auths";
 
 class RootSocket {
   private static _instance: RootSocket;
@@ -37,6 +32,7 @@ class RootSocket {
       });
     }
     return RootSocket._instance;
+
   }
 }
 

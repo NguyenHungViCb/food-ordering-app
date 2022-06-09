@@ -77,6 +77,6 @@ Product.belongsTo(Category, {
 });
 Category.hasMany(Product, {
   as: "products",
-  foreignKey: "id",
+  foreignKey: "category_id",
 });
 export default Product;
