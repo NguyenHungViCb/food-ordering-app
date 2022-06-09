@@ -70,37 +70,6 @@ class UserResponse {
 }
 
 class GetUserInfo {
-  // "id": 1,
-  // "first_name": "duc",
-  // "last_name": "phan",
-  // "birthday": null,
-  // "email": "ducmphan@gmail.com",
-  // "email_verified": false,
-  // "phone_number": null,
-  // "password": "123456789",
-  // "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjU0NTExMzUxLCJleHAiOjE2NTcxMDMzNTF9.K7kSqsJD4AQeBZSW7gmKvJV7f2mfzYZA3A-4G3-xOk4",
-  // "facebook_id": null,
-  // "google_id": null,
-  // "avatar": "https://scontent.fsgn5-3.fna.fbcdn.net/v/t1.30497-1/cp0/c15.0.50.50a/p50x50/84628273_176159830277856_972693363922829312_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=12b3be&_nc_ohc=XyWt8Z2JeBcAX894iLG&_nc_ht=scontent.fsgn5-3.fna&edm=AP4hL3IEAAAA&oh=15811581152ebb890135bfd3201e3439&oe=61D27B38",
-  // "active": true,
-  // "stripe_id": null,
-  // "selected_card": null,
-  // "address": "test, s, 1, duc",
-  // "created_at": "2022-06-05T14:33:45.586Z",
-  // "updated_at": "2022-06-06T10:29:11.260Z"
-
-  // "id": 1,
-  // "first_name": "duc",
-  // "last_name": "phan",
-  // "email": "ducmphan@gmail.com",
-  // "email_verified": false,
-  // "phone_number": null,
-  // "birthday": null,
-  // "avatar": "https://scontent.fsgn5-3.fna.fbcdn.net/v/t1.30497-1/cp0/c15.0.50.50a/p50x50/84628273_176159830277856_972693363922829312_n.jpg?_nc_cat=1&ccb=1-5&_nc_sid=12b3be&_nc_ohc=XyWt8Z2JeBcAX894iLG&_nc_ht=scontent.fsgn5-3.fna&edm=AP4hL3IEAAAA&oh=15811581152ebb890135bfd3201e3439&oe=61D27B38",
-  // "active": true,
-  // "created_at": "2022-06-05T14:33:45.586Z",
-  // "updated_at": "2022-06-06T11:04:29.765Z",
-  // "address": "test, s, 1, duc"
   int id;
   String firstName;
   String lastName;
@@ -109,14 +78,8 @@ class GetUserInfo {
   bool emailVerified;
   dynamic phoneNumber;
   dynamic birthday;
-  //String password;
-  //String refreshToken;
-  // String? facebookId;
-  // String? googleId;
   String avatar;
   bool active;
-  // String? stripeId;
-  // String? selectedCard;
 
   DateTime createdAt;
   DateTime updatedAt;
@@ -129,10 +92,6 @@ class GetUserInfo {
     this.emailVerified,
     this.phoneNumber,
     this.birthday,
-    //this.password,
-    //this.refreshToken,
-    // this.facebookId,
-    // this.googleId,
     this.avatar,
     this.active,
     this.createdAt,
@@ -148,10 +107,6 @@ class GetUserInfo {
         json["email_verified"],
         json["phone_number"],
         json["birthday"],
-        // json["password"],
-        // json["refresh_token"],
-        // json["facebook_id"],
-        // json["google_id"],
         json["avatar"],
         json["active"],
         DateTime.parse(json["updated_at"]),

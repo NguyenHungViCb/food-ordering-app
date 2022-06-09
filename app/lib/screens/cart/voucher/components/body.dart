@@ -184,10 +184,7 @@ class VoucherPageState extends State<VoucherPage> {
 
   void addVouchersHandler(context, id, code, discount) async {
     GlobalStorage.write(key: "voucher_id", value: id);
-    GlobalStorage.read(key: "voucher_id").then((value) => print(value));
     GlobalStorage.write(key: "code", value: code);
-    GlobalStorage.read(key: "code").then((value) => print("code discount: " + value!));
     GlobalStorage.write(key: "discount", value: discount.toString());
-    GlobalStorage.read(key: "discount").then((value) => print("discount percent: " + value!));
   }
 }

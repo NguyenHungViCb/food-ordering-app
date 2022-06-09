@@ -218,11 +218,13 @@ class _CheckoutCardState extends State<CheckoutCard> {
                               const SizedBox(width: 10),
                               vouchers != "Add voucher code"
                                   ? IconButton(
-                                      icon: Icon(Icons.dangerous),
+                                      icon: const Icon(Icons.dangerous),
                                       onPressed: () async {
                                         setState(() async {
                                          await GlobalStorage.delete(key: "code");
-
+                                         await GlobalStorage.delete(key: "id");
+                                         await GlobalStorage.delete(key: "discount");
+                                         await Navigator.pushNamed(context, CartScreen.routeName);
                                       });
                                     })
                                   : const Icon(
