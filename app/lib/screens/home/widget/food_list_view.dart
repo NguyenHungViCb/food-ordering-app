@@ -1,4 +1,4 @@
-import 'package:app/models/restaurant.dart';
+import 'package:app/models/category.dart';
 import 'package:app/screens/detail/detail.dart';
 import 'package:app/screens/home/widget/food_item.dart';
 import 'package:flutter/material.dart';
@@ -7,33 +7,32 @@ class FoodListView extends StatelessWidget {
   final int selected;
   final Function callback;
   final PageController pageController;
-  final Restaurant restaurant;
+  // final Restaurant restaurant;
+  final List<Category> categories;
 
-  FoodListView(
-      this.selected, this.callback, this.pageController, this.restaurant);
+  const FoodListView(
+      this.selected, this.callback, this.pageController, this.categories);
 
   @override
   Widget build(BuildContext context) {
-    final category = restaurant.menu.keys.toList();
+    // final category = restaurant.menu.keys.toList();
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: 25),
+      padding: const EdgeInsets.symmetric(horizontal: 25),
       child: PageView(
         controller: pageController,
-        onPageChanged: (index) => callback(index),
-        children: category
+        onPageChanged: (index) => callback(context, index),
+        children: categories
             .map((e) => ListView.separated(
-          padding: EdgeInsets.zero,
-                itemBuilder: (context, index) =>
-                    GestureDetector(
-                        onTap: (){
-                           Navigator.of(context).push(
-                             MaterialPageRoute(builder: (context)=> DetailPage(
-                                restaurant.menu[category[selected]]![index]))
-                          );
-                        },
-                        child: FoodItem(restaurant.menu[category[selected]]![index])),
-                separatorBuilder: (_, index) => SizedBox(height: 15),
-                itemCount: restaurant.menu[category[selected]]!.length))
+                padding: EdgeInsets.zero,
+                itemBuilder: (context, index) => GestureDetector(
+                    onTap: () {
+                      Navigator.of(context).push(MaterialPageRoute(
+                          builder: (context) => DetailPage(
+                              categories[selected].products[index])));
+                    },
+                    child: FoodItem(categories[selected].products[index])),
+                separatorBuilder: (_, index) => const SizedBox(height: 15),
+                itemCount: categories[selected].products.length))
             .toList(),
       ),
     );

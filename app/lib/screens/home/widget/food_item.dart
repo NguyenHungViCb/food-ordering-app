@@ -1,9 +1,8 @@
-import 'package:app/models/food.dart';
-import 'package:app/share/constants/colors.dart';
+import 'package:app/models/product/product.dart';
 import 'package:flutter/material.dart';
 
 class FoodItem extends StatelessWidget {
-  final Food food;
+  final Product food;
 
   FoodItem(this.food);
 
@@ -17,12 +16,13 @@ class FoodItem extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(5),
-            width: 110,
-            height: 110,
-            child: Image.asset(food.imgUrl, fit: BoxFit.fitHeight),
-          ),
+          if (food.images?[0].src != null)
+            Container(
+              padding: EdgeInsets.all(5),
+              width: 110,
+              height: 110,
+              child: Image.network(food.images![0].src!, fit: BoxFit.cover),
+            ),
           Expanded(
             child: Container(
               padding: EdgeInsets.only(
@@ -37,7 +37,7 @@ class FoodItem extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        food.name,
+                        food.name ?? '',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
@@ -59,14 +59,16 @@ class FoodItem extends StatelessWidget {
                   // ),
                   SizedBox(height: 5),
                   Row(
-                    children:[
-                      Text('\$',
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.bold,
+                    children: [
+                      Text(
+                        '\$',
+                        style: TextStyle(
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                      ),
-                      Text('${food.price}',
+                      Text(
+                        '${food.price}',
                         style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
