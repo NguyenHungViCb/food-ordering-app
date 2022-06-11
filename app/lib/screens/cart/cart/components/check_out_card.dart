@@ -4,8 +4,11 @@ import 'package:app/screens/home/home.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/screens/cart/voucher/voucher_page.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/order_service.dart';
 import 'package:app/utils/payment_service.dart';
+import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
@@ -125,7 +128,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                 });
                           }
                         },
-                        child: paymentMethod == null
+                        child: paymentMethod == null ||
+                                paymentMethod['card']['last4'] == null ||
+                                paymentMethod['card']['last4'] == ""
                             ? const Text("Add Payment Method")
                             : Row(
                                 children: [
@@ -168,8 +173,8 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           children: [
                             TextSpan(
                               text: "\$ ${snapshot.data}",
-                              style:
-                                  const TextStyle(fontSize: 16, color: Colors.black),
+                              style: const TextStyle(
+                                  fontSize: 16, color: Colors.black),
                             ),
                           ],
                         ),
@@ -179,18 +184,50 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         child: DefaultButton(
                             text: "Check Out",
                             press: () async {
-                              // Replace this hard code id by allow user to select voucher
-                              // You can pass null to skip apply voucher
-                              var response = await PaymentService.checkout(
-                                  context, paymentMethod, "test");
-                              if (response["error"] != true) {
-                                await GlobalStorage.write(
-                                    key: "isCheckouted", value: "true");
-                                Navigator.popUntil(
-                                    context,
-                                    (route) =>
-                                        route.settings.name ==
-                                        HomePage.routeName);
+                              var isLogin = await UserService().isLogin();
+                              if (isLogin) {
+                                if (paymentMethod == null ||
+                                    paymentMethod['card']['last4'] == null ||
+                                    paymentMethod['card']['last4'] == "") {
+                                  actionRequire(context, "No payment method",
+                                      "Please add a payment method", () {
+                                    Navigator.of(context).pop();
+                                    Navigator.pushNamed(
+                                        context, Payment.routeName);
+                                  });
+                                } else {
+                                  var responseOrder =
+                                      await OrderService().fetchOnGoingOrder();
+                                  if (responseOrder.id != "0") {
+                                    actionRequire(context, "Order exist",
+                                        "You cannot order when having ongoing one",
+                                        () {
+                                      Navigator.of(context).pop();
+                                    }, true);
+                                  } else {
+                                    // Replace this hard code id by allow user to select voucher
+                                    // You can pass null to skip apply voucher
+                                    var response =
+                                        await PaymentService.checkout(
+                                            context, paymentMethod, "test");
+                                    if (response["error"] != true) {
+                                      await GlobalStorage.write(
+                                          key: "isCheckouted", value: "true");
+                                      Navigator.popUntil(
+                                          context,
+                                          (route) =>
+                                              route.settings.name ==
+                                              HomePage.routeName);
+                                    }
+                                  }
+                                }
+                              } else {
+                                actionRequire(context, "Login required",
+                                    "You need to login to continue", () {
+                                  Navigator.of(context).pop();
+                                  Navigator.pushNamed(
+                                      context, WelcomeScreen.routeName);
+                                });
                               }
                             }),
                       ),
@@ -214,5 +251,31 @@ class _CheckoutCardState extends State<CheckoutCard> {
               padding: const EdgeInsets.symmetric(horizontal: 18),
               child: sheet,
             )).then((value) => {});
+  }
+
+  actionRequire(context, String title, String content, Function onconfirm,
+      [bool hideDiscard = false]) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    onconfirm();
+                  },
+                  child: const Text("Continue")),
+              hideDiscard == true
+                  ? const SizedBox.shrink()
+                  : TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("No"))
+            ],
+          );
+        });
   }
 }

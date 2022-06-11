@@ -6,7 +6,7 @@ const axiosInstance = axios.create({
   headers: {
     Authorization:
       "Bearer " +
-      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwiaWF0IjoxNjU0NjY2MDIyLCJleHAiOjE2NTQ3NTI0MjJ9.OpeYz22SNshH6xooUPANYXcGkNrodXGYqGV2b6hBbxw",
+      process.env.REACT_APP_TOKEN,
   },
 });
 

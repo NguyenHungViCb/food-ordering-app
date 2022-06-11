@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:app/models/api/base_response.dart';
 import 'package:app/models/tokens/tokens.dart';
 import 'package:app/models/users/auth.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
 
 // =================== User related models ===================
@@ -88,8 +89,11 @@ class User {
 
   Future<dynamic> localLogin(String email, String password) async {
     try {
-      var response = await ApiService().post("/api/users/login/local",
-          json.encode({"email": email, "password": password}));
+      var cartId = await GlobalStorage.read(key: "cart_id");
+      var response = await ApiService().post(
+          "/api/users/login/local",
+          json.encode(
+              {"email": email, "password": password, "cart_id": cartId}));
       if (response.statusCode.toString().startsWith("2")) {
         var tokens = Token.fromJson(responseFromJson(response.body).data);
         return tokens;

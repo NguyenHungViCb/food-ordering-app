@@ -14,6 +14,7 @@ import {
 import { generateRefreshToken, generateToken } from "../../utils/tokenUtils";
 import { getAttributesData } from "../../utils/modelUtils";
 import { updateIfExist } from "../../services";
+import { attachExistCartToUser } from "../../middlewares/carts";
 
 const path = "/users";
 @controller
@@ -34,11 +35,12 @@ class UserController {
   })
   @routeConfig({ method: "post", path: `${path}/signup/local` })
   async signUp(req: Request, res: Response, __: NextFunction) {
-    const { password, ...rest } = req.body;
+    const { password, cart_id, ...rest } = req.body;
     requireValues([...req.body]);
     const user = await this.createUser(rest);
     user.set("password", password);
     await user.save();
+    await attachExistCartToUser(cart_id, user);
     const values = getAttributesData(user, [
       "id",
       "first_name",
@@ -111,7 +113,7 @@ class UserController {
       "active",
       "created_at",
       "updated_at",
-      "address"
+      "address",
     ]);
     return res.status(200).json({ data: values, success: true });
   }
@@ -181,7 +183,9 @@ class UserController {
     const { user } = req;
     const { address, ward, district, city } = req.body;
     requireValues([address, ward, district, city]);
-    const updatedAddress = await user.update({ address: `${address}, ${ward}, ${district}, ${city}` });
+    const updatedAddress = await user.update({
+      address: `${address}, ${ward}, ${district}, ${city}`,
+    });
     return res.json({ data: updatedAddress, success: true });
   }
 }

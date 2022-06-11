@@ -237,12 +237,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                           Text.rich(
                             TextSpan(
-                              text: "\$${order.details.reduce((value, element) {
-                                value.total = (int.parse(value.total) +
-                                        int.parse(element.total))
-                                    .toString();
-                                return value;
-                              }).total}",
+                              text: "\$${order.total.toString()}",
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: kPrimaryColor2),
