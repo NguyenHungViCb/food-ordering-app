@@ -43,7 +43,7 @@ class _BodyState extends State<Body> {
                     onDismissed: (direction) {
                       setState(() {
                         deleteCart(
-                            snapshot.data!.details[index].productId, null);
+                            snapshot.data!.details[index].productId, 0);
                         snapshot.data!.details.removeAt(index);
                         if(snapshot.data!.details.length == 0)
                           {

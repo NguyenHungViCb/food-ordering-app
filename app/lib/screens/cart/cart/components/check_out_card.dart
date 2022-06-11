@@ -1,6 +1,9 @@
 import 'dart:convert';
 
+import 'package:app/models/users/users.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
+import 'package:app/screens/cart/cart/components/address.dart';
+import 'package:app/screens/cart/update_address/update_address_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/screens/cart/voucher/voucher_page.dart';
@@ -29,12 +32,11 @@ class _CheckoutCardState extends State<CheckoutCard> {
   dynamic paymentMethod;
   late Future<double> sumPrice;
   dynamic vouchers;
-
   @override
   void initState() {
     super.initState();
     sumPrice = CartItems().sum();
-    getTextFromFile();
+    getCodeFromVoucher();
   }
 
   getDefaultMethod() async {
@@ -84,6 +86,73 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text("Delivery to:"),
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Spacer(),
+                      Row(
+                        children: [
+                          InkWell(
+                            child: AddressInformation(userAddress: User().getUserAddress()),
+                            //AddressInformation(),
+                            onTap: () async {
+                              String? savedToken =
+                              await GlobalStorage.read(key: "tokens");
+                              if (savedToken != null) {
+                                Navigator.pushNamed(context, AddressPage.routeName).then((_) => setState(() {}));
+                              } else {
+                                FToast().init(context).showToast(
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 20, vertical: 10),
+                                      decoration: const BoxDecoration(
+                                          color: Color(0xfffa5252),
+                                          borderRadius: BorderRadius.all(
+                                              Radius.circular(5))),
+                                      child: Row(
+                                        children: [
+                                          SvgPicture.asset(
+                                            "assets/images/error.svg",
+                                            width: 18,
+                                          ),
+                                          const SizedBox(
+                                            width: 20,
+                                          ),
+                                          const Text(
+                                            "Please login to view/update address",
+                                            style: TextStyle(
+                                                color: Colors.white),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                    /* backgroundColor: const Color(0xfffa5252), */
+                                    gravity: ToastGravity.CENTER,
+                                    toastDuration:
+                                    const Duration(seconds: 3),
+                                    positionedToastBuilder:
+                                        (context, child) {
+                                      return Positioned(
+                                          child: child, top: 150, left: 80);
+                                    });
+                              }
+                            },
+                          ),
+                          const SizedBox(width: 10),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 12,
+                            color: kTextColor,
+                          )
+                        ],
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  const Divider(
+                      color: Colors.black, height:15),
+                  const SizedBox(height: 10),
                   Row(
                     children: [
                       GestureDetector(
@@ -148,64 +217,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                       const Spacer(),
                       Column(
                         children: [
-                          Row(
-                            children: [
-                              InkWell(
-                                child: const Text("Address"),
-                                onTap: () async {
-                                  String? savedToken =
-                                      await GlobalStorage.read(key: "tokens");
-                                  if (savedToken != null) {
-                                    displayBottomSheet(
-                                        context,
-                                        const AuthBottomSheet(
-                                            child: Address()));
-                                  } else {
-                                    FToast().init(context).showToast(
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                              horizontal: 20, vertical: 10),
-                                          decoration: const BoxDecoration(
-                                              color: Color(0xfffa5252),
-                                              borderRadius: BorderRadius.all(
-                                                  Radius.circular(5))),
-                                          child: Row(
-                                            children: [
-                                              SvgPicture.asset(
-                                                "assets/images/error.svg",
-                                                width: 18,
-                                              ),
-                                              const SizedBox(
-                                                width: 20,
-                                              ),
-                                              const Text(
-                                                "Please login to view/update address",
-                                                style: TextStyle(
-                                                    color: Colors.white),
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                        /* backgroundColor: const Color(0xfffa5252), */
-                                        gravity: ToastGravity.CENTER,
-                                        toastDuration:
-                                            const Duration(seconds: 3),
-                                        positionedToastBuilder:
-                                            (context, child) {
-                                          return Positioned(
-                                              child: child, top: 150, left: 80);
-                                        });
-                                  }
-                                },
-                              ),
-                              const SizedBox(width: 10),
-                              const Icon(
-                                Icons.arrow_forward_ios,
-                                size: 12,
-                                color: kTextColor,
-                              )
-                            ],
-                          ),
+
                           Row(
                             children: [
                               InkWell(
@@ -347,7 +359,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
         return "Add voucher code";
     }
   }
-  void getTextFromFile() async {
+  void getCodeFromVoucher() async {
     try {
       String data = await getVouchers();
       setState(() {

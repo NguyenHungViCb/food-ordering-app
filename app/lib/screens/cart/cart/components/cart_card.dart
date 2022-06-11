@@ -10,7 +10,6 @@ class CartCard extends StatelessWidget {
 
   final Future<GetSingleProductResponse> productResponse;
   final int index;
-  final sum = 0;
   final pageController = PageController();
 
   @override

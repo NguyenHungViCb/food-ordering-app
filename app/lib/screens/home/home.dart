@@ -181,6 +181,7 @@ class _HomePageState extends State<HomePage> {
                     await GlobalStorage.delete(key: "cart_id");
                     setState(() {
                       isLogin = false;
+                      Navigator.pushNamed(context, HomePage.routeName);
                     });
                   },
                   text: "Log out"),

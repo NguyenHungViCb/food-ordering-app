@@ -13,6 +13,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
+import '../home/home.dart';
+
 class DetailPage extends StatefulWidget {
   final Product food;
   const DetailPage(this.food, {Key? key}) : super(key: key);
@@ -104,7 +106,16 @@ class _DetailPageState extends State<DetailPage> {
       });
     });
   }
-
+  AppBar buildAppBar(BuildContext context) {
+    return AppBar(
+      backgroundColor: const Color(0xFFFFFFFF),
+      leading: GestureDetector(
+        onTap: () => Navigator.pushNamed(context, HomePage.routeName),
+        child: const Icon(Icons.arrow_back_ios_outlined, color: Color(
+            0xFF000000),),
+      ),
+    );
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -112,8 +123,8 @@ class _DetailPageState extends State<DetailPage> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            CustomAppBar(Icons.arrow_back_ios_outlined, Icons.favorite_outline,
-                leftCallback: () => Navigator.of(context).pop()),
+            //CustomAppBar(Icons.arrow_back_ios_outlined, Icons.favorite_outline,leftCallback: () => Navigator.of(context).pop()),
+            buildAppBar(context),
             FoodImg(widget.food),
             FoodDetail(
               widget.food,

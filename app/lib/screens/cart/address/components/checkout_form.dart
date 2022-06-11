@@ -56,8 +56,8 @@ class AddressFormState extends State<AddressForm> {
                             color: Colors.white, height: 10),
                         const SizedBox(height: 15),
                         DefaultButton(
-                          press:() {
-                            Navigator.pushNamed(context, AddressPage.routeName);
+                          press:() async {
+                            Navigator.pushNamed(context, AddressPage.routeName).then((_) => setState(() {}));
                           },
                           text: "Edit",
                         )

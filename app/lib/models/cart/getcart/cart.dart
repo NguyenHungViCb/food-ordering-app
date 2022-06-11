@@ -204,7 +204,6 @@ class CartItems {
         var cartResponse =
             CartResponse.fromJson(responseFromJson(response.body).data);
         await GlobalStorage.write(key: "cart_id", value: cartResponse.id);
-        await GlobalStorage.read(key: "cart_id").then((value) => print(value));
         if (cartResponse.failedInserts.isNotEmpty) {
           showNotify(
               context,

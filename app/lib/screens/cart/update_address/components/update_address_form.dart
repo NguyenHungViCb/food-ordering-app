@@ -1,7 +1,7 @@
 import 'package:app/components/default_button.dart';
+import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_svg/svg.dart';
 
 import '../../../../models/users/users.dart';
 
@@ -21,6 +21,7 @@ class _AccountDetailState extends State<AccountDetail> {
   void initState() {
     super.initState();
     userAddress = User().getUserAddress();
+    getUserAddress();
   }
 
   @override
@@ -37,19 +38,19 @@ class _AccountDetailState extends State<AccountDetail> {
                       const SizedBox(
                         height: 15,
                       ),
-                      addressTextFormField(address: snapshot.data![0]),
+                      addressTextFormField(),
                       const SizedBox(
                         height: 15,
                       ),
-                      wardFormField(ward: snapshot.data![1]),
+                      wardFormField(),
                       const SizedBox(
                         height: 15,
                       ),
-                      districtTextFormField(district: snapshot.data![2]),
+                      districtTextFormField(),
                       const SizedBox(
                         height: 15,
                       ),
-                      cityTextFormField(city: snapshot.data![3]),
+                      cityTextFormField(),
                       const SizedBox(
                         height: 15,
                       ),
@@ -66,7 +67,7 @@ class _AccountDetailState extends State<AccountDetail> {
                                     wardInput.text == "" ? snapshot.data[1] : wardInput.text,
                                     districtInput.text == "" ? snapshot.data[2] : districtInput.text,
                                     cityInput.text == "" ? snapshot.data[3] : cityInput.text);
-                                Navigator.pop(context);
+                                Navigator.pushNamed(context,CartScreen.routeName);
                               })),
                       const SizedBox(
                         height: 15,
@@ -75,76 +76,29 @@ class _AccountDetailState extends State<AccountDetail> {
                   ),
                 );
               } else {
-                return Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    children: [
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Text("Address"),
-                      addressTextFormField(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Text("Ward"),
-                      wardFormField(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Text("District"),
-                      districtTextFormField(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      const Text("City"),
-                      cityTextFormField(),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                      SizedBox(
-                          height: 50,
-                          width: MediaQuery.of(context).size.width,
-                          child: DefaultButton(
-                              text: "Save",
-                              press: () async {
-                                // Replace this hard code id by allow user to select voucher
-                                // You can pass null to skip apply voucher
-                                addOrUpdateAddress(
-                                    addressInput.text,
-                                    wardInput.text,
-                                    districtInput.text,
-                                    cityInput.text);
-                                Navigator.pop(context);
-                              })),
-                      const SizedBox(
-                        height: 15,
-                      ),
-                    ],
-                  ),
-                );
+                return const Text("failed");
               }
             }));
   }
 
-  TextFormField addressTextFormField({String? address}) {
+  TextFormField addressTextFormField() {
     return TextFormField(
       controller: addressInput,
-      decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: address ?? "please input your address",
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: "please input your address",
           // If  you are using latest version of flutter then lable text and hint text shown like this
           // if you r using flutter less then 1.20.* then maybe this is not working properly
-          floatingLabelBehavior: FloatingLabelBehavior.always,)
+          floatingLabelBehavior: FloatingLabelBehavior.always,),
     );
   }
 
-  TextFormField wardFormField({String? ward}) {
+  TextFormField wardFormField() {
     return TextFormField(
       controller: wardInput,
-      decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: ward ?? "Please input your ward",
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: "Please input your ward",
           // If  you are using latest version of flutter then lable text and hint text shown like this
           // if you r using flutter less then 1.20.* then maybe this is not working properly
           floatingLabelBehavior: FloatingLabelBehavior.always)
@@ -163,12 +117,12 @@ class _AccountDetailState extends State<AccountDetail> {
     );
   }
 
-  TextFormField cityTextFormField({String? city}) {
+  TextFormField cityTextFormField() {
     return TextFormField(
       controller: cityInput,
-      decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: city ?? "Please Input your city",
+      decoration: const InputDecoration(
+          border: OutlineInputBorder(),
+          hintText: "Please Input your city",
           // If  you are using latest version of flutter then lable text and hint text shown like this
           // if you r using flutter less then 1.20.* then maybe this is not working properly
           floatingLabelBehavior: FloatingLabelBehavior.always)
@@ -178,6 +132,21 @@ class _AccountDetailState extends State<AccountDetail> {
   void addOrUpdateAddress(String? address, String? ward, String? district, String? city) async {
     try {
       await User().updateAddress(address!, ward!, district!, city!);
+    } catch (e) {
+      return null;
+    }
+  }
+  void getUserAddress() async
+  {
+    try {
+      var listAddress = await User().getUserAddress();
+      if(listAddress.isNotEmpty)
+        {
+          addressInput.text = listAddress[0];
+          wardInput.text = listAddress[1];
+          districtInput.text = listAddress[2];
+          cityInput.text = listAddress[3];
+        }
     } catch (e) {
       return null;
     }

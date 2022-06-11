@@ -166,7 +166,7 @@ class User {
       var response = await ApiService().get("/api/users/auth/info/single");
       if (response.statusCode.toString().startsWith("2")) {
         var userInfoResponse =
-        GetUserInfo.fromJson(responseFromJson(response.body).data);
+          GetUserInfo.fromJson(responseFromJson(response.body).data);
         var address = userInfoResponse.address.split(",");
         for(int i = 0; i<address.length;i++)
           {
@@ -179,7 +179,7 @@ class User {
     }
     return Future.error(GetUserInfo);
   }
-  Future<dynamic> getUserAddress() async {
+  Future<List<String>> getUserAddress() async {
     try {
       var response = await ApiService().get("/api/users/auth/info/single");
       if (response.statusCode.toString().startsWith("2")) {
@@ -195,6 +195,6 @@ class User {
     } catch (e) {
       log(e.toString());
     }
-    return Future.error(GetUserInfo);
+    return List.empty();
   }
 }
