@@ -4,6 +4,7 @@ import 'package:app/screens/cart/voucher/voucher_page.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/order/order.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/search/search.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/widgets.dart';
 
@@ -16,5 +17,6 @@ final Map<String, WidgetBuilder> routes = {
   HomePage.routeName: (context) => const HomePage(),
   Payment.routeName: (context) => const Payment(),
   AddCard.routeName: (context) => const AddCard(),
-  OrderScreen.routeName: (context) => const OrderScreen()
+  OrderScreen.routeName: (context) => const OrderScreen(),
+  SearchScreen.routeName: (context) => const SearchScreen()
 };

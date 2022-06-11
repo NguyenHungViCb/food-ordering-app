@@ -72,7 +72,7 @@ const Product = sequelize.define<
 );
 
 Product.belongsTo(Category, {
-  as: "category",
+  as: "products",
   foreignKey: "id",
 });
 Category.hasMany(Product, {
