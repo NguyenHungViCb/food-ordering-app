@@ -16,8 +16,6 @@ import 'package:app/components/default_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
-import '../../../welcome/auth_bottom_sheet.dart';
-import '../../address/components/body.dart';
 
 class CheckoutCard extends StatefulWidget {
   const CheckoutCard({
@@ -32,11 +30,16 @@ class _CheckoutCardState extends State<CheckoutCard> {
   dynamic paymentMethod;
   late Future<double> sumPrice;
   dynamic vouchers;
+  late Future<List<String>> getAddress;
+  dynamic checkAddress;
+
   @override
   void initState() {
     super.initState();
     sumPrice = CartItems().sum();
+    getAddress = User().getUserAddress();
     getCodeFromVoucher();
+    checkAddressOfUser();
   }
 
   getDefaultMethod() async {
@@ -86,72 +89,68 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Delivery to:"),
+                  checkAddress == true
+                      ? const Text("Delivery to:")
+                      : const SizedBox(height: 0),
                   const SizedBox(height: 10),
                   Row(
                     children: [
-                      const Spacer(),
-                      Row(
-                        children: [
-                          InkWell(
-                            child: AddressInformation(userAddress: User().getUserAddress()),
-                            //AddressInformation(),
-                            onTap: () async {
-                              String? savedToken =
+                      InkWell(
+                        child: AddressInformation(
+                            userAddress: User().getUserAddress()),
+                        onTap: () async {
+                          String? savedToken =
                               await GlobalStorage.read(key: "tokens");
-                              if (savedToken != null) {
-                                Navigator.pushNamed(context, AddressPage.routeName).then((_) => setState(() {}));
-                              } else {
-                                FToast().init(context).showToast(
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 20, vertical: 10),
-                                      decoration: const BoxDecoration(
-                                          color: Color(0xfffa5252),
-                                          borderRadius: BorderRadius.all(
-                                              Radius.circular(5))),
-                                      child: Row(
-                                        children: [
-                                          SvgPicture.asset(
-                                            "assets/images/error.svg",
-                                            width: 18,
-                                          ),
-                                          const SizedBox(
-                                            width: 20,
-                                          ),
-                                          const Text(
-                                            "Please login to view/update address",
-                                            style: TextStyle(
-                                                color: Colors.white),
-                                          )
-                                        ],
+                          if (savedToken != null) {
+                            Navigator.pushNamed(context, AddressPage.routeName)
+                                .then((_) => setState(() {}));
+                          } else {
+                            FToast().init(context).showToast(
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 20, vertical: 10),
+                                  decoration: const BoxDecoration(
+                                      color: Color(0xfffa5252),
+                                      borderRadius:
+                                          BorderRadius.all(Radius.circular(5))),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/images/error.svg",
+                                        width: 18,
                                       ),
-                                    ),
-                                    /* backgroundColor: const Color(0xfffa5252), */
-                                    gravity: ToastGravity.CENTER,
-                                    toastDuration:
-                                    const Duration(seconds: 3),
-                                    positionedToastBuilder:
-                                        (context, child) {
-                                      return Positioned(
-                                          child: child, top: 150, left: 80);
-                                    });
-                              }
-                            },
-                          ),
-                          const SizedBox(width: 10),
-                          const Icon(
-                            Icons.arrow_forward_ios,
-                            size: 12,
-                            color: kTextColor,
-                          )
-                        ],
+                                      const SizedBox(
+                                        width: 20,
+                                      ),
+                                      const Text(
+                                        "Please login to view/update address",
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                ),
+                                /* backgroundColor: const Color(0xfffa5252), */
+                                gravity: ToastGravity.CENTER,
+                                toastDuration: const Duration(seconds: 3),
+                                positionedToastBuilder: (context, child) {
+                                  return Positioned(
+                                      child: child, top: 150, left: 80);
+                                });
+                          }
+                        },
                       ),
+                      const Spacer(
+                        flex: 2,
+                      ),
+                      const Icon(
+                        Icons.arrow_forward_ios,
+                        size: 12,
+                        color: kTextColor,
+                      )
                     ],
                   ),
                   const SizedBox(height: 10),
-                  const Divider(
-                      color: Colors.black, height:15),
+                  const Divider(color: Colors.black, height: 15),
                   const SizedBox(height: 10),
                   Row(
                     children: [
@@ -217,7 +216,6 @@ class _CheckoutCardState extends State<CheckoutCard> {
                       const Spacer(),
                       Column(
                         children: [
-
                           Row(
                             children: [
                               InkWell(
@@ -228,8 +226,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                   if (savedToken != null) {
                                     Navigator.pushNamed(
                                         context, VouchersScreen.routeName);
-                                  }
-                                  else {
+                                  } else {
                                     FToast().init(context).showToast(
                                         child: Container(
                                           padding: const EdgeInsets.symmetric(
@@ -258,15 +255,13 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                         /* backgroundColor: const Color(0xfffa5252), */
                                         gravity: ToastGravity.CENTER,
                                         toastDuration:
-                                        const Duration(seconds: 3),
+                                            const Duration(seconds: 3),
                                         positionedToastBuilder:
                                             (context, child) {
                                           return Positioned(
                                               child: child, top: 150, left: 80);
                                         });
                                   }
-
-
                                 },
                               ),
                               const SizedBox(width: 10),
@@ -275,12 +270,15 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                       icon: const Icon(Icons.dangerous),
                                       onPressed: () async {
                                         setState(() async {
-                                         await GlobalStorage.delete(key: "code");
-                                         await GlobalStorage.delete(key: "id");
-                                         await GlobalStorage.delete(key: "discount");
-                                         await Navigator.pushNamed(context, CartScreen.routeName);
-                                      });
-                                    })
+                                          await GlobalStorage.delete(
+                                              key: "code");
+                                          await GlobalStorage.delete(key: "id");
+                                          await GlobalStorage.delete(
+                                              key: "discount");
+                                          await Navigator.pushNamed(
+                                              context, CartScreen.routeName);
+                                        });
+                                      })
                                   : const Icon(
                                       Icons.arrow_forward_ios,
                                       size: 12,
@@ -356,9 +354,10 @@ class _CheckoutCardState extends State<CheckoutCard> {
     if (voucherCode.toString() != "null") {
       return voucherCode.toString();
     } else {
-        return "Add voucher code";
+      return "Add voucher code";
     }
   }
+
   void getCodeFromVoucher() async {
     try {
       String data = await getVouchers();
@@ -368,5 +367,21 @@ class _CheckoutCardState extends State<CheckoutCard> {
     } catch (ex) {
       print(ex);
     }
+  }
+
+  void checkAddressOfUser() {
+    getAddress.then((value) {
+      if (value.isNotEmpty) {
+        setState(() {
+          checkAddress = true;
+        });
+      }
+      else
+        {
+          setState(() {
+            checkAddress = false;
+          });
+        }
+    });
   }
 }
