@@ -50,10 +50,9 @@ class OrderController {
         data: {
           ...onGoingOrder,
           total: orderTotal,
-          allowCancel: isAllowTransitionState(
-            onGoingOrder.status!,
-            ORDER_STATUS.canceled
-          ),
+          allowCancel:
+            onGoingOrder.status !== ORDER_STATUS.shipping &&
+            isAllowTransitionState(onGoingOrder.status!, ORDER_STATUS.canceled),
         },
         success: true,
       });
