@@ -12,6 +12,7 @@ class ResponseOrder {
   String updatedAt;
   List<OrderDetail> details;
   dynamic total;
+  bool allowCancel;
 
   ResponseOrder(
       this.id,
@@ -26,7 +27,8 @@ class ResponseOrder {
       this.createdAt,
       this.updatedAt,
       this.details,
-      this.total);
+      this.total,
+      this.allowCancel);
 
   factory ResponseOrder.fromJson(Map<dynamic, dynamic> json) => ResponseOrder(
       json['id'],
@@ -42,7 +44,8 @@ class ResponseOrder {
       json['updated_at'],
       List<OrderDetail>.from(
           json['details'].map((item) => OrderDetail.fromJson(item))),
-      json['total']);
+      json['total'],
+      json['allowCancel']);
 
   toJson() => {
         "id": id,

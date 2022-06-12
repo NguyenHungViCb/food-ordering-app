@@ -47,7 +47,14 @@ class OrderController {
         }
       }
       return res.json({
-        data: { ...onGoingOrder, total: orderTotal },
+        data: {
+          ...onGoingOrder,
+          total: orderTotal,
+          allowCancel: isAllowTransitionState(
+            onGoingOrder.status!,
+            ORDER_STATUS.canceled
+          ),
+        },
         success: true,
       });
     }
@@ -85,8 +92,7 @@ class OrderController {
     const updatedOrder = await order?.update({
       status: status,
       status_history:
-        order.getDataValue("status_history") +
-        `; ${new Date()}-${status}`,
+        order.getDataValue("status_history") + `; ${new Date()}-${status}`,
     });
     if (updatedOrder.getDataValue("status") === ORDER_STATUS.canceled) {
       const paymentIntents = await stripe.charges.search({

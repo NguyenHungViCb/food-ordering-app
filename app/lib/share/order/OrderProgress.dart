@@ -52,7 +52,7 @@ class _OrderProgressState extends State<OrderProgress> {
         value: status['confirmed'],
       )),
       SvgPicture.asset(
-        'assets/images/cooking.svg',
+        'assets/images/pot.svg',
         width: 24,
         height: 24,
       ),

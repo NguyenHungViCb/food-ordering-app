@@ -9,12 +9,12 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 class OrderService {
   final ResponseOrder _nullSafety = ResponseOrder("0", "0", "", "", "", "", "",
-      "", "0", "", "", [OrderDetail('', '', '', 0, "0", '', '')], 0);
+      "", "0", "", "", [OrderDetail('', '', '', 0, "0", '', '')], 0, false);
   get nullSafety {
     return _nullSafety;
   }
 
-  fetchOnGoingOrder() async {
+  Future<ResponseOrder> fetchOnGoingOrder() async {
     try {
       var response = await ApiService().get('/api/orders/ongoing');
       if (response.statusCode == 200) {

@@ -7,8 +7,6 @@ import 'package:app/screens/home/widget/food_list_view.dart';
 import 'package:app/screens/home/widget/order/order_processing_card.dart';
 import 'package:app/screens/home/widget/slider_List.dart';
 import 'package:app/screens/order/order.dart';
-import 'package:app/screens/welcome/welcome.dart';
-import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/category_service.dart';
@@ -16,7 +14,6 @@ import 'package:app/utils/order_service.dart';
 import 'package:app/utils/product_service.dart';
 import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:app/screens/home/widget/drawer.dart';
 
 import '../../widgets/custom_app_bar.dart';
@@ -39,18 +36,10 @@ class _HomePageState extends State<HomePage> {
   ResponseOrder order = OrderService().nullSafety;
 
   getOrder() async {
-    var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
-    print({"isCheckouted": isCheckouted});
-    print(order.id);
-    if (isCheckouted == "true" || order.id == '0') {
-      print("GET ORDER");
-      var responseOrder = await OrderService().fetchOnGoingOrder();
-      print(responseOrder.id);
-      await GlobalStorage.delete(key: "isCheckouted");
-      setState(() {
-        order = responseOrder;
-      });
-    }
+    var responseOrder = await OrderService().fetchOnGoingOrder();
+    setState(() {
+      order = responseOrder;
+    });
   }
 
   updateOrder(context, _order) {
@@ -85,6 +74,16 @@ class _HomePageState extends State<HomePage> {
       await getOrder();
     });
   }
+
+  // checkoutOrder() async {
+  //   var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
+  //   await GlobalStorage.delete(key: "isCheckouted");
+
+  //   print({isCheckouted: isCheckouted});
+  //   if (isCheckouted == "true") {
+  //     getOrder();
+  //   }
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -127,8 +126,8 @@ class _HomePageState extends State<HomePage> {
               order: order,
               updateOrder: updateOrder,
             ),
-            onTap: () {
-              Navigator.pushNamed(context, OrderScreen.routeName)
+            onTap: () async {
+              await Navigator.pushNamed(context, OrderScreen.routeName)
                   .then((value) => getOrder());
             },
           )
@@ -136,10 +135,10 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () {
-                Navigator.pushNamed(context, CartScreen.routeName)
-                    .then((value) async {
-                  await getOrder();
+              onPressed: () async {
+                await Navigator.pushNamed(context, CartScreen.routeName)
+                    .then((value) {
+                  getOrder();
                 });
               },
               backgroundColor: kPrimaryColor,
