@@ -9,7 +9,7 @@ import 'package:socket_io_client/socket_io_client.dart';
 
 class OrderService {
   final ResponseOrder _nullSafety = ResponseOrder("0", "0", "", "", "", "", "",
-      "", "0", "", "", [OrderDetail('', '', '', 0, "0", '', '')]);
+      "", "0", "", "", [OrderDetail('', '', '', 0, "0", '', '')], 0);
   get nullSafety {
     return _nullSafety;
   }
@@ -23,6 +23,7 @@ class OrderService {
       }
       return _nullSafety;
     } catch (e) {
+      print(e);
       return _nullSafety;
     }
   }

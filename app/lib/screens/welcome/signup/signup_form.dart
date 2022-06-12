@@ -1,5 +1,6 @@
 import 'package:app/models/users/auth.dart';
 import 'package:app/models/users/users.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:app/share/text_fields/email.dart';
 import 'package:app/share/text_fields/password.dart';
 import 'package:app/share/text_fields/text.dart';
@@ -91,12 +92,14 @@ class SignupFormState extends State<SignupForm> {
 
   void signupHandler(context, toggleLoading) async {
     toggleLoading();
+    var cartId = await GlobalStorage.read(key: "cart_id");
     var user = await User().localSignup(LocalSignupRequest(
         firstName: firstNameController.text,
         lastName: lastNameController.text,
         email: emailController.text,
         password: passwordController.text,
-        confirmPass: confirmPassController.text));
+        confirmPass: confirmPassController.text,
+        cartId: cartId));
     if (user is UserResponse) {
       Navigator.pop(context, user);
     }

@@ -81,12 +81,7 @@ class _OrderProgressCardState extends State<OrderProgressCard> {
                         ),
                         Text(
                           "Total: \$" +
-                              widget.order.details.reduce((current, prev) {
-                                current.total = (int.parse(current.total) +
-                                        int.parse(prev.total))
-                                    .toString();
-                                return current;
-                              }).total,
+                              widget.order.total.toString(),
                           style: const TextStyle(color: Color(0xFF495057)),
                         )
                       ]),
