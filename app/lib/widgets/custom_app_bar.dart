@@ -1,9 +1,10 @@
+import 'package:app/screens/search/search.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:flutter/material.dart';
 
 class CustomAppBar extends StatelessWidget {
   final IconData leftIcon;
-  final IconData?  rightIcon;
+  final IconData? rightIcon;
   final Function? leftCallback;
 
   const CustomAppBar(this.leftIcon, this.rightIcon, {this.leftCallback});
@@ -24,7 +25,14 @@ class CustomAppBar extends StatelessWidget {
             onTap: leftCallback != null ? () => leftCallback!(context) : null,
             child: _buildIcon(leftIcon),
           ),
-          rightIcon != null ? _buildIcon(rightIcon as IconData) : SizedBox.shrink(),
+          rightIcon != null
+              ? GestureDetector(
+                  child: _buildIcon(rightIcon as IconData),
+                  onTap: () {
+                    Navigator.pushNamed(context, SearchScreen.routeName);
+                  },
+                )
+              : const SizedBox.shrink(),
         ],
       ),
     );

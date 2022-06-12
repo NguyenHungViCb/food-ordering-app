@@ -1,3 +1,4 @@
+import 'package:app/share/constants/colors.dart';
 import 'package:carousel_slider/carousel_controller.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
@@ -27,26 +28,26 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
     'assets/images/voucher2.png',
   ];
 
- // final List<String> places = [
- //   'ASIA',
+  // final List<String> places = [
+  //   'ASIA',
   //  'AFRICA',
- //   'EUROPE',
- //   'SOUTH AMERICA',
- //   'AUSTRALIA',
- //   'ANTARCTICA',
- // ];
+  //   'EUROPE',
+  //   'SOUTH AMERICA',
+  //   'AUSTRALIA',
+  //   'ANTARCTICA',
+  // ];
 
   List<Widget> generateImageTiles(screenSize) {
     return images
         .map(
           (element) => ClipRRect(
-        borderRadius: BorderRadius.circular(20.0),
-        child: Image.asset(
-          element,
-          fit: BoxFit.cover,
-        ),
-      ),
-    )
+            borderRadius: BorderRadius.circular(20.0),
+            child: Image.asset(
+              element,
+              fit: BoxFit.cover,
+            ),
+          ),
+        )
         .toList();
   }
 
@@ -56,29 +57,24 @@ class _DestinationCarouselState extends State<DestinationCarousel> {
     var imageSliders = generateImageTiles(screenSize);
 
     return Container(
-        padding: const EdgeInsets.only(top:50),
-        color:Colors.white,
-
+        padding: const EdgeInsets.only(top: 50),
+        color: kBackground,
         child: Stack(
           children: [
             CarouselSlider(
               items: imageSliders,
               options: CarouselOptions(
                   enlargeCenterPage: true,
-                  aspectRatio: 18/8,
+                  aspectRatio: 18 / 8,
                   onPageChanged: (index, reason) {
                     setState(() {
                       _current = index;
-
                     });
                   }),
               carouselController: _controller,
             ),
-
-
           ],
-        )
-    );
-
+        ));
   }
 }
+

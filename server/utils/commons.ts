@@ -9,3 +9,12 @@ export const errorsConverter = {
     return err;
   },
 };
+
+export const imagesToArray = (images: string) => {
+  return images
+    .split(";")
+    .map((url) => ({
+      src: url,
+    }))
+    .filter((item) => item.src.trim() !== "");
+};
