@@ -1,8 +1,3 @@
-import 'package:app/constants.dart';
-import 'package:app/models/product/product.dart';
-import 'package:app/models/users/users.dart';
-import 'package:app/screens/home/home.dart';
-import 'package:app/size_config.dart';
 import 'package:flutter/material.dart';
 
 class AddressInformation extends StatelessWidget {
@@ -22,13 +17,13 @@ class AddressInformation extends StatelessWidget {
               return const Text("Add address");
             }
           } else {
-            return Text("failed");
+            return const Text("failed");
           }
         });
   }
 
   String address(List<String>? addressInfo) {
-    var address = addressInfo?.join(",");
+    var address = addressInfo?.join(", ").trim();
     return address!;
   }
 }

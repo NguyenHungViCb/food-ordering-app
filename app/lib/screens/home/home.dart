@@ -1,7 +1,7 @@
-import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/models/category.dart';
 import 'package:app/models/order/orders.dart';
 import 'package:app/models/restaurant.dart';
+import 'package:app/models/users/users.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
 import 'package:app/screens/home/widget/food_list.dart';
 import 'package:app/screens/home/widget/food_list_view.dart';
@@ -12,17 +12,16 @@ import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
-import 'package:app/utils/cart_service.dart';
 import 'package:app/utils/category_service.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:app/utils/product_service.dart';
 import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../utils/cart_service.dart';
 import '../../widgets/custom_app_bar.dart';
-
+import 'package:fluttertoast/fluttertoast.dart';
 class HomePage extends StatefulWidget {
   static String routeName = "/home";
 
@@ -34,15 +33,16 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   var selected = 0;
-  var countCartItems = 0;
   final pageController = PageController();
   Restaurant? restaurant;
   List<Category> categories = [CategoryService().nullSafety];
+  GetUserInfo? userInfo;
   bool isLogin = false;
+  int countCartItems=0;
   final controls = [
-    {"icon": 'assets/images/account.svg', "text": "Account"},
-    {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
-    {"icon": 'assets/images/location.svg', "text": "Address"}
+    {"icon": 'assets/images/account.svg', "text": "Account", "routeName": "/account"},
+    {"icon": 'assets/images/shopping-bag.svg', "text": "Orders", "routeName": "/input route here"},
+    {"icon": 'assets/images/location.svg', "text": "Address", "routeName": "./address"}
   ];
   ResponseOrder order = OrderService().nullSafety;
 
@@ -60,6 +60,7 @@ class _HomePageState extends State<HomePage> {
       });
     }
   }
+
   updateOrder(context, _order) {
     setState(() {
       order = _order;
@@ -70,12 +71,16 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
-      await getOrder();
-    });
-    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final products = await ProductService().loadList();
       setState(() {
         restaurant = Restaurant.generateRestaurant(list: products);
+      });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      User().getUserInformation().then((value) => {
+        setState(() {
+          userInfo = value;
+        })
       });
     });
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
@@ -90,6 +95,9 @@ class _HomePageState extends State<HomePage> {
               isLogin = value;
             })
           });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      await getOrder();
     });
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       final count = await CartService().countItemInCart();
@@ -122,8 +130,12 @@ class _HomePageState extends State<HomePage> {
                                 color: const Color(0xFF1A1A1A), width: 2),
                             color: Colors.white),
                         padding: const EdgeInsets.all(15),
-                        child: SvgPicture.asset('assets/images/avatar.svg',
-                            width: 60)),
+                        child: isLogin == true ?
+                        Image.network(userInfo?.avatar ?? "" ,width: 60,
+                          errorBuilder: (context,exception,stackTrace) {
+                            return Image.asset("assets/temp/images/defaultAvatar.jpg", width: 60,);
+                          } )
+                       : Image.asset("assets/temp/images/defaultAvatar.jpg", width: 60,)),
                     const SizedBox(
                       width: 20,
                     ),
@@ -133,7 +145,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            isLogin == false ? "Anonymous" : "Your name",
+                            isLogin == false ? "Anonymous" : " ${userInfo?.firstName} ${userInfo?.lastName}",
                             style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.w500,
@@ -152,6 +164,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ],
                 )),
+                isLogin == true ?
             Expanded(
               child: ListView.separated(
                 separatorBuilder: (context, index) =>
@@ -159,33 +172,46 @@ class _HomePageState extends State<HomePage> {
                 itemCount: 3,
                 itemBuilder: (context, index) => Padding(
                   padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
-                  child: Row(children: [
-                    SvgPicture.asset(
-                      controls[index]['icon']!,
-                      width: 30,
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      controls[index]['text']!,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    )
-                  ]),
+                  child:
+                  GestureDetector(
+                    child:  Row(children: [
+                      SvgPicture.asset(
+                        controls[index]['icon']!,
+                        width: 30,
+                      ),
+                      const SizedBox(width: 15),
+                      Text(
+                        controls[index]['text']!,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      )
+                    ]),
+                    onTap: () async {
+                      await GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
+                      Navigator.pushNamed(context, controls[index]['routeName']!);
+                    },
+                  ),
                 ),
               ),
-            ),
+            ) : const Text(""),
+                isLogin == true ?
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 20),
               child: DangerousButton(
                   onPressed: (context) async {
                     await GlobalStorage.delete(key: "tokens");
                     await GlobalStorage.delete(key: "cart_id");
+                    await GlobalStorage.delete(
+                        key: "code");
+                    await GlobalStorage.delete(key: "id");
+                    await GlobalStorage.delete(
+                        key: "discount");
                     setState(() {
+                      countCartItems = 0;
                       isLogin = false;
-                      Navigator.pushNamed(context, HomePage.routeName);
                     });
                   },
                   text: "Log out"),
-            )
+            ) : const Text("")
           ]),
         ),
         borderRadius: const BorderRadius.vertical(
@@ -229,10 +255,10 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () async {
-
-                if(countCartItems >0)
+              onPressed: () {
+                if(countCartItems > 0)
                   {
+                    GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
                     Navigator.pushNamed(context, CartScreen.routeName)
                         .then((value) async {
                       await getOrder();

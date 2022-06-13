@@ -8,6 +8,7 @@ import 'package:flutter_svg/svg.dart';
 
 import '../../../../share/constants/storage.dart';
 import '../../../../size_config.dart';
+import '../../../../utils/notification.dart';
 import 'cart_card.dart';
 
 class Body extends StatefulWidget {
@@ -41,13 +42,19 @@ class _BodyState extends State<Body> {
                     key: Key(snapshot.data!.details[index].id.toString()),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
-                      setState(() {
+                      setState(() async {
                         deleteCart(
                             snapshot.data!.details[index].productId, 0);
                         snapshot.data!.details.removeAt(index);
-                        if(snapshot.data!.details.length == 0)
+                        if(snapshot.data!.details.isEmpty)
                           {
+                            await GlobalStorage.delete(
+                                key: "code");
+                            await GlobalStorage.delete(key: "id");
+                            await GlobalStorage.delete(
+                                key: "discount");
                             Navigator.pushNamed(context, HomePage.routeName);
+                            showNotify(context, "success", "Your Cart is empty now");
                           }
                       });
                     },

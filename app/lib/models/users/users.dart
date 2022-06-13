@@ -6,6 +6,8 @@ import 'package:app/models/tokens/tokens.dart';
 import 'package:app/models/users/auth.dart';
 import 'package:app/utils/api_service.dart';
 
+import '../../utils/notification.dart';
+
 // =================== User related models ===================
 
 UserResponse userFromJson(String str) =>
@@ -77,13 +79,14 @@ class GetUserInfo {
   String email;
   bool emailVerified;
   dynamic phoneNumber;
-  dynamic birthday;
+  DateTime birthday;
   String avatar;
   bool active;
 
   DateTime createdAt;
   DateTime updatedAt;
   String address;
+
   GetUserInfo(
     this.id,
     this.firstName,
@@ -106,7 +109,7 @@ class GetUserInfo {
         json["email"],
         json["email_verified"],
         json["phone_number"],
-        json["birthday"],
+        DateTime.parse(json["birthday"]),
         json["avatar"],
         json["active"],
         DateTime.parse(json["updated_at"]),
@@ -145,15 +148,39 @@ class User {
     return null;
   }
 
-  Future<dynamic> updateAddress(String address, String ward, String district, String city ) async {
+  Future<dynamic> updateAddress(context, String address, String ward,
+      String district, String city) async {
     try {
-      var response = await ApiService().post("/api/users/auth/addresses/update",
-          json.encode({"address": address, "ward": ward, "district": district, "city": city}));
-      {
-    }
+      var response = await ApiService().post(
+          "/api/users/auth/addresses/update",
+          json.encode({
+            "address": address,
+            "ward": ward,
+            "district": district,
+            "city": city
+          }));
       if (response.statusCode.toString().startsWith("2")) {
-        var tokens = Token.fromJson(responseFromJson(response.body).data);
-        return tokens;
+        showNotify(context, "success", "Address updated");
+      }
+    } catch (e) {
+      log(e.toString());
+    }
+    return null;
+  }
+
+  Future<dynamic> updateAccount(context, String lastName, String firstName,
+      String birthday, String phoneNumber, String avatar) async {
+    try {
+      var response =
+          await ApiService().put("/api/users/auth/info/update/single", {
+        "last_name": lastName,
+        "first_name": firstName,
+        "phone_number": phoneNumber,
+        "birthday": birthday,
+        "avatar": avatar
+      });
+      if (response.statusCode.toString().startsWith("2")) {
+        showNotify(context, "success", "Account updated");
       }
     } catch (e) {
       log(e.toString());
@@ -166,12 +193,7 @@ class User {
       var response = await ApiService().get("/api/users/auth/info/single");
       if (response.statusCode.toString().startsWith("2")) {
         var userInfoResponse =
-          GetUserInfo.fromJson(responseFromJson(response.body).data);
-        var address = userInfoResponse.address.split(",");
-        for(int i = 0; i<address.length;i++)
-          {
-            print(address[i]);
-          }
+            GetUserInfo.fromJson(responseFromJson(response.body).data);
         return userInfoResponse;
       }
     } catch (e) {
@@ -179,16 +201,16 @@ class User {
     }
     return Future.error(GetUserInfo);
   }
+
   Future<List<String>> getUserAddress() async {
     try {
       var response = await ApiService().get("/api/users/auth/info/single");
       if (response.statusCode.toString().startsWith("2")) {
         var userInfoResponse =
-        GetUserInfo.fromJson(responseFromJson(response.body).data);
-        var address = userInfoResponse.address.split(",");
-        for(int i = 0; i<address.length;i++)
-        {
-          print(address[i]);
+            GetUserInfo.fromJson(responseFromJson(response.body).data);
+        var address = userInfoResponse.address.split(", ");
+        for (int i = 0; i < address.length; i++) {
+          print(address[i].trim());
         }
         return address;
       }

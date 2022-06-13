@@ -44,7 +44,6 @@ dependencies:
   fluttertoast: ^8.0.9
   coupon_uikit: 0.0.1
   intl: 0.17.0
-
 dev_dependencies:
   flutter_test:
     sdk: flutter

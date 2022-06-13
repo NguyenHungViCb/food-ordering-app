@@ -6,10 +6,7 @@ import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
 import 'package:app/utils/notification.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/src/response.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 // =================== User related models ===================
 
@@ -172,7 +169,7 @@ class CartItems {
       return responseFromJson(response.body).data['succeeded_deletes'][0]
           ['quantity'];
     } catch (e) {
-      showNotify(context, "success", "Some error has occured");
+      //showNotify(context, "success", "Some error has occured");
       log(e.toString());
     }
     return null;

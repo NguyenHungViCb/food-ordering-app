@@ -1,12 +1,12 @@
-import 'package:app/screens/cart/update_address/update_address_screen.dart';
-import 'package:app/screens/home/home.dart';
 import 'package:flutter/material.dart';
 
+import '../../../share/constants/storage.dart';
 import 'components/body.dart';
 import 'components/check_out_card.dart';
 
 class CartScreen extends StatelessWidget {
   static String routeName = "/cart";
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -21,14 +21,19 @@ class CartScreen extends StatelessWidget {
     return AppBar(
       backgroundColor: const Color(0xFFFDBF30),
       leading: GestureDetector(
-        onTap: (){
-          Navigator.pushNamed(context, HomePage.routeName);
+        onTap: () async {
+          var routeName = await GlobalStorage.read(key: "previousRoute");
+          routeName == "details"
+              ? Navigator.pop(context)
+              : Navigator.pushNamed(context, routeName!);
         },
         child: const Icon(Icons.arrow_back_ios),
       ),
       title: Row(
         children: const [
-          SizedBox(width: 100,),
+          SizedBox(
+            width: 100,
+          ),
           Text(
             "Your Cart",
             style: TextStyle(color: Colors.black),

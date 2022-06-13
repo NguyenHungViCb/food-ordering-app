@@ -1,17 +1,18 @@
-import 'package:app/screens/cart/update_address/components/update_address_form.dart';
+import 'package:app/screens/home/account/components/update_account_form.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/cupertino.dart';
+
+import '../home.dart';
 
 
-class AddressPage extends StatelessWidget {
-  static String routeName="./address";
+class AccountPage extends StatelessWidget {
+  static String routeName="/account";
   @override
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
       backgroundColor: const Color(0xFFF5F5F5),
       appBar: buildAppBar(context),
-      body: AddressDetail(),
+      body: AccountDetail(),
     );
   }
 
@@ -20,7 +21,7 @@ class AddressPage extends StatelessWidget {
       backgroundColor: const Color(0xFFFDBF30),
       leading: GestureDetector(
         onTap: (){
-          Navigator.pop(context);
+          Navigator.pushNamed(context, HomePage.routeName);
         },
         child: const Icon(Icons.arrow_back_ios),
       ),
@@ -28,7 +29,7 @@ class AddressPage extends StatelessWidget {
         children: const [
           SizedBox(width: 80,),
           Text(
-            "Your Address",
+            "Your Information",
             style: TextStyle(color: Colors.black),
           ),
         ],

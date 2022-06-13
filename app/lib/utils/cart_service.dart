@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:app/models/api/base_response.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/share/constants/storage.dart';
@@ -17,20 +19,24 @@ class CartService {
 
   Future<int> countItemInCart() async
   {
-    var isLogin = await GlobalStorage.read(key: "tokens");
     var cartId = await GlobalStorage.read(key: "cart_id");
-    var response = await ApiService().get("/api/carts/active?cart_id=$cartId");
-
-    print(responseFromJson(response.body).data);
-    if (response.statusCode == 200) {
-      //var cartDetails = GetCartItems();
-      var cartResponse =
+    try{
+      var response = await ApiService().get("/api/carts/active?cart_id=$cartId");
+      print(responseFromJson(response.body).data);
+      if (response.statusCode == 200) {
+        var cartResponse =
         GetCartResponse.fromJson(responseFromJson(response.body).data);
-      return cartResponse.details.length;
-    } else {
-      // If the server did not return a 200 OK response,
-      // then throw an exception.
+        return cartResponse.details.length;
+      } else {
+        // If the server did not return a 200 OK response,
+        // then throw an exception.
+        return 0;
+      }
+    }
+    catch (e){
+      log(e.toString());
       return 0;
     }
+
   }
 }

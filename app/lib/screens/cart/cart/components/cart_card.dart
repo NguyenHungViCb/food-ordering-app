@@ -1,6 +1,5 @@
 import 'package:app/constants.dart';
 import 'package:app/models/product/product.dart';
-import 'package:app/screens/home/home.dart';
 import 'package:app/size_config.dart';
 import 'package:flutter/material.dart';
 
@@ -20,7 +19,8 @@ class CartCard extends StatelessWidget {
           return GestureDetector(
             onTap: () {
               //pageController.jumpToPage(int.parse(snapshot.data!.id));
-              //Navigator.pushNamed(context, HomePage.routeName, );
+              //Navigator.of(context).push(MaterialPageRoute(
+                //  builder: (context) => DetailPage()));
             },
             child: Container(
               decoration: BoxDecoration(

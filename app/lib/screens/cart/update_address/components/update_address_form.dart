@@ -1,16 +1,16 @@
 import 'package:app/components/default_button.dart';
-import 'package:app/screens/cart/cart/cart_screen.dart';
+import 'package:app/share/constants/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
 import '../../../../models/users/users.dart';
 
-class AccountDetail extends StatefulWidget {
+class AddressDetail extends StatefulWidget {
   @override
-  _AccountDetailState createState() => _AccountDetailState();
+  _AddressDetailState createState() => _AddressDetailState();
 }
 
-class _AccountDetailState extends State<AccountDetail> {
+class _AddressDetailState extends State<AddressDetail> {
   final addressInput = TextEditingController();
   final wardInput = TextEditingController();
   final districtInput = TextEditingController();
@@ -60,14 +60,15 @@ class _AccountDetailState extends State<AccountDetail> {
                           child: DefaultButton(
                               text: "Save",
                               press: () async {
-                                // Replace this hard code id by allow user to select voucher
-                                // You can pass null to skip apply voucher
                                 addOrUpdateAddress(
-                                    addressInput.text == "" ? snapshot.data[0] : addressInput.text,
-                                    wardInput.text == "" ? snapshot.data[1] : wardInput.text,
-                                    districtInput.text == "" ? snapshot.data[2] : districtInput.text,
-                                    cityInput.text == "" ? snapshot.data[3] : cityInput.text);
-                                Navigator.pushNamed(context,CartScreen.routeName);
+                                    context,
+                                    addressInput.text,
+                                    wardInput.text,
+                                    districtInput.text,
+                                    cityInput.text);
+                                String? routeName = await GlobalStorage.read(
+                                    key: "previousRoute");
+                                Navigator.pushNamed(context, routeName!);
                               })),
                       const SizedBox(
                         height: 15,
@@ -85,68 +86,66 @@ class _AccountDetailState extends State<AccountDetail> {
     return TextFormField(
       controller: addressInput,
       decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: "please input your address",
-          // If  you are using latest version of flutter then lable text and hint text shown like this
-          // if you r using flutter less then 1.20.* then maybe this is not working properly
-          floatingLabelBehavior: FloatingLabelBehavior.always,),
+        border: OutlineInputBorder(),
+        hintText: "please input your address",
+        // If  you are using latest version of flutter then lable text and hint text shown like this
+        // if you r using flutter less then 1.20.* then maybe this is not working properly
+        floatingLabelBehavior: FloatingLabelBehavior.always,
+      ),
     );
   }
 
   TextFormField wardFormField() {
     return TextFormField(
-      controller: wardInput,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: "Please input your ward",
-          // If  you are using latest version of flutter then lable text and hint text shown like this
-          // if you r using flutter less then 1.20.* then maybe this is not working properly
-          floatingLabelBehavior: FloatingLabelBehavior.always)
-    );
+        controller: wardInput,
+        decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: "Please input your ward",
+            // If  you are using latest version of flutter then lable text and hint text shown like this
+            // if you r using flutter less then 1.20.* then maybe this is not working properly
+            floatingLabelBehavior: FloatingLabelBehavior.always));
   }
 
   TextFormField districtTextFormField({String? district}) {
     return TextFormField(
-      controller: districtInput,
-      decoration: InputDecoration(
-          border: const OutlineInputBorder(),
-          hintText: district ?? "Please input your district",
-          // If  you are using latest version of flutter then lable text and hint text shown like this
-          // if you r using flutter less then 1.20.* then maybe this is not working properly
-          floatingLabelBehavior: FloatingLabelBehavior.always)
-    );
+        controller: districtInput,
+        decoration: InputDecoration(
+            border: const OutlineInputBorder(),
+            hintText: district ?? "Please input your district",
+            // If  you are using latest version of flutter then lable text and hint text shown like this
+            // if you r using flutter less then 1.20.* then maybe this is not working properly
+            floatingLabelBehavior: FloatingLabelBehavior.always));
   }
 
   TextFormField cityTextFormField() {
     return TextFormField(
-      controller: cityInput,
-      decoration: const InputDecoration(
-          border: OutlineInputBorder(),
-          hintText: "Please Input your city",
-          // If  you are using latest version of flutter then lable text and hint text shown like this
-          // if you r using flutter less then 1.20.* then maybe this is not working properly
-          floatingLabelBehavior: FloatingLabelBehavior.always)
-    );
+        controller: cityInput,
+        decoration: const InputDecoration(
+            border: OutlineInputBorder(),
+            hintText: "Please Input your city",
+            // If  you are using latest version of flutter then lable text and hint text shown like this
+            // if you r using flutter less then 1.20.* then maybe this is not working properly
+            floatingLabelBehavior: FloatingLabelBehavior.always));
   }
 
-  void addOrUpdateAddress(String? address, String? ward, String? district, String? city) async {
+  void addOrUpdateAddress(context, String? address, String? ward,
+      String? district, String? city) async {
     try {
-      await User().updateAddress(address!, ward!, district!, city!);
+      await User().updateAddress(context, address!, ward!, district!, city!);
     } catch (e) {
       return null;
     }
   }
-  void getUserAddress() async
-  {
+
+  void getUserAddress() async {
     try {
       var listAddress = await User().getUserAddress();
-      if(listAddress.isNotEmpty)
-        {
-          addressInput.text = listAddress[0];
-          wardInput.text = listAddress[1];
-          districtInput.text = listAddress[2];
-          cityInput.text = listAddress[3];
-        }
+      if (listAddress.isNotEmpty) {
+        addressInput.text = listAddress[0];
+        wardInput.text = listAddress[1];
+        districtInput.text = listAddress[2];
+        cityInput.text = listAddress[3];
+      }
     } catch (e) {
       return null;
     }

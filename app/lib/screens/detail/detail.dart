@@ -8,7 +8,6 @@ import 'package:app/share/constants/colors.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/cart_service.dart';
 import 'package:app/utils/user_service.dart';
-import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:fluttertoast/fluttertoast.dart';
@@ -172,6 +171,7 @@ class _DetailPageState extends State<DetailPage> {
           onPressed: () async {
             if(countCartItems >0 || inCart > 0)
             {
+              GlobalStorage.write(key: "previousRoute", value: "details");
               Navigator.pushNamed(context, CartScreen.routeName)
                   .then((value) async => {await getQuantityInCart()});
             }

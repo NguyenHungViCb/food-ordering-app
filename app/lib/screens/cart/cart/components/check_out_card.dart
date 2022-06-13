@@ -102,6 +102,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           String? savedToken =
                               await GlobalStorage.read(key: "tokens");
                           if (savedToken != null) {
+                            await GlobalStorage.write(key: "previousRoute", value: CartScreen.routeName);
                             Navigator.pushNamed(context, AddressPage.routeName)
                                 .then((_) => setState(() {}));
                           } else {

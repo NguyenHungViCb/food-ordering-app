@@ -14,7 +14,6 @@ class VoucherPage extends StatefulWidget {
 }
 
 class VoucherPageState extends State<VoucherPage> {
-  final _formKey = GlobalKey<FormState>();
   final noteController = TextEditingController();
   late Future<List<GetVouchersResponse>?> voucher;
 
@@ -129,22 +128,13 @@ class VoucherPageState extends State<VoucherPage> {
                                                   snapshot.data![index].id,
                                                   snapshot.data![index].code,
                                                   snapshot.data![index].discount);
-                                              await Navigator.pushNamed(context, CartScreen.routeName);
+                                              await Navigator.popAndPushNamed(context, CartScreen.routeName);
 
                                               });
                                           },
                                         )
                                       ],
                                     ),
-                                    // const Text(
-                                    //   'Coupon Code',
-                                    //   textAlign: TextAlign.center,
-                                    //   style: TextStyle(
-                                    //     fontSize: 11,
-                                    //     fontWeight: FontWeight.bold,
-                                    //     color: Colors.black54,
-                                    //   ),
-                                    // ),
                                     const SizedBox(height: 4),
                                     Text(
                                       snapshot.data![index].code,
