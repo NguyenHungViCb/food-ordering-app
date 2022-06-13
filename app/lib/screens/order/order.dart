@@ -176,7 +176,7 @@ class _OrderScreenState extends State<OrderScreen> {
                       value: status['confirmed'],
                     )),
                     SvgPicture.asset(
-                      'assets/images/cooking.svg',
+                      'assets/images/pot.svg',
                       width: 24,
                       height: 24,
                     ),
@@ -237,12 +237,7 @@ class _OrderScreenState extends State<OrderScreen> {
                           ),
                           Text.rich(
                             TextSpan(
-                              text: "\$${order.details.reduce((value, element) {
-                                value.total = (int.parse(value.total) +
-                                        int.parse(element.total))
-                                    .toString();
-                                return value;
-                              }).total}",
+                              text: "\$${order.total.toString()}",
                               style: const TextStyle(
                                   fontWeight: FontWeight.w600,
                                   color: kPrimaryColor2),
@@ -282,88 +277,93 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
-            Column(
-              children: [
-                SizedBox(
-                    width: MediaQuery.of(context).size.width * 100,
-                    child: DangerousButton(
-                        onPressed: (context) async {
-                          var result = await OrderService().cancelOrder();
-                          if (result == null) {
-                            FToast().init(context).showToast(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xfffa5252),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/images/error.svg",
-                                        width: 18,
+            order.allowCancel
+                ? Column(
+                    children: [
+                      SizedBox(
+                          width: MediaQuery.of(context).size.width * 100,
+                          child: DangerousButton(
+                              onPressed: (context) async {
+                                var result = await OrderService().cancelOrder();
+                                if (result == null) {
+                                  FToast().init(context).showToast(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        decoration: const BoxDecoration(
+                                            color: Color(0xfffa5252),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5))),
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/images/error.svg",
+                                              width: 18,
+                                            ),
+                                            const SizedBox(
+                                              width: 20,
+                                            ),
+                                            const Text(
+                                              "An error has occured",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      const SizedBox(
-                                        width: 20,
+                                      /* backgroundColor: const Color(0xfffa5252), */
+                                      gravity: ToastGravity.CENTER,
+                                      toastDuration: const Duration(seconds: 3),
+                                      positionedToastBuilder: (context, child) {
+                                        return Positioned(
+                                            child: child, top: 150, left: 80);
+                                      });
+                                } else {
+                                  await GlobalStorage.write(
+                                      key: "isCheckouted", value: "true");
+                                  FToast().init(context).showToast(
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                            horizontal: 20, vertical: 10),
+                                        decoration: const BoxDecoration(
+                                            color: Color(0xff37b24d),
+                                            borderRadius: BorderRadius.all(
+                                                Radius.circular(5))),
+                                        child: Row(
+                                          children: [
+                                            SvgPicture.asset(
+                                              "assets/images/error.svg",
+                                              width: 18,
+                                            ),
+                                            const SizedBox(
+                                              width: 20,
+                                            ),
+                                            const Text(
+                                              "Canceled order successful",
+                                              style: TextStyle(
+                                                  color: Colors.white),
+                                            )
+                                          ],
+                                        ),
                                       ),
-                                      const Text(
-                                        "An error has occured",
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                /* backgroundColor: const Color(0xfffa5252), */
-                                gravity: ToastGravity.CENTER,
-                                toastDuration: const Duration(seconds: 3),
-                                positionedToastBuilder: (context, child) {
-                                  return Positioned(
-                                      child: child, top: 150, left: 80);
-                                });
-                          } else {
-                            await GlobalStorage.write(
-                                key: "isCheckouted", value: "true");
-                            FToast().init(context).showToast(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xff37b24d),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/images/error.svg",
-                                        width: 18,
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      const Text(
-                                        "Canceled order successful",
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    ],
-                                  ),
-                                ),
-                                /* backgroundColor: const Color(0xfffa5252), */
-                                gravity: ToastGravity.CENTER,
-                                toastDuration: const Duration(seconds: 3),
-                                positionedToastBuilder: (context, child) {
-                                  return Positioned(
-                                      child: child, top: 150, left: 80);
-                                });
-                            Navigator.popUntil(
-                                context,
-                                (route) =>
-                                    route.settings.name == HomePage.routeName);
-                          }
-                        },
-                        text: "Cancel"))
-              ],
-            )
+                                      /* backgroundColor: const Color(0xfffa5252), */
+                                      gravity: ToastGravity.CENTER,
+                                      toastDuration: const Duration(seconds: 3),
+                                      positionedToastBuilder: (context, child) {
+                                        return Positioned(
+                                            child: child, top: 150, left: 80);
+                                      });
+                                  Navigator.popUntil(
+                                      context,
+                                      (route) =>
+                                          route.settings.name ==
+                                          HomePage.routeName);
+                                }
+                              },
+                              text: "Cancel"))
+                    ],
+                  )
+                : const SizedBox.shrink()
           ],
         ),
       ),

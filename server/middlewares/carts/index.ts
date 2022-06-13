@@ -1,6 +1,9 @@
 import { red } from "colors";
 import { NextFunction, Request, Response } from "express";
+import { Model } from "sequelize";
 import Cart from "../../models/cart";
+import CartDetail from "../../models/cart/detail";
+import { UserCreation, UserModel } from "../../types/user/userInterfaces";
 import { queryToNum } from "../../utils/validations/assertions";
 
 const activeCartValidate = async (
@@ -92,10 +95,40 @@ const getUnAuthCartDecorator = (
   };
 };
 
+const attachExistCartToUser = async (
+  cartId: string | number,
+  user: Model<UserCreation, UserModel | UserCreation>
+) => {
+  console.log({ cartId });
+  const existCart = await Cart.findByPk(cartId);
+  console.log({ existCart: existCart?.get() });
+  if (existCart) {
+    const userCart = await Cart.findOne({
+      where: { user_id: user.getDataValue("id") },
+    });
+    if (
+      userCart &&
+      userCart.getDataValue("id") !== existCart.getDataValue("id")
+    ) {
+      await CartDetail.update(
+        { cart_id: userCart.getDataValue("id") },
+        { where: { cart_id: existCart.getDataValue("id") } }
+      );
+    } else if (!userCart) {
+      console.log({ userId: user.getDataValue("id") });
+      await Cart.update(
+        { user_id: user.getDataValue("id") },
+        { where: { id: existCart.getDataValue("id") } }
+      );
+    }
+  }
+};
+
 export {
   upsertActiveCartValidate,
   activeCartValidate,
   unAuthCartDecorator,
   getUnAuthCart,
-  getUnAuthCartDecorator
+  getUnAuthCartDecorator,
+  attachExistCartToUser,
 };

@@ -6,6 +6,7 @@ import 'package:app/screens/home/account/update_account_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/order/order.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/search/search.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:flutter/widgets.dart';
 
@@ -20,5 +21,6 @@ final Map<String, WidgetBuilder> routes = {
   AddCard.routeName: (context) => const AddCard(),
   OrderScreen.routeName: (context) => const OrderScreen(),
   AddressPage.routeName: (context) => AddressPage(),
-  AccountPage.routeName: (context) => AccountPage()
+  AccountPage.routeName: (context) => AccountPage(),
+  SearchScreen.routeName: (context) => const SearchScreen()
 };

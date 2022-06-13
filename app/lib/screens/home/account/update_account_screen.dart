@@ -1,9 +1,6 @@
 import 'package:app/screens/home/account/components/update_account_form.dart';
 import 'package:flutter/material.dart';
 
-import '../home.dart';
-
-
 class AccountPage extends StatelessWidget {
   static String routeName="/account";
   @override
@@ -21,7 +18,7 @@ class AccountPage extends StatelessWidget {
       backgroundColor: const Color(0xFFFDBF30),
       leading: GestureDetector(
         onTap: (){
-          Navigator.pushNamed(context, HomePage.routeName);
+          Navigator.pop(context);
         },
         child: const Icon(Icons.arrow_back_ios),
       ),

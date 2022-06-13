@@ -92,6 +92,8 @@ class CartItems {
   Future<double> sum() async {
     double sum = 0;
     var cartId = await GlobalStorage.read(key: "cart_id");
+    var voucherPercent = await GlobalStorage.read(key: "discount");
+
     var getCartResponse =
         await ApiService().get("/api/carts/active?cart_id=$cartId");
     if (getCartResponse.statusCode == 200) {
@@ -114,6 +116,11 @@ class CartItems {
           throw Exception('Failed to load product');
         }
       }
+      if(voucherPercent != null)
+        {
+          sum = sum - sum*double.parse(voucherPercent)*0.01;
+        }
+
       return sum;
     } else {
       // If the server did not return a 200 OK getCartResponse,

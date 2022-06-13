@@ -12,6 +12,9 @@ import {
 } from "../../utils/routeConfig";
 import { isArray } from "../../utils/validations/assertions";
 import { imageToArray } from "../../utils/modelUtils";
+import { Op } from "sequelize";
+import Category from "../../models/category";
+import { imagesToArray } from "../../utils/commons";
 
 const path = "/products";
 @controller
@@ -32,6 +35,37 @@ class ProductController {
     return res
       .status(200)
       .json({ message: "success", data: products, success: true });
+  }
+
+  @routeConfig({ method: "get", path: `${path}/search` })
+  async searchAll(req: Request, res: Response, __: NextFunction) {
+    let { keyword } = req.query;
+    if (typeof keyword !== "string") {
+      throw new Error(JSON.stringify({ code: 400, message: "invalid format" }));
+    }
+    let products = await Product.findAndCountAll({
+      where: { name: { [Op.iLike]: `%${keyword}%` } },
+    });
+    if (products.rows.length === 0) {
+      products = await Product.findAndCountAll({
+        limit: 10,
+        include: [
+          {
+            model: Category,
+            where: { name: { [Op.iLike]: `%${keyword}%` } },
+            as: "products",
+          },
+        ],
+      });
+    }
+    const transformedData = {
+      count: products.count,
+      rows: products.rows.map((product) => ({
+        ...product.get(),
+        images: imagesToArray(product.getDataValue("images")),
+      })),
+    };
+    return res.json({ data: transformedData, success: true });
   }
 
   @routeDescription({
