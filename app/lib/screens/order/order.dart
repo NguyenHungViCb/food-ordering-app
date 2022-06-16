@@ -164,10 +164,7 @@ class _OrderScreenState extends State<OrderScreen> {
                                 color: Colors.red,
                                 width: 32,
                               ),
-                              Text(
-                                  "51 Thành Thái, Phường 12, Quận 10, Hồ Chí Minh"
-                                          .substring(0, 35) +
-                                      "...")
+                              Text(order.address)
                             ]),
                         const SizedBox(
                           height: 15,

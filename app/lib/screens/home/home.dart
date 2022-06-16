@@ -100,13 +100,14 @@ class _HomePageState extends State<HomePage> {
 
     print({isCheckouted: isCheckouted});
     if (isCheckouted == "true") {
-      getOrder();
+      await getOrder();
+      await GlobalStorage.delete(key: "isCheckouted");
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    checkoutOrder();
+    // checkoutOrder();
     return Scaffold(
       backgroundColor: kBackground,
       // background color main
@@ -165,51 +166,45 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-        onPressed: () {
-          if(countCartItems > 0)
-          {
-            GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
-            Navigator.pushNamed(context, CartScreen.routeName)
-                .then((value) async {
-              await getOrder();
-            });
-          }
-          else {
-            FToast().init(context).showToast(
-                child: Container(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 20, vertical: 10),
-                  decoration: const BoxDecoration(
-                      color: Color(0xfffa5252),
-                      borderRadius: BorderRadius.all(
-                          Radius.circular(5))),
-                  child: Row(
-                    children: [
-                      SvgPicture.asset(
-                        "assets/images/error.svg",
-                        width: 18,
+              onPressed: () {
+                if (countCartItems > 0) {
+                  GlobalStorage.write(
+                      key: "previousRoute", value: HomePage.routeName);
+                  Navigator.pushNamed(context, CartScreen.routeName)
+                      .then((value) async {
+                    await getOrder();
+                  });
+                } else {
+                  FToast().init(context).showToast(
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 10),
+                        decoration: const BoxDecoration(
+                            color: Color(0xfffa5252),
+                            borderRadius: BorderRadius.all(Radius.circular(5))),
+                        child: Row(
+                          children: [
+                            SvgPicture.asset(
+                              "assets/images/error.svg",
+                              width: 18,
+                            ),
+                            const SizedBox(
+                              width: 20,
+                            ),
+                            const Text(
+                              "Your cart is empty",
+                              style: TextStyle(color: Colors.white),
+                            )
+                          ],
+                        ),
                       ),
-                      const SizedBox(
-                        width: 20,
-                      ),
-                      const Text(
-                        "Your cart is empty",
-                        style: TextStyle(
-                            color: Colors.white),
-                      )
-                    ],
-                  ),
-                ),
-                /* backgroundColor: const Color(0xfffa5252), */
-                gravity: ToastGravity.CENTER,
-                toastDuration:
-                const Duration(seconds: 3),
-                positionedToastBuilder:
-                    (context, child) {
-                  return Positioned(
-                      child: child, top: 150, left: 80);
-                });
-          }
+                      /* backgroundColor: const Color(0xfffa5252), */
+                      gravity: ToastGravity.CENTER,
+                      toastDuration: const Duration(seconds: 3),
+                      positionedToastBuilder: (context, child) {
+                        return Positioned(child: child, top: 150, left: 80);
+                      });
+                }
               },
               backgroundColor: kPrimaryColor,
               elevation: 2,

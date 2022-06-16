@@ -100,7 +100,12 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   Row(
                     children: [
                       InkWell(
-                        child: Text(address ?? "Add address"),
+                        child: Expanded(
+                          child: Text(
+                            address ?? "Add address",
+                            overflow: TextOverflow.visible,
+                          ),
+                        ),
                         onTap: () async {
                           String? savedToken =
                               await GlobalStorage.read(key: "tokens");
