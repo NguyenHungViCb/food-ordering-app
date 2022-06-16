@@ -1,7 +1,6 @@
 import 'package:app/routes.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/share/constants/app_config.dart';
-import 'package:app/share/constants/storage.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_stripe/flutter_stripe.dart';

@@ -68,9 +68,11 @@ class UserController {
   })
   @routeConfig({ method: "post", path: `${path}/login/local` })
   async login(req: Request, res: Response, __: NextFunction) {
-    requireValues([...req.body]);
+    const { cart_id, ...rest } = req.body;
+    requireValues([...rest]);
     const user = await User.findOne({ where: { email: req.body.email } });
     if (user) {
+      await attachExistCartToUser(cart_id, user);
       if (user.getDataValue("password") !== req.body.password) {
         throw new Error("UnAuthorized. Wrong email or password");
       }
@@ -131,7 +133,7 @@ class UserController {
       last_name,
       birthday,
       avatar,
-	  phone_number
+      phone_number,
     });
     const values = getAttributesData(updated, [
       "id",

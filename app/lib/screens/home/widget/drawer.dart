@@ -151,6 +151,8 @@ class _CustomDrawerState extends State<CustomDrawer> {
                         await GlobalStorage.delete(key: "code");
                         await GlobalStorage.delete(key: "id");
                         await GlobalStorage.delete(key: "discount");
+                        await GlobalStorage.delete(key: "voucher_id");
+                        await GlobalStorage.delete(key: "user_info");
                         widget.setIsLogin(false);
                         widget.setCountCartItems(0);
                       },

@@ -94,18 +94,19 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  // checkoutOrder() async {
-  //   var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
-  //   await GlobalStorage.delete(key: "isCheckouted");
+  checkoutOrder() async {
+    var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
+    await GlobalStorage.delete(key: "isCheckouted");
 
-  //   print({isCheckouted: isCheckouted});
-  //   if (isCheckouted == "true") {
-  //     getOrder();
-  //   }
-  // }
+    print({isCheckouted: isCheckouted});
+    if (isCheckouted == "true") {
+      getOrder();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    checkoutOrder();
     return Scaffold(
       backgroundColor: kBackground,
       // background color main

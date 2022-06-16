@@ -54,6 +54,8 @@ class OrderController {
             originalTotal -
             (originalTotal * voucher.getDataValue("discount")) / 100;
         }
+      } else {
+        orderTotal = originalTotal;
       }
       return res.json({
         data: {
@@ -222,6 +224,8 @@ class OrderController {
                 // @ts-ignore
                 data.getDataValue("voucher").getDataValue("discount")) /
                 100;
+          } else {
+            orderTotal = originalTotal;
           }
           const transformedDetails = // @ts-ignore
             (data.getDataValue("details") as any[]).map((detail) => ({

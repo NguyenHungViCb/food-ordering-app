@@ -1,4 +1,4 @@
-import { red } from "colors";
+import { green, red } from "colors";
 import { NextFunction, Request, Response } from "express";
 import { Model } from "sequelize";
 import Cart from "../../models/cart";
@@ -99,9 +99,8 @@ const attachExistCartToUser = async (
   cartId: string | number,
   user: Model<UserCreation, UserModel | UserCreation>
 ) => {
-  console.log({ cartId });
+  console.log(green("CartId"));
   const existCart = await Cart.findByPk(cartId);
-  console.log({ existCart: existCart?.get() });
   if (existCart) {
     const userCart = await Cart.findOne({
       where: { user_id: user.getDataValue("id") },

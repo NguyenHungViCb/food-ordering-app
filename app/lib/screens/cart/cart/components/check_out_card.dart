@@ -2,19 +2,20 @@ import 'dart:convert';
 
 import 'package:app/models/users/users.dart';
 import 'package:app/screens/cart/cart/cart_screen.dart';
-import 'package:app/screens/cart/cart/components/address.dart';
 import 'package:app/screens/cart/update_address/update_address_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/screens/cart/voucher/voucher_page.dart';
 import 'package:app/screens/payment/payment.dart';
+import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/order_service.dart';
 import 'package:app/utils/payment_service.dart';
+import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
-import 'package:http/http.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 
@@ -104,7 +105,9 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           String? savedToken =
                               await GlobalStorage.read(key: "tokens");
                           if (savedToken != null) {
-                            await GlobalStorage.write(key: "previousRoute", value: CartScreen.routeName);
+                            await GlobalStorage.write(
+                                key: "previousRoute",
+                                value: CartScreen.routeName);
                             Navigator.pushNamed(context, AddressPage.routeName)
                                 .then((_) => setState(() {}));
                           } else {
@@ -314,18 +317,50 @@ class _CheckoutCardState extends State<CheckoutCard> {
                         child: DefaultButton(
                             text: "Check Out",
                             press: () async {
-                              // Replace this hard code id by allow user to select voucher
-                              // You can pass null to skip apply voucher
-                              var response = await PaymentService.checkout(
-                                  context, paymentMethod, "test");
-                              if (response["error"] != true) {
-                                await GlobalStorage.write(
-                                    key: "isCheckouted", value: "true");
-                                Navigator.popUntil(
-                                    context,
-                                    (route) =>
-                                        route.settings.name ==
-                                        HomePage.routeName);
+                              var isLogin = await UserService().isLogin();
+                              if (isLogin) {
+                                if (paymentMethod == null ||
+                                    paymentMethod['card']['last4'] == null ||
+                                    paymentMethod['card']['last4'] == "") {
+                                  actionRequire(context, "No payment method",
+                                      "Please add a payment method", () {
+                                    Navigator.of(context).pop();
+                                    Navigator.pushNamed(
+                                        context, Payment.routeName);
+                                  });
+                                } else {
+                                  var responseOrder =
+                                      await OrderService().fetchOnGoingOrder();
+                                  if (responseOrder.id != "0") {
+                                    actionRequire(context, "Order exist",
+                                        "You cannot order when having ongoing one",
+                                        () {
+                                      Navigator.of(context).pop();
+                                    }, true);
+                                  } else {
+                                    // Replace this hard code id by allow user to select voucher
+                                    // You can pass null to skip apply voucher
+                                    var response =
+                                        await PaymentService.checkout(
+                                            context, paymentMethod, address);
+                                    if (response["error"] != true) {
+                                      await GlobalStorage.write(
+                                          key: "isCheckouted", value: "true");
+                                      Navigator.popUntil(
+                                          context,
+                                          (route) =>
+                                              route.settings.name ==
+                                              HomePage.routeName);
+                                    }
+                                  }
+                                }
+                              } else {
+                                actionRequire(context, "Login required",
+                                    "You need to login to continue", () {
+                                  Navigator.of(context).pop();
+                                  Navigator.pushNamed(
+                                      context, WelcomeScreen.routeName);
+                                });
                               }
                             }),
                       ),
@@ -334,6 +369,32 @@ class _CheckoutCardState extends State<CheckoutCard> {
                 ],
               ),
             ),
+          );
+        });
+  }
+
+  actionRequire(context, String title, String content, Function onconfirm,
+      [bool hideDiscard = false]) {
+    showDialog(
+        context: context,
+        builder: (BuildContext ctx) {
+          return AlertDialog(
+            title: Text(title),
+            content: Text(content),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    onconfirm();
+                  },
+                  child: const Text("Continue")),
+              hideDiscard == true
+                  ? const SizedBox.shrink()
+                  : TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                      child: const Text("No"))
+            ],
           );
         });
   }
@@ -378,8 +439,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
         setState(() {
           checkAddress = true;
         });
-      }
-      else {
+      } else {
         setState(() {
           checkAddress = false;
         });
@@ -387,16 +447,15 @@ class _CheckoutCardState extends State<CheckoutCard> {
     });
   }
 
-    Future<void> getAddressTest()
-    async {
-      var getAddress = await User().getUserAddress();
-      if(getAddress.isNotEmpty)
-        {
-          address = joinAddress(getAddress);
-        }
-    }
-    String joinAddress(List<String>? addressInfo) {
-      var address = addressInfo?.join(", ").trim();
-      return address!;
+  Future<void> getAddressTest() async {
+    var getAddress = await User().getUserAddress();
+    if (getAddress.isNotEmpty) {
+      address = joinAddress(getAddress);
     }
   }
+
+  String joinAddress(List<String>? addressInfo) {
+    var address = addressInfo?.join(", ").trim();
+    return address!;
+  }
+}
