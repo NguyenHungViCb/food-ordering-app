@@ -20,7 +20,7 @@ class _EmailState extends State<Email> {
       keyboardType: TextInputType.emailAddress,
       controller: widget.controller,
       autovalidateMode: AutovalidateMode.onUserInteraction,
-      decoration: commonInputDecoration("Email *"),
+      decoration: commonInputDecoration("Phone number *"),
       validator: (value) {
         if (value != null &&
             !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")

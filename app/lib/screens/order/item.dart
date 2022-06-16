@@ -1,4 +1,3 @@
-import 'package:app/constants.dart';
 import 'package:app/models/order/orders.dart';
 import 'package:app/models/product/product.dart';
 import 'package:app/size_config.dart';
@@ -11,7 +10,7 @@ class OrderItemCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<GetSingleProductResponse>(
-        future: ProductItems().getSingleProduct(int.parse(item.productId)),
+        future: ProductItems().getSingleProduct(item.productId),
         builder: (context, snapshot) {
           if (snapshot.hasData) {
             return Container(
