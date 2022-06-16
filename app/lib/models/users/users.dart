@@ -109,7 +109,7 @@ class GetUserInfo {
         json["email"],
         json["email_verified"],
         json["phone_number"],
-        DateTime.parse(json["birthday"]),
+        json["birthday"] != null ? DateTime.parse(json["birthday"]) : "",
         json["avatar"],
         json["active"],
         DateTime.parse(json["updated_at"]),
