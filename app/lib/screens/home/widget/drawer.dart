@@ -42,7 +42,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
       "routeName": OrderManagement.routeName
     },
     {
-      "icon": 'assets/images/location.svg',
+      "icon": 'assets/images/location-primary.svg',
       "text": "Address",
       "routeName": "./address"
     }

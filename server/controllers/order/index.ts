@@ -169,6 +169,8 @@ class OrderController {
                   // @ts-ignore
                   row.getDataValue("voucher").getDataValue("discount")) /
                   100;
+            } else {
+              orderTotal = originalTotal;
             }
           }
           return {
