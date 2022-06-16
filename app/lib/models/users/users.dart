@@ -109,7 +109,9 @@ class GetUserInfo {
         json["email"],
         json["email_verified"],
         json["phone_number"],
-        json["birthday"] != null ? DateTime.parse(json["birthday"]) : "",
+        json["birthday"] != null
+            ? DateTime.parse(json["birthday"])
+            : json["birthday"],
         json["avatar"],
         json["active"],
         DateTime.parse(json["updated_at"]),
@@ -174,14 +176,39 @@ class User {
   Future<dynamic> updateAccount(context, String lastName, String firstName,
       String birthday, String phoneNumber, String avatar) async {
     try {
+      var request;
+
+      if (phoneNumber == "" && birthday == "") {
+        request = {
+          "last_name": lastName,
+          "first_name": firstName,
+          "avatar": avatar
+        };
+      } else if (birthday == "") {
+        request = {
+          "last_name": lastName,
+          "first_name": firstName,
+          "phone_number": phoneNumber,
+          "avatar": avatar
+        };
+      } else if (phoneNumber == "") {
+        request = {
+          "last_name": lastName,
+          "first_name": firstName,
+          "birthday": birthday,
+          "avatar": avatar
+        };
+      } else {
+        request = {
+          "last_name": lastName,
+          "first_name": firstName,
+          "phone_number": phoneNumber,
+          "birthday": birthday,
+          "avatar": avatar
+        };
+      }
       var response =
-          await ApiService().put("/api/users/auth/info/update/single", {
-        "last_name": lastName,
-        "first_name": firstName,
-        "phone_number": phoneNumber,
-        "birthday": birthday,
-        "avatar": avatar
-      });
+          await ApiService().put("/api/users/auth/info/update/single", {request});
       if (response.statusCode.toString().startsWith("2")) {
         showNotify(context, "success", "Account updated");
       }
@@ -200,7 +227,7 @@ class User {
         return userInfoResponse;
       }
     } catch (e) {
-      log("userinfo"+e.toString());
+      log("userinfo" + e.toString());
     }
     return Future.error(GetUserInfo);
   }
@@ -212,7 +239,7 @@ class User {
         var userInfoResponse =
             GetUserInfo.fromJson(responseFromJson(response.body).data);
         List<String> address = List<String>.empty();
-        if(userInfoResponse.address != null) {
+        if (userInfoResponse.address != null) {
           address = userInfoResponse.address!.split(", ");
         }
         for (int i = 0; i < address.length; i++) {
@@ -221,7 +248,7 @@ class User {
         return address;
       }
     } catch (e) {
-      log("address"+e.toString());
+      log("address" + e.toString());
     }
     return List.empty();
   }
