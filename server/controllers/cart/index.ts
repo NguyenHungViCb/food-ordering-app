@@ -158,7 +158,7 @@ class CartController {
         failedInserts.push(result.failedInsert);
       }
     }
-    await cart.update({ total });
+    await cart.increment({ total: total });
     return res.json({
       ...(failedInserts.length > 0
         ? { message: "The operation succeed with error" }

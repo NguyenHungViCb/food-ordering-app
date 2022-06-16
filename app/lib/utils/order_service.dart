@@ -8,8 +8,23 @@ import 'package:app/utils/api_service.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class OrderService {
-  final ResponseOrder _nullSafety = ResponseOrder("0", "0", "", "", "", "", "",
-      "", "0", "", "", [OrderDetail('', '', '', 0, "0", '', '')], 0, false);
+  final ResponseOrder _nullSafety = ResponseOrder(
+      "0",
+      "0",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "",
+      "0",
+      "",
+      "",
+      [OrderDetail('', '', '', 0, "0", '', '')],
+      0,
+      false,
+      null,
+      0);
   get nullSafety {
     return _nullSafety;
   }
@@ -38,6 +53,20 @@ class OrderService {
       return null;
     } catch (e) {
       return null;
+    }
+  }
+
+  Future<ResponseOrder> fetchOrderById(String id) async {
+    try {
+      var response = await ApiService().get('/api/orders/$id');
+      if (response.statusCode == 200) {
+        var decoded = responseFromJson(response.body).data;
+        return ResponseOrder.fromJson(decoded);
+      }
+      return _nullSafety;
+    } catch (e) {
+      print(e);
+      return _nullSafety;
     }
   }
 }
@@ -108,7 +137,7 @@ class OrderSocket {
 }
 
 class OrderProgressService {
-  Map<String, double?> status = {
+  Map<String, dynamic> status = {
     "pending": 0,
     "confirmed": 0,
     "processing": 0,
@@ -117,7 +146,7 @@ class OrderProgressService {
     "cancelled": 0
   };
 
-  Map<String, double?> getStatus(ResponseOrder order) {
+  Map<String, dynamic> getStatus(ResponseOrder order) {
     orderStatus.forEach((key, value) {
       if (orderStatus[order.status] != null) {
         if (value < (orderStatus[order.status] as int)) {

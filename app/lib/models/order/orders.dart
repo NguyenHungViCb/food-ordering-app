@@ -13,6 +13,8 @@ class ResponseOrder {
   List<OrderDetail> details;
   dynamic total;
   bool allowCancel;
+  Voucher? voucher;
+  dynamic originalTotal;
 
   ResponseOrder(
       this.id,
@@ -28,7 +30,9 @@ class ResponseOrder {
       this.updatedAt,
       this.details,
       this.total,
-      this.allowCancel);
+      this.allowCancel,
+      this.voucher,
+      this.originalTotal);
 
   factory ResponseOrder.fromJson(Map<dynamic, dynamic> json) => ResponseOrder(
       json['id'],
@@ -45,7 +49,9 @@ class ResponseOrder {
       List<OrderDetail>.from(
           json['details'].map((item) => OrderDetail.fromJson(item))),
       json['total'],
-      json['allowCancel']);
+      json['allowCancel'],
+      json['voucher'] != null ? Voucher.fromJson(json['voucher']) : null,
+      json['original_total']);
 
   toJson() => {
         "id": id,
@@ -82,4 +88,12 @@ class OrderDetail {
       json['total'],
       json['created_at'],
       json['updated_at']);
+}
+
+class Voucher {
+  String code;
+  dynamic discount;
+  Voucher(this.code, this.discount);
+  factory Voucher.fromJson(Map<String, dynamic> json) =>
+      Voucher(json['code'], json['discount']);
 }

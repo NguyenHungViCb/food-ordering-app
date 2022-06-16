@@ -154,6 +154,7 @@ class CartItems {
       //var cartDetails = GetCartItems();
       var cartResponse =
           GetCartResponse.fromJson(responseFromJson(response.body).data);
+      await GlobalStorage.write(key: "cart_id", value: cartResponse.id);
       return cartResponse;
     } else {
       // If the server did not return a 200 OK response,

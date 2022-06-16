@@ -1,3 +1,4 @@
+import 'package:app/screens/order_management/order_management_screen.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
@@ -38,7 +39,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
     {
       "icon": 'assets/images/shopping-bag.svg',
       "text": "Orders",
-      "routeName": "/input route here"
+      "routeName": OrderManagement.routeName
     },
     {
       "icon": 'assets/images/location.svg',

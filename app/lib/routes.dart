@@ -5,6 +5,8 @@ import 'package:app/screens/cart/voucher/voucher_page.dart';
 import 'package:app/screens/home/account/update_account_screen.dart';
 import 'package:app/screens/home/home.dart';
 import 'package:app/screens/order/order.dart';
+import 'package:app/screens/order_management/details.dart';
+import 'package:app/screens/order_management/order_management_screen.dart';
 import 'package:app/screens/payment/payment.dart';
 import 'package:app/screens/search/search.dart';
 import 'package:app/screens/welcome/welcome.dart';
@@ -22,5 +24,7 @@ final Map<String, WidgetBuilder> routes = {
   OrderScreen.routeName: (context) => const OrderScreen(),
   AddressPage.routeName: (context) => AddressPage(),
   AccountPage.routeName: (context) => AccountPage(),
-  SearchScreen.routeName: (context) => const SearchScreen()
+  SearchScreen.routeName: (context) => const SearchScreen(),
+  OrderManagement.routeName: (context) => const OrderManagement(),
+  OrderDetail.routeName: ((context) => const OrderDetail())
 };

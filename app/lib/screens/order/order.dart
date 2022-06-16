@@ -1,9 +1,11 @@
 import 'package:app/constants.dart';
 import 'package:app/screens/order/item.dart';
+import 'package:app/screens/order_management/details.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
 import 'package:app/models/order/orders.dart';
 import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/notification.dart';
 import 'package:app/utils/order_service.dart';
 import 'package:app/widgets/custom_app_bar.dart';
 import 'package:flutter/material.dart';
@@ -45,67 +47,12 @@ class _OrderScreenState extends State<OrderScreen> {
       ResponseOrder _order = await OrderService().fetchOnGoingOrder();
       if (_order.id == "0") {
         if (data == 'canceled') {
-          FToast().init(context).showToast(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: const BoxDecoration(
-                    color: Color(0xfffa5252),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/images/error.svg",
-                      width: 18,
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    const Text(
-                      "Order has been canceled. A refund will be transfer to your account soon",
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-              /* backgroundColor: const Color(0xfffa5252), */
-              gravity: ToastGravity.CENTER,
-              toastDuration: const Duration(seconds: 3),
-              positionedToastBuilder: (context, child) {
-                return Positioned(child: child, top: 150, left: 80);
-              });
+          showNotify(context, "success",
+              "Order has been canceled. A refund will be transfer to your account soon");
           Navigator.popUntil(
               context, (route) => route.settings.name == HomePage.routeName);
         } else {
-          FToast().init(context).showToast(
-              child: Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                decoration: const BoxDecoration(
-                    color: Color(0xfffa5252),
-                    borderRadius: BorderRadius.all(Radius.circular(5))),
-                child: Row(
-                  children: [
-                    SvgPicture.asset(
-                      "assets/images/error.svg",
-                      width: 18,
-                    ),
-                    const SizedBox(
-                      width: 20,
-                    ),
-                    const Text(
-                      "Order has complete",
-                      style: TextStyle(color: Colors.white),
-                    )
-                  ],
-                ),
-              ),
-              /* backgroundColor: const Color(0xfffa5252), */
-              gravity: ToastGravity.CENTER,
-              toastDuration: const Duration(seconds: 3),
-              positionedToastBuilder: (context, child) {
-                return Positioned(child: child, top: 150, left: 80);
-              });
+          showNotify(context, "success", "Order has complete");
           Navigator.popUntil(
               context, (route) => route.settings.name == HomePage.routeName);
         }
@@ -119,7 +66,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     fetchOrder();
-    Map<String, double?> status = OrderProgressService().getStatus(order);
+    Map<String, dynamic> status = OrderProgressService().getStatus(order);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
@@ -207,43 +154,114 @@ class _OrderScreenState extends State<OrderScreen> {
                     decoration: const BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.all(Radius.circular(20))),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    child: Column(
                       children: [
-                        const Text(
-                          "Total",
-                          style: TextStyle(
-                              fontWeight: FontWeight.w600,
-                              fontSize: 16,
-                              color: Color(0xFF495057)),
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              SvgPicture.asset(
+                                "assets/images/location.svg",
+                                color: Colors.red,
+                                width: 32,
+                              ),
+                              Text(
+                                  "51 Thành Thái, Phường 12, Quận 10, Hồ Chí Minh"
+                                          .substring(0, 35) +
+                                      "...")
+                            ]),
+                        const SizedBox(
+                          height: 15,
                         ),
-                        Row(children: [
-                          order.paymentMethod == "visa"
-                              ? SvgPicture.asset(
-                                  'assets/images/visa.svg',
-                                  width: 34,
-                                )
-                              : order.paymentMethod == "mastercard"
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "SubTotal",
+                              style: TextStyle(color: Color(0xFF495057)),
+                            ),
+                            Text.rich(
+                              TextSpan(
+                                text: "\$${order.originalTotal.toString()}",
+                                style: const TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: Colors.black),
+                              ),
+                            )
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text("Voucher"),
+                            order.voucher != null
+                                ? Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                        const Text("Voucher"),
+                                        Row(
+                                          children: [
+                                            Text(order.voucher!.code),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            const Text("•"),
+                                            const SizedBox(
+                                              width: 5,
+                                            ),
+                                            Text(
+                                                "-\$${dp(order.originalTotal - order.total, 2)}")
+                                          ],
+                                        )
+                                      ])
+                                : const SizedBox.shrink(),
+                          ],
+                        ),
+                        const SizedBox(
+                          height: 10,
+                        ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            const Text(
+                              "Total",
+                              style: TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 16,
+                                  color: Color(0xFF495057)),
+                            ),
+                            Row(children: [
+                              order.paymentMethod == "visa"
                                   ? SvgPicture.asset(
-                                      'assets/images/mastercard.svg',
+                                      'assets/images/visa.svg',
                                       width: 34,
                                     )
-                                  : SvgPicture.asset(
-                                      'assets/images/paypal.svg',
-                                      width: 34,
-                                    ),
-                          const SizedBox(
-                            width: 10,
-                          ),
-                          Text.rich(
-                            TextSpan(
-                              text: "\$${order.total.toString()}",
-                              style: const TextStyle(
-                                  fontWeight: FontWeight.w600,
-                                  color: kPrimaryColor2),
-                            ),
-                          ),
-                        ])
+                                  : order.paymentMethod == "mastercard"
+                                      ? SvgPicture.asset(
+                                          'assets/images/mastercard.svg',
+                                          width: 34,
+                                        )
+                                      : SvgPicture.asset(
+                                          'assets/images/paypal.svg',
+                                          width: 34,
+                                        ),
+                              const SizedBox(
+                                width: 10,
+                              ),
+                              Text.rich(
+                                TextSpan(
+                                  text: "\$${order.total.toString()}",
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: kPrimaryColor2),
+                                ),
+                              ),
+                            ])
+                          ],
+                        )
                       ],
                     ),
                   ),
