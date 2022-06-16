@@ -41,7 +41,7 @@ class GetSingleProductResponse {
 }
 
 class ProductItems {
-  Future<GetSingleProductResponse> getSingleProduct(int id) async {
+  Future<GetSingleProductResponse> getSingleProduct(dynamic id) async {
     var response = await ApiService().get("/api/products/$id");
     final Map parsed = json.decode(response.body);
     if (response.statusCode == 200) {

@@ -1,3 +1,4 @@
+import 'package:app/screens/order_management/order_management_screen.dart';
 import 'package:app/screens/welcome/welcome.dart';
 import 'package:app/share/buttons/danger_button.dart';
 import 'package:app/share/constants/colors.dart';
@@ -18,9 +19,13 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final controls = [
-    {"icon": 'assets/images/account.svg', "text": "Account"},
-    {"icon": 'assets/images/shopping-bag.svg', "text": "Orders"},
-    {"icon": 'assets/images/location.svg', "text": "Address"}
+    {"icon": 'assets/images/account.svg', "text": "Account", "href": ""},
+    {
+      "icon": 'assets/images/shopping-bag.svg',
+      "text": "Orders",
+      "href": OrderManagement.routeName
+    },
+    {"icon": 'assets/images/location.svg', "text": "Address", "href": ""}
   ];
   @override
   Widget build(BuildContext context) {
@@ -53,7 +58,7 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.isLogin == false ? "Anonymous" : "Your name",
+                          widget.isLogin == false ? "Anonymous" : "Nguyễn Hùng Vĩ",
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
@@ -79,17 +84,23 @@ class _CustomDrawerState extends State<CustomDrawer> {
               itemCount: 3,
               itemBuilder: (context, index) => Padding(
                 padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
-                child: Row(children: [
-                  SvgPicture.asset(
-                    controls[index]['icon']!,
-                    width: 30,
-                  ),
-                  const SizedBox(width: 15),
-                  Text(
-                    controls[index]['text']!,
-                    style: const TextStyle(fontWeight: FontWeight.w500),
-                  )
-                ]),
+                child: GestureDetector(
+                  onTap: () {
+                    Navigator.pushNamed(
+                        context, controls[index]['href'] as String);
+                  },
+                  child: Row(children: [
+                    SvgPicture.asset(
+                      controls[index]['icon']!,
+                      width: 30,
+                    ),
+                    const SizedBox(width: 15),
+                    Text(
+                      controls[index]['text']!,
+                      style: const TextStyle(fontWeight: FontWeight.w500),
+                    )
+                  ]),
+                ),
               ),
             ),
           ),
