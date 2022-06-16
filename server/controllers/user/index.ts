@@ -70,7 +70,9 @@ class UserController {
   async login(req: Request, res: Response, __: NextFunction) {
     const { cart_id, ...rest } = req.body;
     requireValues([...rest]);
-    const user = await User.findOne({ where: { email: req.body.email } });
+    const user = await User.findOne({
+      where: { phone_number: req.body.phone_number },
+    });
     if (user) {
       await attachExistCartToUser(cart_id, user);
       if (user.getDataValue("password") !== req.body.password) {

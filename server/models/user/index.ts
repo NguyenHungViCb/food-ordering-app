@@ -24,7 +24,7 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
       validate: {
         isEmail: true,
       },
@@ -37,6 +37,7 @@ const User = sequelize.define<Model<UserCreation, UserModel | UserCreation>>(
     },
     phone_number: {
       type: DataTypes.STRING,
+      allowNull: false,
       unique: true,
     },
     password: {

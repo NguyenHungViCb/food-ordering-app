@@ -142,7 +142,7 @@ class User {
       var response = await ApiService().post(
           "/api/users/login/local",
           json.encode(
-              {"email": email, "password": password, "cart_id": cartId}));
+              {"phone_number": email, "password": password, "cart_id": cartId}));
       if (response.statusCode.toString().startsWith("2")) {
         var tokens = Token.fromJson(responseFromJson(response.body).data);
         return tokens;

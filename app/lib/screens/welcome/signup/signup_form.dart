@@ -96,7 +96,7 @@ class SignupFormState extends State<SignupForm> {
     var user = await User().localSignup(LocalSignupRequest(
         firstName: firstNameController.text,
         lastName: lastNameController.text,
-        email: emailController.text,
+        phoneNumber: emailController.text,
         password: passwordController.text,
         confirmPass: confirmPassController.text,
         cartId: cartId));

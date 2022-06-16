@@ -22,12 +22,8 @@ class _EmailState extends State<Email> {
       autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: commonInputDecoration("Phone number *"),
       validator: (value) {
-        if (value != null &&
-            !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
-                .hasMatch(value)) {
-          return "Email not valid";
-        } else if (value == null || value == '') {
-          return "Email must not be empty";
+        if (value == null || value == '') {
+          return "Phone number must not be empty";
         }
         return null;
       },

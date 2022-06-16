@@ -3,14 +3,14 @@
 class LocalSignupRequest {
   String firstName;
   String lastName;
-  String email;
+  String phoneNumber;
   String password;
   String confirmPass;
   String? cartId;
   LocalSignupRequest(
       {required this.firstName,
       required this.lastName,
-      required this.email,
+      required this.phoneNumber,
       required this.password,
       required this.confirmPass,
       this.cartId});
@@ -18,7 +18,7 @@ class LocalSignupRequest {
   Map<String, dynamic> toJson() => {
         "first_name": firstName,
         "last_name": lastName,
-        "email": email,
+        "phone_number": phoneNumber,
         "password": password,
         "confirm_pass": confirmPass,
         "cart_id": cartId
