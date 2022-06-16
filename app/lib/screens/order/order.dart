@@ -66,7 +66,7 @@ class _OrderScreenState extends State<OrderScreen> {
   @override
   Widget build(BuildContext context) {
     fetchOrder();
-    Map<String, dynamic> status = OrderProgressService().getStatus(order);
+    Map<String, double?> status = OrderProgressService().getStatus(order);
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
