@@ -6,10 +6,7 @@ import 'package:app/models/product/product.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
 import 'package:app/utils/notification.dart';
-import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:http/src/response.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 
 // =================== User related models ===================
 
@@ -95,6 +92,8 @@ class CartItems {
   Future<double> sum() async {
     double sum = 0;
     var cartId = await GlobalStorage.read(key: "cart_id");
+    var voucherPercent = await GlobalStorage.read(key: "discount");
+
     var getCartResponse =
         await ApiService().get("/api/carts/active?cart_id=$cartId");
     if (getCartResponse.statusCode == 200) {
@@ -117,6 +116,11 @@ class CartItems {
           throw Exception('Failed to load product');
         }
       }
+      if(voucherPercent != null)
+        {
+          sum = sum - sum*double.parse(voucherPercent)*0.01;
+        }
+
       return sum;
     } else {
       // If the server did not return a 200 OK getCartResponse,
@@ -173,7 +177,7 @@ class CartItems {
       return responseFromJson(response.body).data['succeeded_deletes'][0]
           ['quantity'];
     } catch (e) {
-      showNotify(context, "success", "Some error has occured");
+      //showNotify(context, "success", "Some error has occured");
       log(e.toString());
     }
     return null;
@@ -205,7 +209,6 @@ class CartItems {
         var cartResponse =
             CartResponse.fromJson(responseFromJson(response.body).data);
         await GlobalStorage.write(key: "cart_id", value: cartResponse.id);
-        await GlobalStorage.read(key: "cart_id").then((value) => print(value));
         if (cartResponse.failedInserts.isNotEmpty) {
           showNotify(
               context,

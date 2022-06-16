@@ -14,7 +14,6 @@ class VoucherPage extends StatefulWidget {
 }
 
 class VoucherPageState extends State<VoucherPage> {
-  final _formKey = GlobalKey<FormState>();
   final noteController = TextEditingController();
   late Future<List<GetVouchersResponse>?> voucher;
 
@@ -78,7 +77,7 @@ class VoucherPageState extends State<VoucherPage> {
                                         ),
                                       ),
                                     ),
-                                    Divider(
+                                    const Divider(
                                         color: Colors.white, height: 5),
                                     Expanded(
                                       child: Center(
@@ -123,22 +122,19 @@ class VoucherPageState extends State<VoucherPage> {
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold),
                                           ),
-                                          onTap: () {
-                                            addVouchersHandler(context,
-                                                snapshot.data![index].id);
+                                          onTap: () async {
+                                            setState(() async {
+                                              addVouchersHandler(context,
+                                                  snapshot.data![index].id,
+                                                  snapshot.data![index].code,
+                                                  snapshot.data![index].discount);
+                                              await Navigator.popAndPushNamed(context, CartScreen.routeName);
+
+                                              });
                                           },
                                         )
                                       ],
                                     ),
-                                    // const Text(
-                                    //   'Coupon Code',
-                                    //   textAlign: TextAlign.center,
-                                    //   style: TextStyle(
-                                    //     fontSize: 11,
-                                    //     fontWeight: FontWeight.bold,
-                                    //     color: Colors.black54,
-                                    //   ),
-                                    // ),
                                     const SizedBox(height: 4),
                                     Text(
                                       snapshot.data![index].code,
@@ -176,9 +172,9 @@ class VoucherPageState extends State<VoucherPage> {
     );
   }
 
-  void addVouchersHandler(context, id) async {
+  void addVouchersHandler(context, id, code, discount) async {
     GlobalStorage.write(key: "voucher_id", value: id);
-    GlobalStorage.read(key: "voucher_id").then((value) => print(value));
-    Navigator.pushNamed(context, CartScreen.routeName);
+    GlobalStorage.write(key: "code", value: code);
+    GlobalStorage.write(key: "discount", value: discount.toString());
   }
 }

@@ -125,12 +125,13 @@ class UserController {
   })
   async updateInfo(req: Request, res: Response, __: NextFunction) {
     const { user } = req;
-    const { first_name, last_name, birthday, avatar } = req.body;
+    const { first_name, last_name, birthday, avatar, phone_number } = req.body;
     const updated = await updateIfExist(user, {
       first_name,
       last_name,
       birthday,
       avatar,
+	  phone_number
     });
     const values = getAttributesData(updated, [
       "id",

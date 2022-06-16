@@ -6,11 +6,23 @@ import 'package:app/share/constants/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
+import '../../../models/users/users.dart';
+import '../home.dart';
+
 class CustomDrawer extends StatefulWidget {
   final bool isLogin;
   final Function setIsLogin;
+  final int countCartItems;
+  final Function setCountCartItems;
+  final GetUserInfo? userInfo;
+
   const CustomDrawer(
-      {Key? key, required this.isLogin, required this.setIsLogin})
+      {Key? key,
+      required this.isLogin,
+      required this.setIsLogin,
+      required this.countCartItems,
+      required this.setCountCartItems,
+      required this.userInfo})
       : super(key: key);
 
   @override
@@ -19,14 +31,23 @@ class CustomDrawer extends StatefulWidget {
 
 class _CustomDrawerState extends State<CustomDrawer> {
   final controls = [
-    {"icon": 'assets/images/account.svg', "text": "Account", "href": ""},
+    {
+      "icon": 'assets/images/account.svg',
+      "text": "Account",
+      "routeName": "/account"
+    },
     {
       "icon": 'assets/images/shopping-bag.svg',
       "text": "Orders",
-      "href": OrderManagement.routeName
+      "routeName": OrderManagement.routeName
     },
-    {"icon": 'assets/images/location.svg', "text": "Address", "href": ""}
+    {
+      "icon": 'assets/images/location.svg',
+      "text": "Address",
+      "routeName": "./address"
+    }
   ];
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -47,8 +68,19 @@ class _CustomDrawerState extends State<CustomDrawer> {
                               color: const Color(0xFF1A1A1A), width: 2),
                           color: Colors.white),
                       padding: const EdgeInsets.all(15),
-                      child: SvgPicture.asset('assets/images/avatar.svg',
-                          width: 60)),
+                      child: widget.isLogin == true
+                          ? Image.network(widget.userInfo?.avatar ?? "",
+                              width: 60,
+                              errorBuilder: (context, exception, stackTrace) {
+                              return Image.asset(
+                                "assets/temp/images/defaultAvatar.jpg",
+                                width: 60,
+                              );
+                            })
+                          : Image.asset(
+                              "assets/temp/images/defaultAvatar.jpg",
+                              width: 60,
+                            )),
                   const SizedBox(
                     width: 20,
                   ),
@@ -58,7 +90,9 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          widget.isLogin == false ? "Anonymous" : "Nguyễn Hùng Vĩ",
+                          widget.isLogin == false
+                              ? "Guest"
+                              : "${widget.userInfo?.firstName} ${widget.userInfo?.lastName}",
                           style: const TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w500,
@@ -77,33 +111,35 @@ class _CustomDrawerState extends State<CustomDrawer> {
                   ),
                 ],
               )),
+              widget.isLogin ?
           Expanded(
             child: ListView.separated(
               separatorBuilder: (context, index) =>
                   const Divider(color: Colors.black),
               itemCount: 3,
               itemBuilder: (context, index) => Padding(
-                padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
-                child: GestureDetector(
-                  onTap: () {
-                    Navigator.pushNamed(
-                        context, controls[index]['href'] as String);
-                  },
-                  child: Row(children: [
-                    SvgPicture.asset(
-                      controls[index]['icon']!,
-                      width: 30,
-                    ),
-                    const SizedBox(width: 15),
-                    Text(
-                      controls[index]['text']!,
-                      style: const TextStyle(fontWeight: FontWeight.w500),
-                    )
-                  ]),
-                ),
-              ),
+                  padding: const EdgeInsets.fromLTRB(20, 10, 10, 20),
+                  child: GestureDetector(
+                    child: Row(children: [
+                      SvgPicture.asset(
+                        controls[index]['icon']!,
+                        width: 30,
+                      ),
+                      const SizedBox(width: 15),
+                      Text(
+                        controls[index]['text']!,
+                        style: const TextStyle(fontWeight: FontWeight.w500),
+                      )
+                    ]),
+                    onTap: () async {
+                      await GlobalStorage.write(
+                          key: "previousRoute", value: HomePage.routeName);
+                      Navigator.pushNamed(
+                          context, controls[index]['routeName']!);
+                    },
+                  )),
             ),
-          ),
+          ) : const SizedBox.shrink(),
           widget.isLogin
               ? Padding(
                   padding:
@@ -112,7 +148,11 @@ class _CustomDrawerState extends State<CustomDrawer> {
                       onPressed: (context) async {
                         await GlobalStorage.delete(key: "tokens");
                         await GlobalStorage.delete(key: "cart_id");
+                        await GlobalStorage.delete(key: "code");
+                        await GlobalStorage.delete(key: "id");
+                        await GlobalStorage.delete(key: "discount");
                         widget.setIsLogin(false);
+                        widget.setCountCartItems(0);
                       },
                       text: "Log out"),
                 )

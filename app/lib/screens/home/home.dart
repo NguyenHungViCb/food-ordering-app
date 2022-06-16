@@ -13,8 +13,13 @@ import 'package:app/utils/order_service.dart';
 import 'package:app/utils/product_service.dart';
 import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:app/screens/home/widget/drawer.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
+import '../../models/users/users.dart';
+import '../../share/constants/storage.dart';
+import '../../utils/cart_service.dart';
 import '../../widgets/custom_app_bar.dart';
 
 class HomePage extends StatefulWidget {
@@ -33,6 +38,8 @@ class _HomePageState extends State<HomePage> {
   List<Category> categories = [CategoryService().nullSafety];
   bool isLogin = false;
   ResponseOrder order = OrderService().nullSafety;
+  int countCartItems = 0;
+  GetUserInfo? userInfo;
 
   getOrder() async {
     var responseOrder = await OrderService().fetchOnGoingOrder();
@@ -72,6 +79,19 @@ class _HomePageState extends State<HomePage> {
     WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
       await getOrder();
     });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      User().getUserInformation().then((value) => {
+            setState(() {
+              userInfo = value;
+            })
+          });
+    });
+    WidgetsBinding.instance.addPostFrameCallback((timeStamp) async {
+      final count = await CartService().countItemInCart();
+      setState(() {
+        countCartItems = count;
+      });
+    });
   }
 
   // checkoutOrder() async {
@@ -90,12 +110,22 @@ class _HomePageState extends State<HomePage> {
       backgroundColor: kBackground,
       // background color main
       drawer: CustomDrawer(
-          isLogin: isLogin,
-          setIsLogin: (value) {
-            setState(() {
-              isLogin = value;
-            });
-          }),
+        isLogin: isLogin,
+        setIsLogin: (value) {
+          setState(() {
+            isLogin = value;
+          });
+        },
+        countCartItems: countCartItems,
+        setCountCartItems: (value) {
+          setState(
+            () {
+              countCartItems = value;
+            },
+          );
+        },
+        userInfo: userInfo,
+      ),
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(100),
         child: CustomAppBar(Icons.menu_sharp, Icons.search_outlined,
@@ -134,11 +164,51 @@ class _HomePageState extends State<HomePage> {
       ),
       floatingActionButton: order.id == "0"
           ? FloatingActionButton(
-              onPressed: () async {
-                await Navigator.pushNamed(context, CartScreen.routeName)
-                    .then((value) {
-                  getOrder();
+        onPressed: () {
+          if(countCartItems > 0)
+          {
+            GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
+            Navigator.pushNamed(context, CartScreen.routeName)
+                .then((value) async {
+              await getOrder();
+            });
+          }
+          else {
+            FToast().init(context).showToast(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 20, vertical: 10),
+                  decoration: const BoxDecoration(
+                      color: Color(0xfffa5252),
+                      borderRadius: BorderRadius.all(
+                          Radius.circular(5))),
+                  child: Row(
+                    children: [
+                      SvgPicture.asset(
+                        "assets/images/error.svg",
+                        width: 18,
+                      ),
+                      const SizedBox(
+                        width: 20,
+                      ),
+                      const Text(
+                        "Your cart is empty",
+                        style: TextStyle(
+                            color: Colors.white),
+                      )
+                    ],
+                  ),
+                ),
+                /* backgroundColor: const Color(0xfffa5252), */
+                gravity: ToastGravity.CENTER,
+                toastDuration:
+                const Duration(seconds: 3),
+                positionedToastBuilder:
+                    (context, child) {
+                  return Positioned(
+                      child: child, top: 150, left: 80);
                 });
+          }
               },
               backgroundColor: kPrimaryColor,
               elevation: 2,

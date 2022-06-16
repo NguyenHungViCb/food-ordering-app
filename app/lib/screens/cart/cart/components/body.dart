@@ -2,11 +2,13 @@ import 'dart:developer';
 
 import 'package:app/models/cart/getcart/cart.dart';
 import 'package:app/models/product/product.dart';
+import 'package:app/screens/home/home.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
 import '../../../../share/constants/storage.dart';
 import '../../../../size_config.dart';
+import '../../../../utils/notification.dart';
 import 'cart_card.dart';
 
 class Body extends StatefulWidget {
@@ -40,10 +42,20 @@ class _BodyState extends State<Body> {
                     key: Key(snapshot.data!.details[index].id.toString()),
                     direction: DismissDirection.endToStart,
                     onDismissed: (direction) {
-                      setState(() {
+                      setState(() async {
                         deleteCart(
-                            snapshot.data!.details[index].productId, null);
+                            snapshot.data!.details[index].productId, 0);
                         snapshot.data!.details.removeAt(index);
+                        if(snapshot.data!.details.isEmpty)
+                          {
+                            await GlobalStorage.delete(
+                                key: "code");
+                            await GlobalStorage.delete(key: "id");
+                            await GlobalStorage.delete(
+                                key: "discount");
+                            Navigator.pushNamed(context, HomePage.routeName);
+                            showNotify(context, "success", "Your Cart is empty now");
+                          }
                       });
                     },
                     background: Container(
@@ -164,7 +176,7 @@ class _BodyState extends State<Body> {
 
   void addCart(String id, int? quantity) async {
     try {
-      var response = await CartItems().addCart(context, id, quantity);
+      await CartItems().addCart(context, id, quantity);
     } catch (e) {
       log(e.toString());
     }
@@ -172,7 +184,7 @@ class _BodyState extends State<Body> {
 
   void getStock(String id) async {
     try {
-      var response = await CartItems().getStock(id);
+      await CartItems().getStock(id);
     } catch (e) {
       log(e.toString());
     }
