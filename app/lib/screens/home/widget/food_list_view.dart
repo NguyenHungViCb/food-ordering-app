@@ -9,9 +9,10 @@ class FoodListView extends StatelessWidget {
   final PageController pageController;
   // final Restaurant restaurant;
   final List<Category> categories;
+  final Function getOrder;
 
-  const FoodListView(
-      this.selected, this.callback, this.pageController, this.categories);
+  const FoodListView(this.selected, this.callback, this.pageController,
+      this.categories, this.getOrder);
 
   @override
   Widget build(BuildContext context) {
@@ -26,9 +27,11 @@ class FoodListView extends StatelessWidget {
                 padding: EdgeInsets.zero,
                 itemBuilder: (context, index) => GestureDetector(
                     onTap: () {
-                      Navigator.of(context).push(MaterialPageRoute(
-                          builder: (context) => DetailPage(
-                              categories[selected].products[index])));
+                      Navigator.of(context)
+                          .push(MaterialPageRoute(
+                              builder: (context) => DetailPage(
+                                  categories[selected].products[index])))
+                          .whenComplete(() => getOrder(context));
                     },
                     child: FoodItem(categories[selected].products[index])),
                 separatorBuilder: (_, index) => const SizedBox(height: 15),

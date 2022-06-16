@@ -97,68 +97,71 @@ class _CheckoutCardState extends State<CheckoutCard> {
                       ? const Text("Delivery to:")
                       : const SizedBox(height: 0),
                   const SizedBox(height: 10),
-                  Row(
-                    children: [
-                      InkWell(
-                        child: Expanded(
-                          child: Text(
-                            address ?? "Add address",
-                            overflow: TextOverflow.visible,
+                  ClipRect(
+                    child: Row(
+                      children: [
+                        InkWell(
+                          child: SizedBox(
+                            width: 270,
+                            child: Text(address ?? "Add address",
+                                style: const TextStyle(
+                                    overflow: TextOverflow.ellipsis)),
                           ),
-                        ),
-                        onTap: () async {
-                          String? savedToken =
-                              await GlobalStorage.read(key: "tokens");
-                          if (savedToken != null) {
-                            await GlobalStorage.write(
-                                key: "previousRoute",
-                                value: CartScreen.routeName);
-                            Navigator.pushNamed(context, AddressPage.routeName)
-                                .then((_) => setState(() {}));
-                          } else {
-                            FToast().init(context).showToast(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 20, vertical: 10),
-                                  decoration: const BoxDecoration(
-                                      color: Color(0xfffa5252),
-                                      borderRadius:
-                                          BorderRadius.all(Radius.circular(5))),
-                                  child: Row(
-                                    children: [
-                                      SvgPicture.asset(
-                                        "assets/images/error.svg",
-                                        width: 18,
-                                      ),
-                                      const SizedBox(
-                                        width: 20,
-                                      ),
-                                      const Text(
-                                        "Please login to view/update address",
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    ],
+                          onTap: () async {
+                            String? savedToken =
+                                await GlobalStorage.read(key: "tokens");
+                            if (savedToken != null) {
+                              await GlobalStorage.write(
+                                  key: "previousRoute",
+                                  value: CartScreen.routeName);
+                              Navigator.pushNamed(
+                                      context, AddressPage.routeName)
+                                  .then((_) => setState(() {}));
+                            } else {
+                              FToast().init(context).showToast(
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 20, vertical: 10),
+                                    decoration: const BoxDecoration(
+                                        color: Color(0xfffa5252),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(5))),
+                                    child: Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          "assets/images/error.svg",
+                                          width: 18,
+                                        ),
+                                        const SizedBox(
+                                          width: 20,
+                                        ),
+                                        const Text(
+                                          "Please login to view/update address",
+                                          style: TextStyle(color: Colors.white),
+                                        )
+                                      ],
+                                    ),
                                   ),
-                                ),
-                                /* backgroundColor: const Color(0xfffa5252), */
-                                gravity: ToastGravity.CENTER,
-                                toastDuration: const Duration(seconds: 3),
-                                positionedToastBuilder: (context, child) {
-                                  return Positioned(
-                                      child: child, top: 150, left: 80);
-                                });
-                          }
-                        },
-                      ),
-                      const Spacer(
-                        flex: 2,
-                      ),
-                      const Icon(
-                        Icons.arrow_forward_ios,
-                        size: 12,
-                        color: kTextColor,
-                      )
-                    ],
+                                  /* backgroundColor: const Color(0xfffa5252), */
+                                  gravity: ToastGravity.CENTER,
+                                  toastDuration: const Duration(seconds: 3),
+                                  positionedToastBuilder: (context, child) {
+                                    return Positioned(
+                                        child: child, top: 150, left: 80);
+                                  });
+                            }
+                          },
+                        ),
+                        const Spacer(
+                          flex: 2,
+                        ),
+                        const Icon(
+                          Icons.arrow_forward_ios,
+                          size: 12,
+                          color: kTextColor,
+                        )
+                      ],
+                    ),
                   ),
                   const SizedBox(height: 10),
                   const Divider(color: Colors.black, height: 15),

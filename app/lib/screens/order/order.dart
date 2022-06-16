@@ -164,7 +164,13 @@ class _OrderScreenState extends State<OrderScreen> {
                                 color: Colors.red,
                                 width: 32,
                               ),
-                              Text(order.address)
+                              SizedBox(
+                                width: 250,
+                                child: Text(
+                                  order.address,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
                             ]),
                         const SizedBox(
                           height: 15,

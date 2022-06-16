@@ -41,7 +41,7 @@ class _HomePageState extends State<HomePage> {
   int countCartItems = 0;
   GetUserInfo? userInfo;
 
-  getOrder() async {
+  Future<void> getOrder() async {
     var responseOrder = await OrderService().fetchOnGoingOrder();
     setState(() {
       order = responseOrder;
@@ -94,7 +94,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
-  checkoutOrder() async {
+  // @override
+  // void dispose() {
+  //   super.dispose();
+  // }
+
+  checkoutOrder(context) async {
     var isCheckouted = await GlobalStorage.read(key: "isCheckouted");
     await GlobalStorage.delete(key: "isCheckouted");
 
@@ -107,6 +112,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print("RUN");
     // checkoutOrder();
     return Scaffold(
       backgroundColor: kBackground,
@@ -150,16 +156,16 @@ class _HomePageState extends State<HomePage> {
               setState(() {
                 selected = index;
               });
-            }, pageController, categories),
+            }, pageController, categories, checkoutOrder),
           ),
           GestureDetector(
             child: OrderProgressCard(
               order: order,
               updateOrder: updateOrder,
             ),
-            onTap: () async {
-              await Navigator.pushNamed(context, OrderScreen.routeName)
-                  .then((value) => getOrder());
+            onTap: () {
+              Navigator.pushNamed(context, OrderScreen.routeName)
+                  .whenComplete(() => getOrder());
             },
           )
         ],
@@ -171,8 +177,8 @@ class _HomePageState extends State<HomePage> {
                   GlobalStorage.write(
                       key: "previousRoute", value: HomePage.routeName);
                   Navigator.pushNamed(context, CartScreen.routeName)
-                      .then((value) async {
-                    await getOrder();
+                      .whenComplete(() {
+                    getOrder();
                   });
                 } else {
                   FToast().init(context).showToast(

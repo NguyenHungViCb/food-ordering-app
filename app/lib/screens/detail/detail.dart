@@ -76,20 +76,25 @@ class _DetailPageState extends State<DetailPage> {
     var isLogin = await UserService().isLogin();
     if (isLogin == true) {
       var _count = await CartService().count(widget.food.id as String);
-      setState(() {
-        counter = _count;
-        inCart = _count;
-      });
-    } else {
-      var cartId = await GlobalStorage.read(key: "cart_id");
-      if (cartId != null) {
-        var _count = await CartService().count(widget.food.id!, cartId);
+      if (mounted == true) {
         setState(() {
           counter = _count;
           inCart = _count;
         });
       }
+    } else {
+      var cartId = await GlobalStorage.read(key: "cart_id");
+      if (cartId != null) {
+        var _count = await CartService().count(widget.food.id!, cartId);
+        if (mounted == true) {
+          setState(() {
+            counter = _count;
+            inCart = _count;
+          });
+        }
+      }
     }
+    print("END");
   }
 
   @override
@@ -105,16 +110,20 @@ class _DetailPageState extends State<DetailPage> {
       });
     });
   }
+
   AppBar buildAppBar(BuildContext context) {
     return AppBar(
       backgroundColor: const Color(0xFFFFFFFF),
       leading: GestureDetector(
         onTap: () => Navigator.pushNamed(context, HomePage.routeName),
-        child: const Icon(Icons.arrow_back_ios_outlined, color: Color(
-            0xFF000000),),
+        child: const Icon(
+          Icons.arrow_back_ios_outlined,
+          color: Color(0xFF000000),
+        ),
       ),
     );
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -169,21 +178,23 @@ class _DetailPageState extends State<DetailPage> {
             ],
           ),
           onPressed: () async {
-            if(countCartItems >0 || inCart > 0)
-            {
+            if (countCartItems > 0 || inCart > 0) {
               GlobalStorage.write(key: "previousRoute", value: "details");
               Navigator.pushNamed(context, CartScreen.routeName)
-                  .then((value) async => {await getQuantityInCart()});
-            }
-            else {
+                  .then((value) async {
+                if (mounted == true) {
+                  print("IN TREE");
+                  await getQuantityInCart();
+                }
+              });
+            } else {
               FToast().init(context).showToast(
                   child: Container(
                     padding: const EdgeInsets.symmetric(
                         horizontal: 20, vertical: 10),
                     decoration: const BoxDecoration(
                         color: Color(0xfffa5252),
-                        borderRadius: BorderRadius.all(
-                            Radius.circular(5))),
+                        borderRadius: BorderRadius.all(Radius.circular(5))),
                     child: Row(
                       children: [
                         SvgPicture.asset(
@@ -195,23 +206,18 @@ class _DetailPageState extends State<DetailPage> {
                         ),
                         const Text(
                           "Your cart is empty",
-                          style: TextStyle(
-                              color: Colors.white),
+                          style: TextStyle(color: Colors.white),
                         )
                       ],
                     ),
                   ),
                   /* backgroundColor: const Color(0xfffa5252), */
                   gravity: ToastGravity.CENTER,
-                  toastDuration:
-                  const Duration(seconds: 3),
-                  positionedToastBuilder:
-                      (context, child) {
-                    return Positioned(
-                        child: child, top: 150, left: 80);
+                  toastDuration: const Duration(seconds: 3),
+                  positionedToastBuilder: (context, child) {
+                    return Positioned(child: child, top: 150, left: 80);
                   });
             }
-
           },
         ),
       ),
