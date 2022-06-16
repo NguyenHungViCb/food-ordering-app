@@ -281,9 +281,9 @@ class _AccountDetailState extends State<AccountDetail> {
       lastNameInput.text = userInfo.lastName;
       emailInput.text = userInfo.email;
       phoneNumberInput.text = userInfo.phoneNumber ?? "";
-      birthdayInput.text = DateFormat('MM/dd/yyyy').format(userInfo.birthday);
+      birthdayInput.text = userInfo.birthday == null ? "" : DateFormat('MM/dd/yyyy').format(userInfo.birthday!);
       avatarInput.text = userInfo.avatar;
-      addressInput.text = userInfo.address;
+      addressInput.text = userInfo.address ?? "";
     } catch (e) {
       return null;
     }

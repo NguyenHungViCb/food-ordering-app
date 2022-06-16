@@ -120,7 +120,7 @@ class _HomePageState extends State<HomePage> {
         setCountCartItems: (value) {
           setState(
             () {
-              isLogin = value;
+              countCartItems = value;
             },
           );
         },

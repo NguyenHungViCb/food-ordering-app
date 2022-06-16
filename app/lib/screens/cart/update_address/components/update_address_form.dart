@@ -1,4 +1,5 @@
 import 'package:app/components/default_button.dart';
+import 'package:app/screens/home/home.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
@@ -69,6 +70,7 @@ class _AddressDetailState extends State<AddressDetail> {
                                 String? routeName = await GlobalStorage.read(
                                     key: "previousRoute");
                                 Navigator.pushNamed(context, routeName!);
+                                await GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
                               })),
                       const SizedBox(
                         height: 15,

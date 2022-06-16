@@ -23,7 +23,7 @@ class CartScreen extends StatelessWidget {
       leading: GestureDetector(
         onTap: () async {
           var routeName = await GlobalStorage.read(key: "previousRoute");
-          routeName == "details"
+          routeName == "details" || routeName == CartScreen.routeName
               ? Navigator.pop(context)
               : Navigator.pushNamed(context, routeName!);
         },

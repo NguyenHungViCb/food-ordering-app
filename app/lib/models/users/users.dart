@@ -80,13 +80,12 @@ class GetUserInfo {
   String email;
   bool emailVerified;
   dynamic phoneNumber;
-  DateTime birthday;
+  dynamic birthday;
   String avatar;
   bool active;
-
   DateTime createdAt;
   DateTime updatedAt;
-  String address;
+  dynamic address;
 
   GetUserInfo(
     this.id,
@@ -201,7 +200,7 @@ class User {
         return userInfoResponse;
       }
     } catch (e) {
-      log(e.toString());
+      log("userinfo"+e.toString());
     }
     return Future.error(GetUserInfo);
   }
@@ -212,14 +211,17 @@ class User {
       if (response.statusCode.toString().startsWith("2")) {
         var userInfoResponse =
             GetUserInfo.fromJson(responseFromJson(response.body).data);
-        var address = userInfoResponse.address.split(", ");
+        List<String> address = List<String>.empty();
+        if(userInfoResponse.address != null) {
+          address = userInfoResponse.address!.split(", ");
+        }
         for (int i = 0; i < address.length; i++) {
           print(address[i].trim());
         }
         return address;
       }
     } catch (e) {
-      log(e.toString());
+      log("address"+e.toString());
     }
     return List.empty();
   }

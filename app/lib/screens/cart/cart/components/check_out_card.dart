@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:app/components/default_button.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:http/http.dart';
 import '../../../../constants.dart';
 import '../../../../size_config.dart';
 
@@ -32,12 +33,14 @@ class _CheckoutCardState extends State<CheckoutCard> {
   dynamic vouchers;
   late Future<List<String>> getAddress;
   dynamic checkAddress;
+  dynamic address;
 
   @override
   void initState() {
     super.initState();
     sumPrice = CartItems().sum();
     getAddress = User().getUserAddress();
+    getAddressTest();
     getCodeFromVoucher();
     checkAddressOfUser();
   }
@@ -96,8 +99,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                   Row(
                     children: [
                       InkWell(
-                        child: AddressInformation(
-                            userAddress: User().getUserAddress()),
+                        child: Text(address ?? "Add address"),
                         onTap: () async {
                           String? savedToken =
                               await GlobalStorage.read(key: "tokens");
@@ -220,7 +222,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                           Row(
                             children: [
                               InkWell(
-                                child: Text(vouchers),
+                                child: Text(vouchers ?? "Add Vouchers"),
                                 onTap: () async {
                                   String? savedToken =
                                       await GlobalStorage.read(key: "tokens");
@@ -377,12 +379,24 @@ class _CheckoutCardState extends State<CheckoutCard> {
           checkAddress = true;
         });
       }
-      else
-        {
-          setState(() {
-            checkAddress = false;
-          });
-        }
+      else {
+        setState(() {
+          checkAddress = false;
+        });
+      }
     });
   }
-}
+
+    Future<void> getAddressTest()
+    async {
+      var getAddress = await User().getUserAddress();
+      if(getAddress.isNotEmpty)
+        {
+          address = joinAddress(getAddress);
+        }
+    }
+    String joinAddress(List<String>? addressInfo) {
+      var address = addressInfo?.join(", ").trim();
+      return address!;
+    }
+  }
