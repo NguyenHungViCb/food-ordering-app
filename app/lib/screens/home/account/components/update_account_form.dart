@@ -151,6 +151,7 @@ class _AccountDetailState extends State<AccountDetail> {
                                   press: () async {
                                     addOrUpdateAccount(
                                         context,
+                                        emailInput.text,
                                         lastNameInput.text,
                                         firstNameInput.text,
                                         birthdayInput.text,
@@ -202,7 +203,6 @@ class _AccountDetailState extends State<AccountDetail> {
   TextFormField emailTextFormField() {
     return TextFormField(
       controller: emailInput,
-      readOnly: true,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         hintText: "please input your email",
@@ -264,11 +264,11 @@ class _AccountDetailState extends State<AccountDetail> {
             floatingLabelBehavior: FloatingLabelBehavior.always));
   }
 
-  void addOrUpdateAccount(context, String? firstName, String? lastName,
+  void addOrUpdateAccount(context,String? email, String? firstName, String? lastName,
       String? phoneNumber, String? birthday, String? avatar) async {
     try {
       await User().updateAccount(
-          context, firstName!, lastName!, phoneNumber!, birthday!, avatar!);
+          context, email!, firstName!, lastName!, phoneNumber!, birthday!, avatar!);
     } catch (e) {
       return null;
     }
@@ -279,7 +279,7 @@ class _AccountDetailState extends State<AccountDetail> {
       var userInfo = await User().getUserInformation();
       firstNameInput.text = userInfo.firstName;
       lastNameInput.text = userInfo.lastName;
-      emailInput.text = userInfo.email;
+      emailInput.text = userInfo.email ?? "";
       phoneNumberInput.text = userInfo.phoneNumber ?? "";
       birthdayInput.text = userInfo.birthday == null ? "" : DateFormat('MM/dd/yyyy').format(userInfo.birthday!);
       avatarInput.text = userInfo.avatar;

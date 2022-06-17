@@ -100,9 +100,8 @@ class SignupFormState extends State<SignupForm> {
         password: passwordController.text,
         confirmPass: confirmPassController.text,
         cartId: cartId));
-    if (user is UserResponse) {
       Navigator.pop(context, user);
-    }
+
     toggleLoading();
   }
 }

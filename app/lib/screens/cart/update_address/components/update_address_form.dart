@@ -69,7 +69,7 @@ class _AddressDetailState extends State<AddressDetail> {
                                     cityInput.text);
                                 String? routeName = await GlobalStorage.read(
                                     key: "previousRoute");
-                                Navigator.pushNamed(context, routeName!);
+                                Navigator.pushNamed(context, routeName!).then((_)=> setState(() {}));
                                 await GlobalStorage.write(key: "previousRoute", value: HomePage.routeName);
                               })),
                       const SizedBox(
