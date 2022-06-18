@@ -78,14 +78,8 @@ class OrderController {
     middlewares: [jwtValidate],
   })
   async updateOrderStatus(req: Request, res: Response, __: NextFunction) {
-    const { user } = req;
-    const { status } = req.body;
-    const order = await Order.findOne({
-      where: {
-        user_id: user.getDataValue("id"),
-        status: { [Op.notIn]: [ORDER_STATUS.canceled, ORDER_STATUS.succeeded] },
-      },
-    });
+    const { status, order_id, user_id } = req.body;
+    const order = await Order.findByPk(order_id);
     if (!order) {
       throw new Error("Order not found");
     }
@@ -115,7 +109,7 @@ class OrderController {
       await updatedOrder.update({ canceled_at: new Date() });
     }
     RootSocket.socket?.emit(
-      `ORDER_UPDATE_STATUS`,
+      `ORDER_UPDATE_STATUS_${user_id}`,
       updatedOrder?.getDataValue("status")
     );
     return res.json({ data: order, success: true });
@@ -204,7 +198,13 @@ class OrderController {
           {
             model: User,
             as: "user",
-            attributes: ["first_name", "last_name", "email", "phone_number"],
+            attributes: [
+              "first_name",
+              "last_name",
+              "email",
+              "phone_number",
+              "id",
+            ],
           },
           {
             model: Voucher,

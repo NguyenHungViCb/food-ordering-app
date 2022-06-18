@@ -24,8 +24,8 @@ class LoginFormState extends State<LoginForm> {
   @override
   void initState() {
     super.initState();
-    if (widget.user?.email != null) {
-      emailController.text = widget.user?.email as String;
+    if (widget.user?.phoneNumber != null) {
+      emailController.text = widget.user?.phoneNumber as String;
     }
   }
 

@@ -7,12 +7,12 @@ class ResponseOrder {
   String paymentDetail;
   String? paidAt;
   String? canceledAt;
-  String voucherId;
+  String? voucherId;
   String createdAt;
   String updatedAt;
   List<OrderDetail> details;
   dynamic total;
-  bool allowCancel;
+  bool? allowCancel;
   Voucher? voucher;
   dynamic originalTotal;
 
@@ -43,13 +43,13 @@ class ResponseOrder {
       json['payment_detail'],
       json['paid_at'] ?? '',
       json['canceled_at'] ?? '',
-      json['voucher_id'],
+      json['voucher_id'] ?? '',
       json['created_at'],
       json['updated_at'],
       List<OrderDetail>.from(
           json['details'].map((item) => OrderDetail.fromJson(item))),
       json['total'],
-      json['allowCancel'],
+      json['allowCancel'] ?? false,
       json['voucher'] != null ? Voucher.fromJson(json['voucher']) : null,
       json['original_total']);
 

@@ -5,6 +5,7 @@ import 'package:app/models/order/orders.dart';
 import 'package:app/share/constants/app_config.dart';
 import 'package:app/share/constants/storage.dart';
 import 'package:app/utils/api_service.dart';
+import 'package:app/utils/user_service.dart';
 import 'package:socket_io_client/socket_io_client.dart';
 
 class OrderService {
@@ -43,10 +44,16 @@ class OrderService {
     }
   }
 
-  cancelOrder() async {
+  cancelOrder(orderId) async {
+    var userInfo = await UserService().getUserInfo();
+    print(userInfo);
     try {
-      var response = await ApiService()
-          .put("/api/orders/status/update", {"status": "canceled"});
+      var response = await ApiService().put("/api/orders/status/update", {
+        "status": "canceled",
+        "order_id": orderId,
+        "user_id": userInfo['id']
+      });
+      print(response.body);
       if (response.statusCode == 200) {
         return true;
       }
@@ -119,7 +126,9 @@ class OrderSocket {
   }
 
   Future<OrderSocket> onStatusUpdate(Function cb) async {
-    _instance._socket!.on("ORDER_UPDATE_STATUS", (status) {
+    var userInfo = await UserService().getUserInfo();
+    print("ORDER_UPDATE_STATUS_${userInfo['id']}");
+    _instance._socket!.on("ORDER_UPDATE_STATUS_${userInfo['id']}", (status) {
       cb(status);
     });
     return _instance;

@@ -28,7 +28,7 @@ class VoucherController {
     ]),
     response_payload: getAttributes(Voucher),
     isAuth: true,
-    usage: "Create a single voucher"
+    usage: "Create a single voucher",
   })
   @routeConfig({ method: "post", path: `${path}/create/single` })
   async createVoucher(req: Request, res: Response, __: NextFunction) {
@@ -91,12 +91,16 @@ class VoucherController {
   @routeConfig({
     method: "get",
     path: `${path}/applicabled/cart`,
-    middlewares: [jwtValidate, activeCartValidate, getOrderTotal],
+    middlewares: [jwtValidate, activeCartValidate],
   })
   async getApplicabledVoucher(req: Request, res: Response, __: NextFunction) {
-    const { total } = req.body;
+    const { cart } = req;
     const applicabledVouchers = await Voucher.findAll({
-      where: { min_value: { [Op.lte]: total } },
+      where: {
+        min_value: {
+          [Op.lte]: cart.getDataValue("total"),
+        },
+      },
     });
     return res.json({ data: applicabledVouchers, success: true });
   }

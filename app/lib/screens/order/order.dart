@@ -298,14 +298,14 @@ class _OrderScreenState extends State<OrderScreen> {
                 ],
               ),
             ),
-            order.allowCancel
+            order.allowCancel != null && order.allowCancel == true
                 ? Column(
                     children: [
                       SizedBox(
                           width: MediaQuery.of(context).size.width * 100,
                           child: DangerousButton(
                               onPressed: (context) async {
-                                var result = await OrderService().cancelOrder();
+                                var result = await OrderService().cancelOrder(order.id);
                                 if (result == null) {
                                   FToast().init(context).showToast(
                                       child: Container(

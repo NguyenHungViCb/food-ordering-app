@@ -4,9 +4,7 @@ import { BASE_URL } from "./AppConfig";
 const axiosInstance = axios.create({
   withCredentials: true,
   headers: {
-    Authorization:
-      "Bearer " +
-      process.env.REACT_APP_TOKEN,
+    Authorization: "Bearer " + process.env.REACT_APP_TOKEN,
   },
 });
 
@@ -20,9 +18,11 @@ const fetchOrderById = async (id: string) => {
   return order;
 };
 
-const updateStatus = async (target: string) => {
+const updateStatus = async (target: string, orderId: any, userId: any) => {
   const order = await axiosInstance.put(BASE_URL + "/orders/status/update", {
     status: target,
+    order_id: orderId,
+    user_id: userId,
   });
   return order;
 };

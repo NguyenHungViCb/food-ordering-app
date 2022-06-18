@@ -121,11 +121,13 @@ const Detail = () => {
                     "btn " + orderColors[state as keyof typeof orderColors]
                   }
                   onClick={() => {
-                    updateStatus(state).then(({ data }: any) => {
-                      fetchOrderById(data.data.id).then(({ data }) => {
-                        setOrder(data.data);
-                      });
-                    });
+                    updateStatus(state, order.id, order.user.id).then(
+                      ({ data }: any) => {
+                        fetchOrderById(data.data.id).then(({ data }) => {
+                          setOrder(data.data);
+                        });
+                      }
+                    );
                   }}
                 >
                   {stateMappingAction[state]}
@@ -134,7 +136,7 @@ const Detail = () => {
           </div>
         </div>
       </div>
-      <ProductsTable details={order.details}/>
+      <ProductsTable details={order.details} />
     </>
   );
 };

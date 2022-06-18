@@ -131,7 +131,7 @@ class PaymentController {
     if (!customerId || customerId.trim() == "") {
       // Create customer for the first checkout
       const customer = await stripe.customers.create({
-        email: user.getDataValue("email"),
+        phone: user.getDataValue("phone_number"),
         payment_method: paymentMethodId,
       });
       // Save customer id
