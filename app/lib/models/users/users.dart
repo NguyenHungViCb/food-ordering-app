@@ -176,7 +176,7 @@ class User {
   Future<dynamic> updateAccount(context,String email, String lastName, String firstName,
       String birthday, String phoneNumber, String avatar) async {
     try {
-      var request;
+      Map<String, String> request;
 
       if (email == "" && birthday == "") {
         request = {
@@ -184,7 +184,6 @@ class User {
           "first_name": firstName,
           "phone_number": phoneNumber,
           "avatar": avatar,
-
         };
       } else if (birthday == "" && email != "") {
         request = {
@@ -213,7 +212,7 @@ class User {
         };
       }
       var response =
-          await ApiService().put("/api/users/auth/info/update/single", {request});
+          await ApiService().put("/api/users/auth/info/update/single", request);
       if (response.statusCode.toString().startsWith("2")) {
         showNotify(context, "success", "Account updated");
       }
