@@ -77,7 +77,7 @@ class GetUserInfo {
   String firstName;
   String lastName;
 
-  String email;
+  dynamic email;
   bool emailVerified;
   dynamic phoneNumber;
   dynamic birthday;
@@ -173,35 +173,40 @@ class User {
     return null;
   }
 
-  Future<dynamic> updateAccount(context, String lastName, String firstName,
+  Future<dynamic> updateAccount(context,String email, String lastName, String firstName,
       String birthday, String phoneNumber, String avatar) async {
     try {
       var request;
 
-      if (phoneNumber == "" && birthday == "") {
-        request = {
-          "last_name": lastName,
-          "first_name": firstName,
-          "avatar": avatar
-        };
-      } else if (birthday == "") {
+      if (email == "" && birthday == "") {
         request = {
           "last_name": lastName,
           "first_name": firstName,
           "phone_number": phoneNumber,
+          "avatar": avatar,
+
+        };
+      } else if (birthday == "" && email != "") {
+        request = {
+          "last_name": lastName,
+          "first_name": firstName,
+          "email": email,
+          "phone_number": phoneNumber,
           "avatar": avatar
         };
-      } else if (phoneNumber == "") {
+      } else if (email == "" && birthday != "") {
         request = {
           "last_name": lastName,
           "first_name": firstName,
           "birthday": birthday,
+          "phone_number": phoneNumber,
           "avatar": avatar
         };
       } else {
         request = {
           "last_name": lastName,
           "first_name": firstName,
+          "email": email,
           "phone_number": phoneNumber,
           "birthday": birthday,
           "avatar": avatar
