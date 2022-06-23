@@ -1,5 +1,7 @@
 import 'package:app/components/default_button.dart';
 import 'package:app/screens/home/home.dart';
+import 'package:app/share/constants/storage.dart';
+import 'package:app/utils/user_service.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../models/users/users.dart';
@@ -151,10 +153,11 @@ class _AccountDetailState extends State<AccountDetail> {
                                   press: () async {
                                     addOrUpdateAccount(
                                         context,
-                                        lastNameInput.text,
+                                        emailInput.text,
                                         firstNameInput.text,
-                                        birthdayInput.text,
+                                        lastNameInput.text,
                                         phoneNumberInput.text,
+                                        birthdayInput.text,
                                         avatarInput.text);
                                     Navigator.pushNamed(
                                         context, HomePage.routeName);
@@ -202,7 +205,8 @@ class _AccountDetailState extends State<AccountDetail> {
   TextFormField emailTextFormField() {
     return TextFormField(
       controller: emailInput,
-      readOnly: true,
+      keyboardType: TextInputType.emailAddress,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
       decoration: const InputDecoration(
         border: OutlineInputBorder(),
         hintText: "please input your email",
@@ -210,6 +214,16 @@ class _AccountDetailState extends State<AccountDetail> {
         // if you r using flutter less then 1.20.* then maybe this is not working properly
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
+      validator: (value) {
+        if (value != null &&
+            !RegExp(r"^[a-zA-Z0-9.a-zA-Z0-9.!#$%&'*+-/=?^_`{|}~]+@[a-zA-Z0-9]+\.[a-zA-Z]+")
+                .hasMatch(value)) {
+          return "Email not valid";
+        } else if (value == null || value == '') {
+          return "Email must not be empty";
+        }
+        return null;
+      },
     );
   }
 
@@ -264,11 +278,26 @@ class _AccountDetailState extends State<AccountDetail> {
             floatingLabelBehavior: FloatingLabelBehavior.always));
   }
 
-  void addOrUpdateAccount(context, String? firstName, String? lastName,
-      String? phoneNumber, String? birthday, String? avatar) async {
+  String? validateEmail(String value)
+  {
+    if(value.isEmpty)
+    {
+      return 'Please enter mail';
+    }
+
+    String pattern = r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = RegExp(pattern);
+    if(!regex.hasMatch(value)) {
+      return 'Enter Valid Email';
+    } else {
+      return null;
+    }
+  }
+  void addOrUpdateAccount(context,String email, String firstName, String lastName,
+      String phoneNumber, String birthday, String avatar) async {
     try {
       await User().updateAccount(
-          context, firstName!, lastName!, phoneNumber!, birthday!, avatar!);
+          context, email, lastName, firstName,birthday, phoneNumber, avatar);
     } catch (e) {
       return null;
     }
@@ -279,7 +308,7 @@ class _AccountDetailState extends State<AccountDetail> {
       var userInfo = await User().getUserInformation();
       firstNameInput.text = userInfo.firstName;
       lastNameInput.text = userInfo.lastName;
-      emailInput.text = userInfo.email;
+      emailInput.text = userInfo.email ?? "";
       phoneNumberInput.text = userInfo.phoneNumber ?? "";
       birthdayInput.text = userInfo.birthday == null ? "" : DateFormat('MM/dd/yyyy').format(userInfo.birthday!);
       avatarInput.text = userInfo.avatar;
