@@ -146,7 +146,7 @@ class OrderSocket {
 }
 
 class OrderProgressService {
-  Map<String, double?> status = {
+  Map<String, dynamic> status = {
     "pending": 0,
     "confirmed": 0,
     "processing": 0,
@@ -155,12 +155,12 @@ class OrderProgressService {
     "cancelled": 0
   };
 
-  Map<String, double?> getStatus(ResponseOrder order) {
+  Map<String, dynamic> getStatus(ResponseOrder order) {
     orderStatus.forEach((key, value) {
       if (orderStatus[order.status] != null) {
-        if (value < (orderStatus[order.status] as int)) {
+        if (value < (orderStatus[order.status] as dynamic)) {
           status[key] = 100;
-        } else if (value > (orderStatus[order.status] as int)) {
+        } else if (value > (orderStatus[order.status] as dynamic)) {
           status[key] = 0;
         } else {
           status[key] = null;
