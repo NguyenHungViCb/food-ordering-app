@@ -287,6 +287,7 @@ class _CheckoutCardState extends State<CheckoutCard> {
                                           await GlobalStorage.delete(
                                               key: "code");
                                           await GlobalStorage.delete(key: "id");
+                                          await GlobalStorage.delete(key: "voucher_id");
                                           await GlobalStorage.delete(
                                               key: "discount");
                                           await Navigator.pushNamed(
